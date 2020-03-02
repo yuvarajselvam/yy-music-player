@@ -23,9 +23,12 @@ class CreateUser(Resource):
         parser.add_argument("email", required=True)
         parser.add_argument("phone", required=True)
         parser.add_argument("password", required=True)
+        parser.add_argument("country")
+        parser.add_argument("state")
+        parser.add_argument("city")
         user = parser.parse_args()
         connect('YY-MP-DB', host=HOST_NAME, ssl_cert_reqs=ssl.CERT_NONE)
-        newUser = User(firstName=user["firstName"], lastName=user["lastName"], email=user["email"], phone=user["phone"], password=user["password"])
+        newUser = User.from_json(json_data=user)
         newUser.save()
         print(newUser.id)
         return newUser.to_json(), 201
