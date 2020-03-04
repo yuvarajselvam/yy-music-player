@@ -1,5 +1,15 @@
 import React, { useReducer } from "react";
-import { TextInput, Text, View, Button, Platform, StyleSheet, KeyboardAvoidingView } from "react-native";
+import {
+  TextInput,
+  Picker,
+  Text,
+  View,
+  Button,
+  Platform,
+  StyleSheet,
+  KeyboardAvoidingView,
+  TouchableOpacity
+} from "react-native";
 import Constants from "expo-constants";
 
 const user = {};
@@ -72,6 +82,11 @@ export function Login() {
 
   const submitAndClear = val => {
     console.log(state);
+    if (Object.keys(state).length < 8) {
+      alert("Please fill all the details");
+    } else {
+      dispatch({});
+    }
     // Push the values to the API Endpoint
     // fetch("http://31b6b1df.ngrok.io/user/create/", {
     //   method: "POST",
@@ -100,82 +115,114 @@ export function Login() {
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        placeholder="First Name"
-        style={{ height: 40 }}
-        autoFocus={true}
-        maxLength={30}
-        textContentType="namePrefix"
-        value={state.firstName}
-        onChangeText={setFirstName}
-      />
-
-      <TextInput
-        style={{ height: 40 }}
-        placeholder="Last Name"
-        maxLength={30}
-        textContentType="nameSuffix"
-        value={state.lastName}
-        onChangeText={setLastName}
-      />
-      <TextInput
-        style={{ height: 40 }}
-        placeholder="Email"
-        textContentType="emailAddress"
-        autoCapitalize="none"
-        value={state.email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={{ height: 40 }}
-        placeholder="Phone Number"
-        maxLength={10}
-        textContentType="telephoneNumber"
-        value={state.phone}
-        onChangeText={setPhoneNumber}
-        keyboardType="phone-pad"
-      />
-      <TextInput style={{ height: 40 }} placeholder="Country" value={state.country} onChangeText={setCountry} />
-      <TextInput style={{ height: 40 }} placeholder="City" value={state.city} onChangeText={setCity} />
-      <TextInput style={{ height: 40 }} placeholder="State" value={state.stateName} onChangeText={setStateName} />
-      <TextInput
-        style={{ height: 40 }}
-        placeholder="Password"
-        autoCapitalize="none"
-        textContentType="password"
-        secureTextEntry={true}
-        value={state.password}
-        onChangeText={setPassword}
-      />
-      <Button title="Submit" onPress={submitAndClear} style={styles.button}></Button>
-    </View>
+    <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+      <View style={styles.textBox}>
+        <TextInput
+          placeholder="First Name"
+          returnKeyType={"next"}
+          blurOnSubmit={false}
+          autoFocus={true}
+          maxLength={30}
+          textContentType="namePrefix"
+          value={state.firstName}
+          onChangeText={setFirstName}
+        />
+      </View>
+      <View style={styles.textBox}>
+        <TextInput
+          placeholder="Last Name"
+          maxLength={30}
+          textContentType="nameSuffix"
+          value={state.lastName}
+          onChangeText={setLastName}
+        />
+      </View>
+      <View style={styles.textBox}>
+        <TextInput
+          placeholder="Email"
+          textContentType="emailAddress"
+          autoCapitalize="none"
+          value={state.email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
+      </View>
+      <View style={styles.textBox}>
+        <TextInput
+          placeholder="Phone Number"
+          maxLength={10}
+          textContentType="telephoneNumber"
+          value={state.phone}
+          onChangeText={setPhoneNumber}
+          keyboardType="phone-pad"
+        />
+      </View>
+      <View style={styles.pickerBox}>
+        <Picker selectedValue={state.country} onValueChange={setCountry}>
+          <Picker.Item label="India" value="india" />
+          <Picker.Item label="America" value="america" />
+        </Picker>
+      </View>
+      <View style={styles.textBox}>
+        <TextInput placeholder="City" value={state.city} onChangeText={setCity} />
+      </View>
+      <View style={styles.textBox}>
+        <TextInput placeholder="State" value={state.stateName} onChangeText={setStateName} />
+      </View>
+      <View style={styles.textBox}>
+        <TextInput
+          placeholder="Password"
+          autoCapitalize="none"
+          textContentType="password"
+          secureTextEntry={true}
+          value={state.password}
+          onChangeText={setPassword}
+        />
+      </View>
+      <TouchableOpacity style={styles.button}>
+        <Text>Submit</Text>
+      </TouchableOpacity>
+    </KeyboardAvoidingView>
   );
 }
 
-const styles =
-  Platform.OS === "android"
-    ? StyleSheet.create({
-        container: {
-          flex: 1,
-          backgroundColor: "#fff",
-          alignItems: "center",
-          justifyContent: "center",
-          marginTop: Constants.statusBarHeight
-        },
-        button: {
-          marginTop: 20,
-          // width: "50%",
-          alignSelf: "center",
-          justifyContent: "center"
-        }
-      })
-    : StyleSheet.create({
-        button: {
-          marginTop: 20,
-          width: "50%",
-          alignSelf: "center",
-          justifyContent: "center"
-        }
-      });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#EEEEEE",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+    marginTop: Constants.statusBarHeight
+  },
+  textBox: {
+    height: 50,
+    width: "100%",
+    borderColor: "gray",
+    borderWidth: 1,
+    margin: 10,
+    padding: 10,
+    borderRadius: 4
+  },
+  pickerBox: {
+    height: 50,
+    justifyContent: "center",
+    width: "100%",
+    margin: 10,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 4
+  },
+  button: {
+    flexDirection: "row",
+    width: "90%",
+    height: 50,
+    margin: 10,
+    backgroundColor: "#64B5F6",
+    justifyContent: "center",
+    alignItems: "center",
+    borderColor: "transparent",
+    borderRadius: 5,
+    borderWidth: 1
+  }
+});
