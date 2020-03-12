@@ -4,34 +4,39 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEEEEE",
+    backgroundColor: "#020204",
     alignItems: "center",
-    padding: 20
+    padding: 12
     // marginTop: Constants.statusBarHeight
   },
-  // signupHeading: {
-  //   fontSize: 24,
-  //   padding: 12
-  // },
-  textBox: {
-    height: 50,
-    width: "100%",
-    borderColor: "gray",
-    borderWidth: 1,
-    margin: 10,
-    padding: 10,
-    borderRadius: 4
+  leftIcons: {
+    justifyContent: "center",
+    alignSelf: "flex-start"
+    // alignContent: "flex-start",
+    // alignItems: "flex-start"
+  },
+  inputBox: {
+    padding: 12,
+    margin: 0
+  },
+  inputLabel: {
+    fontFamily: "Poppins-Regular",
+    fontWeight: "normal",
+    color: "#ABB4BD"
   },
   button: {
-    flexDirection: "row",
-    width: "90%",
-    height: 50,
-    margin: 10,
-    backgroundColor: "#64B5F6",
     justifyContent: "center",
-    alignItems: "center",
-    borderColor: "transparent",
+    height: 50,
+    backgroundColor: "#FF1654"
+  },
+  buttonContainer: {
+    height: 50,
+    backgroundColor: "#64B5F6",
     borderRadius: 5,
-    borderWidth: 1
+    width: "90%",
+    margin: 10
+  },
+  buttonTitle: {
+    fontFamily: "Poppins-Regular"
   }
 });

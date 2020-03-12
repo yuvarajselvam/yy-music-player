@@ -1,11 +1,7 @@
 import React, { useReducer } from "react";
-import {
-  TextInput,
-  Text,
-  View,
-  KeyboardAvoidingView,
-  TouchableOpacity
-} from "react-native";
+import { KeyboardAvoidingView } from "react-native";
+
+import { Input, Button } from "react-native-elements";
 
 import { styles } from "./signup.styles";
 
@@ -87,63 +83,65 @@ export function Signup() {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-      {/* <View>
-        <Text style={styles.signupHeading}>Signup</Text>
-      </View> */}
-      <View style={styles.textBox}>
-        <TextInput
-          placeholder="Full Name"
-          returnKeyType={"next"}
-          blurOnSubmit={false}
-          maxLength={30}
-          textContentType="namePrefix"
-          value={state.fullName}
-          onChangeText={setFullName}
-        />
-      </View>
-      <View style={styles.textBox}>
-        <TextInput
-          placeholder="Email"
-          textContentType="emailAddress"
-          autoCapitalize="none"
-          value={state.email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-      </View>
-      <View style={styles.textBox}>
-        <TextInput
-          placeholder="Phone Number"
-          maxLength={10}
-          textContentType="telephoneNumber"
-          value={state.phone}
-          onChangeText={setPhoneNumber}
-          keyboardType="phone-pad"
-        />
-      </View>
-      <View style={styles.textBox}>
-        <TextInput
-          placeholder="Password"
-          autoCapitalize="none"
-          textContentType="password"
-          secureTextEntry={true}
-          value={state.password}
-          onChangeText={setPassword}
-        />
-      </View>
-      <View style={styles.textBox}>
-        <TextInput
-          placeholder="Confirm Password"
-          autoCapitalize="none"
-          textContentType="password"
-          secureTextEntry={true}
-          value={state.confirmPassword}
-          onChangeText={setConfirmPassword}
-        />
-      </View>
-      <TouchableOpacity onPress={submitAndClear} style={styles.button}>
-        <Text>Submit</Text>
-      </TouchableOpacity>
+      <Input
+        labelStyle={styles.inputLabel}
+        containerStyle={styles.inputBox}
+        label="Full Name"
+        returnKeyType={"next"}
+        blurOnSubmit={false}
+        maxLength={30}
+        textContentType="namePrefix"
+        value={state.fullName}
+        onChangeText={setFullName}
+      />
+      <Input
+        labelStyle={styles.inputLabel}
+        containerStyle={styles.inputBox}
+        label="Email"
+        textContentType="emailAddress"
+        autoCapitalize="none"
+        value={state.email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+      />
+      <Input
+        labelStyle={styles.inputLabel}
+        containerStyle={styles.inputBox}
+        label="Phone Number"
+        maxLength={10}
+        textContentType="telephoneNumber"
+        value={state.phone}
+        onChangeText={setPhoneNumber}
+        keyboardType="phone-pad"
+      />
+      <Input
+        labelStyle={styles.inputLabel}
+        containerStyle={styles.inputBox}
+        label="Password"
+        autoCapitalize="none"
+        textContentType="password"
+        secureTextEntry={true}
+        value={state.password}
+        onChangeText={setPassword}
+      />
+      <Input
+        labelStyle={styles.inputLabel}
+        containerStyle={styles.inputBox}
+        label="Confirm Password"
+        autoCapitalize="none"
+        textContentType="password"
+        secureTextEntry={true}
+        value={state.confirmPassword}
+        onChangeText={setConfirmPassword}
+      />
+      <Button
+        raised
+        containerStyle={styles.buttonContainer}
+        buttonStyle={styles.button}
+        titleStyle={styles.buttonTitle}
+        title="Submit"
+        onPress={submitAndClear}
+      />
     </KeyboardAvoidingView>
   );
 }

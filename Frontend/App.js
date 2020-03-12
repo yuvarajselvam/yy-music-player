@@ -4,7 +4,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator, HeaderTitle } from "@react-navigation/stack";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
-import { Ionicons } from "@expo/vector-icons";
 
 import { Login } from "./authorization/login/";
 import { Signup } from "./authorization/signup/";
@@ -21,7 +20,7 @@ export default class App extends Component {
 
   async componentDidMount() {
     await Font.loadAsync({
-      ...Ionicons.font
+      "Poppins-Regular": require("./assets/fonts/Poppins-Regular.ttf")
     });
     this.setState({ isReady: true });
   }
@@ -38,14 +37,26 @@ export default class App extends Component {
             name="Login"
             component={Login}
             options={{
-              title: "Login"
+              title: "",
+              headerStyle: {
+                backgroundColor: "#020204"
+              },
+              headerTitleStyle: {
+                color: "#ABB4BD"
+              }
             }}
           />
           <Stack.Screen
             name="Signup"
             component={Signup}
             options={{
-              title: "Signup"
+              title: "",
+              headerStyle: {
+                backgroundColor: "#020204"
+              },
+              headerLeftContainerStyle: {
+                color: "#FFFFFF"
+              }
             }}
           />
         </Stack.Navigator>
