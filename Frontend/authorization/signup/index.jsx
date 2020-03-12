@@ -9,7 +9,7 @@ import {
 
 import { styles } from "./signup.styles";
 
-const user = { country: "India" };
+const user = {};
 
 const reducer = (user, action) => {
   switch (action.type) {
@@ -24,7 +24,7 @@ const reducer = (user, action) => {
     case "ConfirmPassword":
       return { ...user, confirmPassword: action.value };
     default:
-      return {country: "India"};
+      return {};
   }
 };
 
@@ -54,7 +54,10 @@ export function Signup() {
   const submitAndClear = val => {
     console.log(state);
     if (Object.keys(state).length < 6) {
-      alert(`Please fill all the details. You only filled ${ Object.keys(state).length - 1 } fields`);
+      alert(
+        `Please fill all the details. You only filled ${Object.keys(state)
+          .length - 1} fields`
+      );
     } else {
       dispatch({});
     }
