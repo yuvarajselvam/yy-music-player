@@ -47,7 +47,7 @@ export function Signup() {
     dispatch({ type: "Password", value: val });
   };
 
-  const setconfirmPassword = val => {
+  const setConfirmPassword = val => {
     dispatch({ type: "ConfirmPassword", value: val });
   };
 
@@ -135,7 +135,7 @@ export function Signup() {
           textContentType="password"
           secureTextEntry={true}
           value={state.confirmPassword}
-          onChangeText={setconfirmPassword}
+          onChangeText={setConfirmPassword}
         />
       </View>
       <TouchableOpacity onPress={submitAndClear} style={styles.button}>
