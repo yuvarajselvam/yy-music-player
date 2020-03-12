@@ -24,7 +24,7 @@ const reducer = (user, action) => {
     case "ConfirmPassword":
       return { ...user, confirmPassword: action.value };
     default:
-      return {};
+      return {country: "India"};
   }
 };
 
@@ -53,8 +53,8 @@ export function Signup() {
 
   const submitAndClear = val => {
     console.log(state);
-    if (Object.keys(state).length < 8) {
-      alert("Please fill all the details");
+    if (Object.keys(state).length < 6) {
+      alert(`Please fill all the details. You only filled ${ Object.keys(state).length - 1 } fields`);
     } else {
       dispatch({});
     }
