@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#020204",
     alignItems: "flex-start",
-    padding: 12
+    padding: 28
     // marginTop: Constants.statusBarHeight
   },
   leftIcons: {

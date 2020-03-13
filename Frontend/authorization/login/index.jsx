@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { KeyboardAvoidingView, View, Alert } from "react-native";
-import { Input, Button, SocialIcon } from "react-native-elements";
+import { Input, Button, SocialIcon, Image } from "react-native-elements";
 import { logInAsync } from "expo-google-app-auth";
 import { initializeAsync, logInWithReadPermissionsAsync } from "expo-facebook";
 // import Icon from "react-native-vector-icons/MaterialIcons";
@@ -57,6 +57,10 @@ export function Login({ navigation }) {
 
   return (
     <KeyboardAvoidingView style={styles.container}>
+      <Image
+        source={require("../../assets/logo5.png")}
+        style={{ width: 200, height: 200 }}
+      />
       <Input
         containerStyle={styles.inputBox}
         labelStyle={styles.inputLabel}
