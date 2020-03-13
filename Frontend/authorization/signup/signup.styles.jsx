@@ -9,6 +9,14 @@ export const styles = StyleSheet.create({
     padding: 12
     // marginTop: Constants.statusBarHeight
   },
+  rowContainer: {
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: "#020204",
+    alignItems: "flex-start",
+    padding: 12
+    // marginTop: Constants.statusBarHeight
+  },
   leftIcons: {
     justifyContent: "center",
     alignSelf: "flex-start"
