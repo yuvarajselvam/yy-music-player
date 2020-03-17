@@ -1,11 +1,12 @@
 import React, { useReducer } from "react";
-import { KeyboardAvoidingView } from "react-native";
+import { ScrollView, KeyboardAvoidingView, Alert } from "react-native";
 
 import { Input, Button } from "react-native-elements";
 
-import { styles } from "./signup.styles";
+import { styles } from "../signup.styles";
+import { authService } from "../../utils/auth.service";
 
-const user = {};
+const initialState = {};
 
 const reducer = (user, action) => {
   switch (action.type) {
@@ -25,7 +26,7 @@ const reducer = (user, action) => {
 };
 
 export function Signup() {
-  const [state, dispatch] = useReducer(reducer, user);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const setFullName = val => {
     dispatch({ type: "FullName", value: val });
@@ -49,99 +50,108 @@ export function Signup() {
 
   const submitAndClear = val => {
     console.log(state);
-    if (Object.keys(state).length < 6) {
-      alert(
-        `Please fill all the details. You only filled ${Object.keys(state)
-          .length - 1} fields`
-      );
-    } else {
-      dispatch({});
+    if (Object.keys(state).length < 5) {
+      Alert.alert("Please fill in all the details");
+      return;
     }
-    // Push the values to the API Endpoint
-    // fetch("http://31b6b1df.ngrok.io/user/create/", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json"
-    //   },
-    //   body: JSON.stringify({
-    //     confirmPassword: state.confirmPassword,
-    //     email: state.email,
-    //     fullName: state.firstName,
-    //     password: state.password,
-    //     phone: state.phone
-    //   })
-    // }).then(
-    //   res => {
-    //     console.log(res);
-    //     dispatch({});
-    //   },
-    //   error => {
-    //     console.log(error);
-    //   }
-    // );
+    if (state.password === state.confirmPassword) {
+      let data = {
+        // confirmPassword: state.confirmPassword,
+        email: state.email,
+        fullName: state.fullName,
+        password: state.password,
+        phone: state.phone
+      };
+      authService
+        .userSignup(data)
+        .then(async response => {
+          console.log(await response.json());
+          if (response.status === 201) {
+            dispatch({});
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          Alert.alert(error.message);
+        });
+    } else {
+      Alert.alert("Password does not match!");
+      return;
+    }
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-      <Input
-        labelStyle={styles.inputLabel}
-        containerStyle={styles.inputBox}
-        label="Full Name"
-        returnKeyType={"next"}
-        blurOnSubmit={false}
-        maxLength={30}
-        textContentType="namePrefix"
-        value={state.fullName}
-        onChangeText={setFullName}
-      />
-      <Input
-        labelStyle={styles.inputLabel}
-        containerStyle={styles.inputBox}
-        label="Email"
-        textContentType="emailAddress"
-        autoCapitalize="none"
-        value={state.email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
-      <Input
-        labelStyle={styles.inputLabel}
-        containerStyle={styles.inputBox}
-        label="Phone Number"
-        maxLength={10}
-        textContentType="telephoneNumber"
-        value={state.phone}
-        onChangeText={setPhoneNumber}
-        keyboardType="phone-pad"
-      />
-      <Input
-        labelStyle={styles.inputLabel}
-        containerStyle={styles.inputBox}
-        label="Password"
-        autoCapitalize="none"
-        textContentType="password"
-        secureTextEntry={true}
-        value={state.password}
-        onChangeText={setPassword}
-      />
-      <Input
-        labelStyle={styles.inputLabel}
-        containerStyle={styles.inputBox}
-        label="Confirm Password"
-        autoCapitalize="none"
-        textContentType="password"
-        secureTextEntry={true}
-        value={state.confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
-      <Button
-        raised
-        containerStyle={styles.buttonContainer}
-        buttonStyle={styles.button}
-        titleStyle={styles.buttonTitle}
-        title="Submit"
-        onPress={submitAndClear}
-      />
-    </KeyboardAvoidingView>
+    <ScrollView
+      indicatorStyle={"white"}
+      automaticallyAdjustContentInsets={true}
+      contentContainerStyle={styles.main}
+    >
+      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+        <Input
+          labelStyle={styles.inputLabel}
+          containerStyle={styles.inputBox}
+          inputStyle={styles.inputText}
+          label="Full Name"
+          returnKeyType={"next"}
+          blurOnSubmit={false}
+          maxLength={30}
+          textContentType="namePrefix"
+          value={state.fullName}
+          onChangeText={setFullName}
+        />
+        <Input
+          labelStyle={styles.inputLabel}
+          containerStyle={styles.inputBox}
+          inputStyle={styles.inputText}
+          label="Email"
+          textContentType="emailAddress"
+          autoCapitalize="none"
+          value={state.email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
+        <Input
+          labelStyle={styles.inputLabel}
+          containerStyle={styles.inputBox}
+          inputStyle={styles.inputText}
+          label="Phone Number"
+          maxLength={10}
+          textContentType="telephoneNumber"
+          value={state.phone}
+          onChangeText={setPhoneNumber}
+          keyboardType="phone-pad"
+        />
+        <Input
+          labelStyle={styles.inputLabel}
+          containerStyle={styles.inputBox}
+          inputStyle={styles.inputText}
+          label="Password"
+          autoCapitalize="none"
+          textContentType="password"
+          secureTextEntry={true}
+          value={state.password}
+          onChangeText={setPassword}
+        />
+        <Input
+          labelStyle={styles.inputLabel}
+          containerStyle={styles.inputBox}
+          inputStyle={styles.inputText}
+          label="Confirm Password"
+          autoCapitalize="none"
+          textContentType="password"
+          secureTextEntry={true}
+          value={state.confirmPassword}
+          onChangeText={setConfirmPassword}
+        />
+        <Button
+          raised
+          containerStyle={styles.buttonContainer}
+          buttonStyle={styles.button}
+          titleStyle={styles.buttonTitle}
+          title="Submit"
+          onPress={submitAndClear}
+        />
+      </KeyboardAvoidingView>
+    </ScrollView>
   );
 }
