@@ -6,7 +6,9 @@ from flask_jwt_extended import create_access_token, JWTManager
 from User.Authenticate import Authenticate
 from User.CreateUser import CreateUser
 from User.SingleSignOn import SingleSignOn
+from User.ForgotPassword import ForgotPassword, ValidateForgotPasswordToken
 from utils.DbUtils import DbUtils
+
 
 JWT_SECRET_KEY = "Musiqplayer@123"
 
@@ -19,6 +21,8 @@ jwt = JWTManager(app)
 api.add_resource(CreateUser, '/signup/')
 api.add_resource(Authenticate, '/signin/')
 api.add_resource(SingleSignOn, '/sso/')
+api.add_resource(ForgotPassword, '/forgot_password/')
+api.add_resource(ValidateForgotPasswordToken, '/forgot_password/validate')
 
 DbUtils().db_connect()
 
