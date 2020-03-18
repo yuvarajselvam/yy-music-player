@@ -1,7 +1,7 @@
 from mongoengine import DoesNotExist
 
 from models.UserModel import User
-from models.ForgotPaswordTokenModel import ForgotPasswordToken
+from models.PasswordChangeTokenModel import PasswordChangeToken
 
 
 def get_user_by_email(email):
@@ -13,6 +13,6 @@ def get_user_by_email(email):
 
 def get_token_by_user(user):
     try:
-        return ForgotPasswordToken.objects(user=user).order_by('-createdAt')[0]
+        return PasswordChangeToken.objects(user=user).order_by('-createdAt')[0]
     except DoesNotExist:
         return
