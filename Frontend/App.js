@@ -1,11 +1,11 @@
 import "react-native-gesture-handler";
 import React, { useEffect, useState, useReducer } from "react";
-import { AsyncStorage } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator, HeaderTitle } from "@react-navigation/stack";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
 
+import { Entry } from "./authorization/entry";
 import { Login } from "./authorization/login";
 import { Signup } from "./authorization/signup";
 import { Home } from "./home";
@@ -87,7 +87,7 @@ export default function App() {
     return (
       <AuthContext.Provider value={authContext}>
         <NavigationContainer>
-          <Stack.Navigator>
+          <Stack.Navigator headerMode="screen">
             {state.userToken && state.loggedIn ? (
               <Stack.Screen
                 name="Home"
@@ -104,6 +104,20 @@ export default function App() {
               />
             ) : (
               <React.Fragment>
+                <Stack.Screen
+                  name="Entry"
+                  component={Entry}
+                  options={{
+                    title: "",
+                    headerStyle: {
+                      backgroundColor: "#020204"
+                    },
+                    headerTitleStyle: {
+                      color: "#ABB4BD"
+                    },
+                    headerShown: false
+                  }}
+                />
                 <Stack.Screen
                   name="Login"
                   component={Login}
