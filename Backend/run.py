@@ -16,6 +16,10 @@ CORS(app)
 api = Api(app)
 jwt = JWTManager(app)
 
+@app.route('/')
+def StartupPage():
+    return "<h1>Hello World!</h1>"
+    
 api.add_resource(CreateUser, '/signup/')
 api.add_resource(Authenticate, '/signin/')
 api.add_resource(SingleSignOn, '/sso/')
