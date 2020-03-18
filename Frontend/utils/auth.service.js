@@ -1,4 +1,4 @@
-const URL_LINK = "http://192.168.0.9:5000/";
+const URL_LINK = "https://yy-music-player-be.herokuapp.com/";
 
 export const authService = {
   userSSO: data => {
