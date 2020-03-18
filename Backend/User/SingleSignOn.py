@@ -87,12 +87,12 @@ class SingleSignOn(Resource):
                         return response
                     else:
                         response = jsonify(Error="Type invalid")
-                        response.status_code = 401
+                        response.status_code = 400
                         return response
             else:
                 return create_new_user(credentials)
 
         except KeyError as e:
             response = jsonify(Error=str(e) + " field is mandatory!")
-            response.status_code = 401
+            response.status_code = 400
             return response

@@ -1,21 +1,22 @@
 import re
 from datetime import datetime
-from mongoengine import StringField, DateTimeField, EmailField, Document, EmbeddedDocument, EmbeddedDocumentField
+from mongoengine import StringField, DateTimeField, EmailField, DynamicDocument, DynamicEmbeddedDocument, \
+    EmbeddedDocumentField, URLField
 
 
-class Google(EmbeddedDocument):
+class Google(DynamicEmbeddedDocument):
     userId = StringField(required=True)
     accessToken = StringField()
     refreshToken = StringField(required=True)
-    photoUrl = StringField()
+    photoUrl = URLField()
 
 
-class Facebook(EmbeddedDocument):
+class Facebook(DynamicEmbeddedDocument):
     userId = StringField(required=True)
     accessToken = StringField()
 
 
-class User(Document):
+class User(DynamicDocument):
     meta = {'collection': 'users'}
     fullName = StringField(required=True)
     email = EmailField(required=True, unique=True)
