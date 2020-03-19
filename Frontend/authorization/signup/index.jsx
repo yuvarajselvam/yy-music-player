@@ -142,14 +142,6 @@ export function Signup() {
           value={state.confirmPassword}
           onChangeText={setConfirmPassword}
         />
-        {/* <Button
-          raised
-          containerStyle={styles.buttonContainer}
-          buttonStyle={styles.button}
-          titleStyle={styles.buttonTitle}
-          title="Submit"
-          onPress={submitAndClear}
-        /> */}
         <Button
           raised
           containerStyle={styles.buttonContainer}

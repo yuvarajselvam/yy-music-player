@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import { KeyboardAvoidingView, View, Alert, AsyncStorage } from "react-native";
-import { Input, Button, SocialIcon, Image, Text } from "react-native-elements";
+import { View, Alert, AsyncStorage } from "react-native";
+import { Button, Image, Text } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { logInAsync } from "expo-google-app-auth";
 import { initializeAsync, logInWithReadPermissionsAsync } from "expo-facebook";

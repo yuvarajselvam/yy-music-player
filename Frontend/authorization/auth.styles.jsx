@@ -7,10 +7,8 @@ import {
 
 export const styles = StyleSheet.create({
   main: {
-    // flex: 1,
     flexGrow: 1,
     backgroundColor: "#020204"
-    // justifyContent: "center"
     // marginTop: Constants.statusBarHeight
   },
   entryContainer: {
@@ -26,7 +24,6 @@ export const styles = StyleSheet.create({
   signupContainer: {
     // flex: 1,
     alignItems: "center",
-    // justifyContent: "center",
     margin: 1
   },
   signupHeading: {
@@ -72,11 +69,9 @@ export const styles = StyleSheet.create({
   iconContainStyle: {
     alignSelf: "center",
     justifyContent: "center"
-    // marginLeft: wp(8)
   },
   socialIcon: {
     alignSelf: "center",
-    // backgroundColor: "#000000",
     marginLeft: wp(4),
     width: wp(8)
   },
