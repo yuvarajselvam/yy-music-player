@@ -13,7 +13,7 @@ import { authService } from "../../utils/auth.service";
 import AuthContext from "../../contexts/auth.context";
 
 import { SOCIAL_TYPES } from "../../utils/constants";
-import { styles } from "../signup.styles";
+import { styles } from "../auth.styles";
 
 const getLocalStore = async () => {
   let data = await AsyncStorage.getItem("localStore");
@@ -168,7 +168,7 @@ export function Entry({ navigation }) {
 
   return (
     <View style={styles.socialMain}>
-      <View style={styles.container}>
+      <View style={styles.entryContainer}>
         <Image
           source={require("../../assets/logo6.png")}
           style={styles.logoImage}

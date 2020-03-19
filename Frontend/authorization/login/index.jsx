@@ -4,7 +4,7 @@ import { Input, Button, Image, Text } from "react-native-elements";
 
 import { authService } from "../../utils/auth.service";
 import AuthContext from "../../contexts/auth.context";
-import { styles } from "../signup.styles";
+import { styles } from "../auth.styles";
 
 export function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -32,14 +32,14 @@ export function Login({ navigation }) {
 
   return (
     <View style={styles.main}>
-      <View style={styles.container}>
+      <View style={styles.loginContainer}>
         <Image
           source={require("../../assets/logo6.png")}
-          style={{ width: 160, height: 160 }}
+          style={styles.logoImage}
         />
         <Text style={styles.appName}>WePlay</Text>
         <Input
-          containerStyle={styles.inputBox}
+          containerStyle={styles.inputBoxContainer}
           labelStyle={styles.inputLabel}
           inputStyle={styles.inputText}
           textContentType="emailAddress"
@@ -52,7 +52,7 @@ export function Login({ navigation }) {
         <Input
           label={"Password"}
           labelStyle={styles.inputLabel}
-          containerStyle={styles.inputBox}
+          containerStyle={styles.inputBoxContainer}
           inputStyle={styles.inputText}
           autoCapitalize="none"
           textContentType="password"

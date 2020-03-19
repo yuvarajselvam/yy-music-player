@@ -1,9 +1,8 @@
 import React, { useReducer } from "react";
-import { ScrollView, KeyboardAvoidingView, Alert } from "react-native";
+import { View, Alert } from "react-native";
+import { Input, Button, Image, Text } from "react-native-elements";
 
-import { Input, Button } from "react-native-elements";
-
-import { styles } from "../signup.styles";
+import { styles } from "../auth.styles";
 import { authService } from "../../utils/auth.service";
 
 const initialState = {};
@@ -56,7 +55,6 @@ export function Signup() {
     }
     if (state.password === state.confirmPassword) {
       let data = {
-        // confirmPassword: state.confirmPassword,
         email: state.email,
         fullName: state.fullName,
         password: state.password,
@@ -81,15 +79,16 @@ export function Signup() {
   };
 
   return (
-    <ScrollView
-      indicatorStyle={"white"}
-      automaticallyAdjustContentInsets={true}
-      contentContainerStyle={styles.main}
-    >
-      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+    <View style={styles.main}>
+      <View style={styles.signupContainer}>
+        <Image
+          source={require("../../assets/logo6.png")}
+          style={styles.signupLogo}
+        />
+        <Text style={styles.signupHeading}>SIGN UP</Text>
         <Input
           labelStyle={styles.inputLabel}
-          containerStyle={styles.inputBox}
+          containerStyle={styles.inputBoxContainer}
           inputStyle={styles.inputText}
           label="Full Name"
           returnKeyType={"next"}
@@ -101,7 +100,7 @@ export function Signup() {
         />
         <Input
           labelStyle={styles.inputLabel}
-          containerStyle={styles.inputBox}
+          containerStyle={styles.inputBoxContainer}
           inputStyle={styles.inputText}
           label="Email"
           textContentType="emailAddress"
@@ -112,7 +111,7 @@ export function Signup() {
         />
         <Input
           labelStyle={styles.inputLabel}
-          containerStyle={styles.inputBox}
+          containerStyle={styles.inputBoxContainer}
           inputStyle={styles.inputText}
           label="Phone Number"
           maxLength={10}
@@ -123,7 +122,7 @@ export function Signup() {
         />
         <Input
           labelStyle={styles.inputLabel}
-          containerStyle={styles.inputBox}
+          containerStyle={styles.inputBoxContainer}
           inputStyle={styles.inputText}
           label="Password"
           autoCapitalize="none"
@@ -134,7 +133,7 @@ export function Signup() {
         />
         <Input
           labelStyle={styles.inputLabel}
-          containerStyle={styles.inputBox}
+          containerStyle={styles.inputBoxContainer}
           inputStyle={styles.inputText}
           label="Confirm Password"
           autoCapitalize="none"
@@ -143,6 +142,14 @@ export function Signup() {
           value={state.confirmPassword}
           onChangeText={setConfirmPassword}
         />
+        {/* <Button
+          raised
+          containerStyle={styles.buttonContainer}
+          buttonStyle={styles.button}
+          titleStyle={styles.buttonTitle}
+          title="Submit"
+          onPress={submitAndClear}
+        /> */}
         <Button
           raised
           containerStyle={styles.buttonContainer}
@@ -151,7 +158,7 @@ export function Signup() {
           title="Submit"
           onPress={submitAndClear}
         />
-      </KeyboardAvoidingView>
-    </ScrollView>
+      </View>
+    </View>
   );
 }
