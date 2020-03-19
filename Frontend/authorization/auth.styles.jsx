@@ -7,21 +7,29 @@ import {
 
 export const styles = StyleSheet.create({
   main: {
-    // flex: 1,
     flexGrow: 1,
     backgroundColor: "#020204"
-    // justifyContent: "center"
     // marginTop: Constants.statusBarHeight
   },
-  socialMain: {
-    // flex: 1,
-    flexGrow: 1,
-    backgroundColor: "#020204",
-    justifyContent: "center"
-    // marginTop: Constants.statusBarHeight
-  },
-  container: {
+  entryContainer: {
     alignItems: "center"
+  },
+  loginContainer: {
+    flex: 1,
+    alignItems: "center",
+    // justifyContent: "center",
+    margin: 1,
+    marginTop: hp(6)
+  },
+  signupContainer: {
+    // flex: 1,
+    alignItems: "center",
+    margin: 1
+  },
+  signupHeading: {
+    fontFamily: "Poppins-Regular",
+    color: "#FFFFFF",
+    fontSize: hp(2.8)
   },
   appName: {
     fontFamily: "Poppins-Regular",
@@ -29,6 +37,12 @@ export const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "600",
     letterSpacing: 1
+  },
+  socialMain: {
+    // flex: 1,
+    flexGrow: 1,
+    backgroundColor: "#020204",
+    justifyContent: "center"
   },
   socialLoginContainer: {
     width: wp(74),
@@ -55,15 +69,12 @@ export const styles = StyleSheet.create({
   iconContainStyle: {
     alignSelf: "center",
     justifyContent: "center"
-    // marginLeft: wp(8)
   },
   socialIcon: {
     alignSelf: "center",
-    // backgroundColor: "#000000",
     marginLeft: wp(4),
     width: wp(8)
   },
-
   socialLoginFont: {
     textAlign: "center",
     color: "#000000"
@@ -72,9 +83,8 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignSelf: "flex-start"
   },
-  inputBox: {
-    padding: 16,
-    margin: 0
+  inputBoxContainer: {
+    marginBottom: hp(2)
   },
   inputText: {
     color: "#FFFFFF"
@@ -83,35 +93,34 @@ export const styles = StyleSheet.create({
     fontFamily: "Poppins-Regular",
     fontWeight: "normal",
     color: "#ABB4BD",
-    fontSize: 12
+    fontSize: hp(1.6)
   },
   button: {
-    height: 46,
+    borderRadius: wp(8),
     backgroundColor: "#FF1654"
   },
   buttonContainer: {
-    height: 46,
-    backgroundColor: "#64B5F6",
-    borderRadius: 5,
-    width: "90%",
-    margin: 12
+    marginTop: hp(2),
+    width: wp(68)
   },
   socialButtonTitle: {
     fontFamily: "Poppins-Regular",
     fontSize: hp(2),
     marginLeft: wp(4)
-    // justifyContent: "flex-start",
   },
   buttonTitle: {
     fontFamily: "Poppins-Regular",
-    fontSize: 14
+    fontSize: hp(2)
   },
   forgotContainer: {
-    alignSelf: "flex-end"
+    alignSelf: "flex-end",
+    marginBottom: hp(2)
   },
   forgotContainerText: {
     color: "#FF1654",
-    fontSize: 12
+    fontFamily: "Poppins-Regular",
+    fontSize: hp(1.6)
   },
-  logoImage: { width: wp(40), height: hp(24), marginBottom: hp(4) }
+  logoImage: { width: wp(34), height: hp(20), marginBottom: hp(2) },
+  signupLogo: { width: wp(24), height: hp(14), marginBottom: hp(1) }
 });
