@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import Constants from "expo-constants";
+// import Constants from "expo-constants";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
@@ -7,29 +7,51 @@ import {
 
 export const styles = StyleSheet.create({
   main: {
-    flexGrow: 1,
-    backgroundColor: "#020204"
-    // marginTop: Constants.statusBarHeight
+    flex: 1,
+    flexDirection: "column",
+    backgroundColor: "#020204",
+    justifyContent: "flex-start"
   },
   entryContainer: {
     alignItems: "center"
   },
   loginContainer: {
-    flex: 1,
+    paddingBottom: hp(8),
     alignItems: "center",
-    // justifyContent: "center",
-    margin: 1,
-    marginTop: hp(6)
+    margin: wp(1)
   },
   signupContainer: {
-    // flex: 1,
+    paddingBottom: hp(4),
     alignItems: "center",
-    margin: 1
+    margin: wp(1)
   },
   signupHeading: {
     fontFamily: "Poppins-Regular",
     color: "#FFFFFF",
-    fontSize: hp(2.8)
+    fontSize: hp(2.8),
+    marginBottom: hp(2)
+  },
+  entrySignUpContainer: {
+    flexDirection: "row",
+    margin: hp(2),
+    alignItems: "center"
+  },
+  dontHaveAccount: {
+    color: "#FFFFFF",
+    fontSize: wp(3.4)
+  },
+  signUpButtonTitle: {
+    color: "#00FFFF",
+    fontSize: wp(3.4)
+  },
+  forgotPasswordContainer: {
+    alignItems: "center"
+  },
+  checkOTPContainer: {
+    alignItems: "center"
+  },
+  changePasswordContainer: {
+    alignItems: "center"
   },
   appName: {
     fontFamily: "Poppins-Regular",
@@ -39,7 +61,6 @@ export const styles = StyleSheet.create({
     letterSpacing: 1
   },
   socialMain: {
-    // flex: 1,
     flexGrow: 1,
     backgroundColor: "#020204",
     justifyContent: "center"
@@ -104,7 +125,8 @@ export const styles = StyleSheet.create({
     width: wp(68)
   },
   socialButtonTitle: {
-    fontFamily: "Poppins-Regular",
+    // fontFamily: "Poppins-Regular",
+    // fontWeight: "100",
     fontSize: hp(2),
     marginLeft: wp(4)
   },
@@ -121,6 +143,14 @@ export const styles = StyleSheet.create({
     fontFamily: "Poppins-Regular",
     fontSize: hp(1.6)
   },
-  logoImage: { width: wp(34), height: hp(20), marginBottom: hp(2) },
-  signupLogo: { width: wp(24), height: hp(14), marginBottom: hp(1) }
+  logoImage: {
+    width: wp(34),
+    height: hp(20),
+    marginBottom: hp(2)
+  },
+  signupLogo: {
+    width: wp(24),
+    height: hp(14),
+    marginBottom: hp(1)
+  }
 });
