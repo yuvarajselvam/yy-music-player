@@ -1,6 +1,8 @@
 import base64
+import json
 import os
 import pickle
+from utils.SecretsUtils import Secrets
 from email.mime.text import MIMEText
 
 from google.auth.transport.requests import Request
@@ -9,7 +11,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 GMAIL_SCOPES = ['https://mail.google.com/']
-KEY_PATH = "resources/credentials.json"
+CLIENT_CONFIG = json.loads(Secrets.OAUTH_CLIENT_CONFIG)
 
 
 credentials = None
@@ -21,7 +23,7 @@ if not credentials or not credentials.valid:
         credentials.refresh(Request())
     else:
         flow = InstalledAppFlow.from_client_secrets_file(
-            KEY_PATH, GMAIL_SCOPES)
+            CLIENT_CONFIG, GMAIL_SCOPES)
         credentials = flow.run_local_server(port=0)
     with open('token.pickle', 'wb') as token:
         pickle.dump(credentials, token)

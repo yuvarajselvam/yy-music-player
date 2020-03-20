@@ -4,11 +4,10 @@ import requests
 from User import Retrieve
 from User.CreateUser import create_user
 from models.UserModel import Google, Facebook
+from utils.SecretsUtils import Secrets
 
 from flask import request, jsonify
 from flask_restful import Resource
-
-CLIENT_ID = "156841541425-lc9o7vpqv3p75n60ncetlh8er8p93jhn.apps.googleusercontent.com"
 
 
 def update_social(user, credentials):
@@ -53,13 +52,16 @@ class SingleSignOn(Resource):
     @staticmethod
     def post():
         credentials = request.get_json()
+        print(credentials)
         try:
             user = Retrieve.get_user_by_email(credentials["email"])
             if user:
                 if credentials["type"] in user:
                     authorized = False
                     if credentials["type"] == "google":
-                        url = f"https://oauth2.googleapis.com/token?client_id={CLIENT_ID}&grant_type=refresh_token&" + \
+                        url = f"https://oauth2.googleapis.com/token?client_id=" \
+                              f"{Secrets.IOS_CLIENT_ID if credentials['os'] == 'iOS' else Secrets.ANDROID_CLIENT_ID}" \
+                              f"&grant_type=refresh_token&" + \
                               f"refresh_token={user['google']['refreshToken']}"
                         r = requests.post(url)
                         print(url, r.text)

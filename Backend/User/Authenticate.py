@@ -14,10 +14,14 @@ class Authenticate(Resource):
         credentials = request.get_json()
         user = Retrieve.get_user_by_email(credentials["email"])
 
-        if user and sha256_crypt.verify(credentials["password"], user["password"]):
+        if user and ("password" in user) and sha256_crypt.verify(credentials["password"], user["password"]):
             response = jsonify(token=create_access_token(str(user.id), expires_delta=datetime.timedelta(hours=3)),
                                userId=str(user.id))
             response.status_code = 200
+            return response
+        elif "password" not in user:
+            response = jsonify(message="User previously signed in via SSO.")
+            response.status_code = 400
             return response
         else:
             response = jsonify(message="Bad Email and Password!")
