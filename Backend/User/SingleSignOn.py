@@ -52,7 +52,7 @@ class SingleSignOn(Resource):
     @staticmethod
     def post():
         credentials = request.get_json()
-        print(credentials)
+        print("Single signon :", json.dumps(credentials, indent=2, sort_keys=True))
         try:
             user = Retrieve.get_user_by_email(credentials["email"])
             if user:
@@ -64,13 +64,13 @@ class SingleSignOn(Resource):
                               f"&grant_type=refresh_token&" + \
                               f"refresh_token={user['google']['refreshToken']}"
                         r = requests.post(url)
-                        print(url, r.text)
+                        print("Trying to refresh google token\n", json.dumps(json.loads(r.text), indent=2, sort_keys=True))
                         authorized = "access_token" in r.text
                     elif credentials["type"] == "facebook":
                         url = f"https://graph.facebook.com/me?fields=id,name,email" + \
                               f"&access_token={user['facebook']['accessToken']}"
                         r = requests.post(url)
-                        print(url, r.text)
+                        print("Trying to refresh facebook token\n", json.dumps(json.loads(r.text), indent=2, sort_keys=True))
                         authorized = "email" in r.text
 
                     if authorized:
