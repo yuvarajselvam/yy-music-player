@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -9,11 +11,11 @@ from User.CreateUser import CreateUser
 from User.ForgotPassword import ForgotPassword, ValidatePasswordChangeToken
 from User.SingleSignOn import SingleSignOn
 from utils.DbUtils import DbUtils
+from utils.SecretsUtils import Secrets
 
-JWT_SECRET_KEY = "Musiqplayer@123"
 
 app = Flask(__name__)
-app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
+app.config["JWT_SECRET_KEY"] = Secrets.JWT_SECRET_KEY
 CORS(app)
 api = Api(app)
 jwt = JWTManager(app)
