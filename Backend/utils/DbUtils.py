@@ -1,12 +1,11 @@
 from mongoengine import connect
-import urllib
+from urllib import parse
 import ssl
+
+from utils.SecretsUtils import Secrets
 
 
 class DbUtils:
-    PASSWORD = "Musiqplayer@123"
-    HOST_NAME = "mongodb+srv://yympserver:" + urllib.parse.quote_plus(
-        PASSWORD) + "@yy-music-player-dev-fygew.mongodb.net/YY-MP-DB?retryWrites=true&w=majority"
-
+    host = Secrets.DB_HOST_NAME
     def db_connect(self):
-        connect('YY-MP-DB', host=self.HOST_NAME, ssl_cert_reqs=ssl.CERT_NONE)
+        connect('YY-MP-DB', host=self.host, ssl_cert_reqs=ssl.CERT_NONE)
