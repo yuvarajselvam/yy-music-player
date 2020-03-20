@@ -8,6 +8,10 @@ import * as Font from "expo-font";
 import { Entry } from "./authorization/entry";
 import { Login } from "./authorization/login";
 import { Signup } from "./authorization/signup";
+import { ForgotPassword } from "./authorization/forgotPassword";
+import { ChangePassword } from "./authorization/changePassword";
+import { EnterOTP } from "./authorization/checkOTP";
+
 import { Home } from "./home";
 
 import AuthContext from "./contexts/auth.context";
@@ -134,6 +138,45 @@ export default function App() {
                 <Stack.Screen
                   name="Signup"
                   component={Signup}
+                  options={{
+                    title: "",
+                    headerStyle: {
+                      backgroundColor: "#020204"
+                    },
+                    headerLeftContainerStyle: {
+                      color: "#FFFFFF"
+                    }
+                  }}
+                />
+                <Stack.Screen
+                  name="ForgotPassword"
+                  component={ForgotPassword}
+                  options={{
+                    title: "",
+                    headerStyle: {
+                      backgroundColor: "#020204"
+                    },
+                    headerLeftContainerStyle: {
+                      color: "#FFFFFF"
+                    }
+                  }}
+                />
+                <Stack.Screen
+                  name="EnterOTP"
+                  component={EnterOTP}
+                  options={{
+                    title: "",
+                    headerStyle: {
+                      backgroundColor: "#020204"
+                    },
+                    headerLeftContainerStyle: {
+                      color: "#FFFFFF"
+                    }
+                  }}
+                />
+                <Stack.Screen
+                  name="ChangePassword"
+                  component={ChangePassword}
                   options={{
                     title: "",
                     headerStyle: {
