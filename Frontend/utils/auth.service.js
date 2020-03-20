@@ -1,4 +1,4 @@
-const URL_LINK = "https://yy-music-player-be.herokuapp.com/";
+const URL_LINK = "http://192.168.0.8:5000/";
 
 export const authService = {
   userSSO: data => {
@@ -23,6 +23,37 @@ export const authService = {
 
   userSignup: data => {
     return fetch(URL_LINK + "signup/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+  },
+
+  forgotPassword: data => {
+    return fetch(URL_LINK + "forgot_password/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+  },
+
+  validateForgotPassword: data => {
+    console.log(data);
+    return fetch(URL_LINK + "forgot_password/validate/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+  },
+
+  changePassword: data => {
+    return fetch(URL_LINK + "change_password/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

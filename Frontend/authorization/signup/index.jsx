@@ -1,5 +1,5 @@
 import React, { useReducer } from "react";
-import { View, Alert } from "react-native";
+import { ScrollView, Alert, KeyboardAvoidingView, View } from "react-native";
 import { Input, Button, Image, Text } from "react-native-elements";
 
 import { styles } from "../auth.styles";
@@ -47,7 +47,7 @@ export function Signup() {
     dispatch({ type: "ConfirmPassword", value: val });
   };
 
-  const submitAndClear = val => {
+  const handleSubmit = val => {
     console.log(state);
     if (Object.keys(state).length < 5) {
       Alert.alert("Please fill in all the details");
@@ -79,78 +79,85 @@ export function Signup() {
   };
 
   return (
-    <View style={styles.main}>
-      <View style={styles.signupContainer}>
-        <Image
-          source={require("../../assets/logo6.png")}
-          style={styles.signupLogo}
-        />
-        <Text style={styles.signupHeading}>SIGN UP</Text>
-        <Input
-          labelStyle={styles.inputLabel}
-          containerStyle={styles.inputBoxContainer}
-          inputStyle={styles.inputText}
-          label="Full Name"
-          returnKeyType={"next"}
-          blurOnSubmit={false}
-          maxLength={30}
-          textContentType="namePrefix"
-          value={state.fullName}
-          onChangeText={setFullName}
-        />
-        <Input
-          labelStyle={styles.inputLabel}
-          containerStyle={styles.inputBoxContainer}
-          inputStyle={styles.inputText}
-          label="Email"
-          textContentType="emailAddress"
-          autoCapitalize="none"
-          value={state.email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-        <Input
-          labelStyle={styles.inputLabel}
-          containerStyle={styles.inputBoxContainer}
-          inputStyle={styles.inputText}
-          label="Phone Number"
-          maxLength={10}
-          textContentType="telephoneNumber"
-          value={state.phone}
-          onChangeText={setPhoneNumber}
-          keyboardType="phone-pad"
-        />
-        <Input
-          labelStyle={styles.inputLabel}
-          containerStyle={styles.inputBoxContainer}
-          inputStyle={styles.inputText}
-          label="Password"
-          autoCapitalize="none"
-          textContentType="password"
-          secureTextEntry={true}
-          value={state.password}
-          onChangeText={setPassword}
-        />
-        <Input
-          labelStyle={styles.inputLabel}
-          containerStyle={styles.inputBoxContainer}
-          inputStyle={styles.inputText}
-          label="Confirm Password"
-          autoCapitalize="none"
-          textContentType="password"
-          secureTextEntry={true}
-          value={state.confirmPassword}
-          onChangeText={setConfirmPassword}
-        />
-        <Button
-          raised
-          containerStyle={styles.buttonContainer}
-          buttonStyle={styles.button}
-          titleStyle={styles.buttonTitle}
-          title="Submit"
-          onPress={submitAndClear}
-        />
-      </View>
-    </View>
+    <KeyboardAvoidingView
+      style={styles.main}
+      behavior="padding"
+      enabled
+      keyboardVerticalOffset={80}
+    >
+      <ScrollView>
+        <View style={styles.signupContainer}>
+          <Image
+            source={require("../../assets/logo6.png")}
+            style={styles.signupLogo}
+          />
+          <Text style={styles.signupHeading}>SIGN UP</Text>
+          <Input
+            labelStyle={styles.inputLabel}
+            containerStyle={styles.inputBoxContainer}
+            inputStyle={styles.inputText}
+            label="Full Name"
+            returnKeyType={"next"}
+            blurOnSubmit={false}
+            maxLength={30}
+            textContentType="namePrefix"
+            value={state.fullName}
+            onChangeText={setFullName}
+          />
+          <Input
+            labelStyle={styles.inputLabel}
+            containerStyle={styles.inputBoxContainer}
+            inputStyle={styles.inputText}
+            label="Email"
+            textContentType="emailAddress"
+            autoCapitalize="none"
+            value={state.email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+          />
+          <Input
+            labelStyle={styles.inputLabel}
+            containerStyle={styles.inputBoxContainer}
+            inputStyle={styles.inputText}
+            label="Phone Number"
+            maxLength={10}
+            textContentType="telephoneNumber"
+            value={state.phone}
+            onChangeText={setPhoneNumber}
+            keyboardType="phone-pad"
+          />
+          <Input
+            labelStyle={styles.inputLabel}
+            containerStyle={styles.inputBoxContainer}
+            inputStyle={styles.inputText}
+            label="Password"
+            autoCapitalize="none"
+            textContentType="password"
+            secureTextEntry={true}
+            value={state.password}
+            onChangeText={setPassword}
+          />
+          <Input
+            labelStyle={styles.inputLabel}
+            containerStyle={styles.inputBoxContainer}
+            inputStyle={styles.inputText}
+            label="Confirm Password"
+            autoCapitalize="none"
+            textContentType="password"
+            secureTextEntry={true}
+            value={state.confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+          <Button
+            raised
+            containerStyle={styles.buttonContainer}
+            buttonStyle={styles.button}
+            titleStyle={styles.buttonTitle}
+            title="Submit"
+            onPress={handleSubmit}
+          />
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

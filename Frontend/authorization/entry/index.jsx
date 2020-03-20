@@ -4,60 +4,50 @@ import { Button, Image, Text } from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { logInAsync } from "expo-google-app-auth";
 import { initializeAsync, logInWithReadPermissionsAsync } from "expo-facebook";
+import { osName } from "expo-device";
 
-import {
-  widthPercentageToDP,
-  heightPercentageToDP
-} from "react-native-responsive-screen";
-import { authService } from "../../utils/auth.service";
 import AuthContext from "../../contexts/auth.context";
 
+import { authService } from "../../utils/auth.service";
 import { SOCIAL_TYPES } from "../../utils/constants";
+import { getLocalStore, setLocalStore } from "../../utils/funtions";
+
 import { styles } from "../auth.styles";
-
-const getLocalStore = async () => {
-  let data = await AsyncStorage.getItem("localStore");
-  let dataObj = JSON.parse(data);
-  return dataObj;
-};
-
-const setLocalStore = async obj => {
-  await AsyncStorage.setItem("localStore", JSON.stringify(obj));
-};
 
 export function Entry({ navigation }) {
   const { signIn } = useContext(AuthContext);
 
   const initialUserAuthentication = async loginType => {
-    // console.log("initialUserAuthentication === ", await getLocalStore());
-    localDataObj = await getLocalStore();
+    let localDataObj = await getLocalStore();
     return new Promise(async (resolve, reject) => {
       if (localDataObj && localDataObj.accessToken) {
         let email = localDataObj.email;
         let type = localDataObj.signInType;
         if (type !== loginType) {
-          console.log("Clearing diff local SSO store");
+          console.log("Clearing unMatched LoginType localstore");
           await AsyncStorage.removeItem("localStore");
-          resolve("Success");
+          resolve(true);
+        } else {
+          let data = {
+            email: email,
+            type: type,
+            os: osName
+          };
+          authService
+            .userSSO(data)
+            .then(response => {
+              if (response.status === 200) {
+                console.log("Intial User Authentication Response");
+                signIn(email, localDataObj.accessToken);
+                resolve(true);
+              } else {
+                resolve(false);
+              }
+            })
+            .catch(err => {
+              Alert.alert(err.message);
+            });
         }
-        let data = {
-          email: email,
-          type: type
-        };
-        authService
-          .userSSO(data)
-          .then(response => {
-            if (response.status === 200) {
-              console.log("intialUserauth Response");
-              signIn(email, localDataObj.accessToken);
-              resolve(true);
-            } else {
-              resolve(false);
-            }
-          })
-          .catch(err => {
-            Alert.alert(err.message);
-          });
       } else {
         resolve(false);
       }
@@ -67,7 +57,7 @@ export function Entry({ navigation }) {
   const signInWithGoogle = () => {
     initialUserAuthentication(SOCIAL_TYPES.GOOGLE)
       .then(async response => {
-        console.log("isAuthorizesUsser===", response);
+        console.log("signInWithFacebook calling!");
         if (!response) {
           console.log("is google auth===");
           try {
@@ -91,7 +81,8 @@ export function Entry({ navigation }) {
                 refreshToken: refreshToken,
                 id: id,
                 fullName: name,
-                email: email
+                email: email,
+                os: osName
               };
               authentiateUser(data);
             } else {
@@ -129,7 +120,8 @@ export function Entry({ navigation }) {
                   accessToken: accessToken,
                   id: id,
                   fullName: name,
-                  email: email
+                  email: email,
+                  os: osName
                 };
                 authentiateUser(data);
               });
@@ -164,6 +156,10 @@ export function Entry({ navigation }) {
         console.log(err.message);
         Alert.alert("Failed!", err.message);
       });
+  };
+
+  const handleSignUp = () => {
+    navigation.navigate("Signup");
   };
 
   return (
@@ -231,21 +227,13 @@ export function Entry({ navigation }) {
           title={"Continue with Email"}
           onPress={() => navigation.navigate("Login")}
         />
-        <View
-          style={{
-            flexDirection: "row",
-            margin: heightPercentageToDP(2),
-            alignItems: "center"
-          }}
-        >
-          <Text style={{ color: "#FFFFFF", fontSize: widthPercentageToDP(3) }}>
-            Don't have an account?
-          </Text>
+        <View style={styles.entrySignUpContainer}>
+          <Text style={styles.dontHaveAccount}>Don't have an account?</Text>
           <Button
             title="Sign Up"
-            titleStyle={{ color: "#00FFFF", fontSize: widthPercentageToDP(3) }}
+            titleStyle={styles.signUpButtonTitle}
             type="clear"
-            onPress={() => navigation.navigate("Signup")}
+            onPress={handleSignUp}
           />
         </View>
       </View>
