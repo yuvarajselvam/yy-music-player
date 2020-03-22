@@ -5,13 +5,13 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
-from User.Authenticate import Authenticate
-from User.ChangePassword import ChangePassword
-from User.CreateUser import CreateUser
-from User.ForgotPassword import ForgotPassword, ValidatePasswordChangeToken
-from User.SingleSignOn import SingleSignOn
-from utils.DbUtils import DbUtils
-from utils.SecretsUtils import Secrets
+from api.auth.authenticate import Authenticate
+from api.auth.change_password import ChangePassword
+from api.auth.create_user import CreateUser
+from api.auth.forgot_password import ForgotPassword, ValidatePasswordChangeToken
+from api.auth.single_sign_on import SingleSignOn
+from utils.db import DbUtils
+from utils.secrets import Secrets
 
 
 app = Flask(__name__)

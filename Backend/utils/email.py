@@ -2,7 +2,7 @@ import base64
 import json
 import os
 import pickle
-from utils.SecretsUtils import Secrets
+from utils.secrets import Secrets
 from email.mime.text import MIMEText
 
 from google.auth.transport.requests import Request
