@@ -19,10 +19,13 @@ class CreateUser(Resource):
     def post():
         user = request.get_json()
         try:
-            user["password"] = sha256_crypt.encrypt(user["password"])
-            user_json = json.dumps(user)
-            response = create_user(user_json)
-            return response.to_json(), 201
+            if len(user["password"]) > 6:
+                user["password"] = sha256_crypt.encrypt(user["password"])
+                user_json = json.dumps(user)
+                response = create_user(user_json)
+                return response.to_json(), 201
+            else:
+                raise ValidationError("Password field must be at least 6 characters long!")
         except ValidationError as e:
             response = jsonify(Error=str(e))
             response.status_code = 400

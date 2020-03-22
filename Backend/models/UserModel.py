@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from mongoengine import StringField, DateTimeField, EmailField, DynamicDocument, DynamicEmbeddedDocument, \
-    EmbeddedDocumentField, URLField
+    EmbeddedDocumentField, URLField, ValidationError
 
 
 class Google(DynamicEmbeddedDocument):
@@ -21,7 +21,11 @@ class User(DynamicDocument):
     fullName = StringField(required=True)
     email = EmailField(required=True, unique=True)
     phone = StringField(min_length=10, max_length=10, regex=re.compile('[0-9]{10}'))
-    password = StringField()
+    password = StringField(min_length=6)
     google = EmbeddedDocumentField(Google)
     facebook = EmbeddedDocumentField(Facebook)
     createdAt = DateTimeField(default=datetime.now)
+
+    def clean(self):
+        if not self.password and not self.google and not self.facebook:
+            raise ValidationError("Password field is required.")
