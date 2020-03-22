@@ -14,6 +14,10 @@ from utils.db import DbUtils
 from utils.secrets import Secrets
 
 
+os.environ.__setitem__('verbose', 'abs')
+if os.environ['verbose']:
+    print("[INFO] Running in verbose mode. \n")
+
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = Secrets.JWT_SECRET_KEY
 CORS(app)
@@ -37,4 +41,4 @@ DbUtils().db_connect()
 
 
 port = int(os.environ.get("PORT", 5000))
-app.run(host="0.0.0.0", port=port)
+app.run(host="0.0.0.0", port=port, debug=True)

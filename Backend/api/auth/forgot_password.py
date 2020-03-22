@@ -1,5 +1,7 @@
+import json
 from datetime import datetime, timedelta
 from random import random
+from os import environ as env
 
 from flask import request, jsonify
 from flask_restful import Resource
@@ -13,41 +15,53 @@ from hmac import compare_digest
 class ForgotPassword(Resource):
     @staticmethod
     def post():
+        if env['verbose']:
+            print(json.dumps(request.get_json(), indent=2, sort_keys=True))
         email = request.get_json()["email"]
         token = int(random() * 1000000)
         subject = "Password reset - Weplay"
         msg = f"Your 6-Digit verification code is We-{token}"
         user = retrieve.get_user_by_email(email)
-        print(email, token, user)
         if user:
             if "password" in user:
                 try:
                     password_change_token = PasswordChangeToken(user=user, token=token)
                     is_mail_sent = email.send_message(email, subject, msg)
-                    print(is_mail_sent)
+                    if env['verbose']:
+                        print("Mail sent:", is_mail_sent)
                     password_change_token.save()
 
                 except ValidationError as e:
                     response = jsonify(Error=str(e))
                     response.status_code = 400
+                    if env['verbose']:
+                        print(json.dumps(response.get_json(), indent=2, sort_keys=True))
                     return response
 
                 if is_mail_sent:
                     response = jsonify(message=f"A 6-Digit token has been sent to {email}.")
                     response.status_code = 200
+                    if env['verbose']:
+                        print(json.dumps(response.get_json(), indent=2, sort_keys=True))
                     return response
                 else:
                     response = jsonify(message="Error sending email")
                     response.status_code = 503
+                    if env['verbose']:
+                        print(json.dumps(response.get_json(), indent=2, sort_keys=True))
                     return response
             else:
                 response = jsonify(message="User previously signed in via SSO.")
                 response.status_code = 400
+                if env['verbose']:
+                    print(json.dumps(response.get_json(), indent=2, sort_keys=True))
                 return response
 
         else:
             response = jsonify(message=f"{email} is not a registered user.")
             response.status_code = 404
+            if env['verbose']:
+                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
 
 
@@ -55,6 +69,8 @@ class ValidatePasswordChangeToken(Resource):
     @staticmethod
     def post():
         req = request.get_json()
+        if env['verbose']:
+            print(json.dumps(request.get_json(), indent=2, sort_keys=True))
         try:
             email = req['email']
             token = req['token']
@@ -62,27 +78,38 @@ class ValidatePasswordChangeToken(Resource):
             datetime_object = datetime.strptime(timestamp, '%d/%m/%y %H:%M:%S')
             user = retrieve.get_user_by_email(email)
             forgot_password_token = retrieve.get_token_by_user(user)
-            print(forgot_password_token['token'], forgot_password_token['createdAt'])
             is_expired = (timedelta.total_seconds(datetime_object - forgot_password_token['createdAt']) / 60) > 60
-            print(timedelta.total_seconds(datetime_object - forgot_password_token['createdAt']) / 60, is_expired)
+            if env['verbose']:
+                print(forgot_password_token['token'], forgot_password_token['createdAt'])
+                print("Has the token expired: ", is_expired)
             if is_expired:
                 response = jsonify(message="Token expired.")
                 response.status_code = 401
+                if env['verbose']:
+                    print(json.dumps(response.get_json(), indent=2, sort_keys=True))
                 return response
             else:
                 if compare_digest(str(forgot_password_token['token']), token):
                     response = jsonify(message="Token matched.")
                     response.status_code = 200
+                    if env['verbose']:
+                        print(json.dumps(response.get_json(), indent=2, sort_keys=True))
                     return response
                 else:
                     response = jsonify(message="Token did not match.")
                     response.status_code = 401
+                    if env['verbose']:
+                        print(json.dumps(response.get_json(), indent=2, sort_keys=True))
                     return response
         except ValueError as e:
             response = jsonify(Error=str(e))
             response.status_code = 400
+            if env['verbose']:
+                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
         except KeyError as e:
             response = jsonify(Error=str(e) + " field is mandatory!")
             response.status_code = 400
+            if env['verbose']:
+                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response

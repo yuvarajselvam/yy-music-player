@@ -1,5 +1,6 @@
 import datetime
-
+import json
+from os import environ as env
 from flask import request, jsonify
 from flask_jwt_extended import create_access_token
 from flask_restful import Resource
@@ -12,6 +13,9 @@ class Authenticate(Resource):
     @staticmethod
     def post():
         credentials = request.get_json()
+        if env['verbose']:
+            print(json.dumps(credentials, indent=2, sort_keys=True))
+
         user = retrieve.get_user_by_email(credentials["email"])
 
         if user and ("password" in user) and sha256_crypt.verify(credentials["password"], user["password"]):

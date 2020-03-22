@@ -36,7 +36,8 @@ def create_message(sender, to, subject, message_text):
     message['to'] = to
     message['from'] = sender
     message['subject'] = subject
-    print(message)
+    if os.environ['verbose']:
+        print("Email message:", message)
     return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
 
 
@@ -51,5 +52,6 @@ def send_message(to_address, subject, message_text, from_address="yymusicplayer@
                    .execute())
         return True
     except HttpError as error:
-        print(error)
+        if os.environ['verbose']:
+            print(error)
         return False

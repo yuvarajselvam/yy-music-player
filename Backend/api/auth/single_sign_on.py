@@ -1,5 +1,6 @@
 import json
 import requests
+from os import environ as env
 
 from utils import retrieve
 from api.auth.create_user import create_user
@@ -52,7 +53,8 @@ class SingleSignOn(Resource):
     @staticmethod
     def post():
         credentials = request.get_json()
-        print("Single signon :", json.dumps(credentials, indent=2, sort_keys=True))
+        if env['verbose']:
+            print("Single sign on:", json.dumps(credentials, indent=2, sort_keys=True))
         try:
             user = retrieve.get_user_by_email(credentials["email"])
             if user:
@@ -64,34 +66,44 @@ class SingleSignOn(Resource):
                               f"&grant_type=refresh_token&" + \
                               f"refresh_token={user['google']['refreshToken']}"
                         r = requests.post(url)
-                        print("Trying to refresh google token\n",
-                              json.dumps(json.loads(r.text), indent=2, sort_keys=True))
+                        if env['verbose']:
+                            print("Trying to refresh google token...\n",
+                                  json.dumps(json.loads(r.text), indent=2, sort_keys=True))
                         authorized = "access_token" in r.text
                     elif credentials["type"] == "facebook":
                         url = f"https://graph.facebook.com/me?fields=id,name,email" + \
                               f"&access_token={user['facebook']['accessToken']}"
                         r = requests.post(url)
-                        print("Trying to refresh facebook token\n",
-                              json.dumps(json.loads(r.text), indent=2, sort_keys=True))
+                        if env['verbose']:
+                            print("Trying to refresh facebook token\n",
+                                  json.dumps(json.loads(r.text), indent=2, sort_keys=True))
                         authorized = "email" in r.text
 
                     if authorized:
                         response = jsonify(message=f"User present and has a {credentials['type']} account.")
                         response.status_code = 200
+                        if env['verbose']:
+                            print(json.dumps(response.get_json(), indent=2, sort_keys=True))
                         return response
                     else:
                         response = jsonify(Error="Token expired")
                         response.status_code = 401
+                        if env['verbose']:
+                            print(json.dumps(response.get_json(), indent=2, sort_keys=True))
                         return response
                 else:
                     if update_social(user, credentials):
                         response = jsonify(message=f"User present but did not link {credentials['type']}" +
                                                    "account before. Updated now.")
                         response.status_code = 200
+                        if env['verbose']:
+                            print(json.dumps(response.get_json(), indent=2, sort_keys=True))
                         return response
                     else:
                         response = jsonify(Error="Type invalid")
                         response.status_code = 400
+                        if env['verbose']:
+                            print(json.dumps(response.get_json(), indent=2, sort_keys=True))
                         return response
             else:
                 return create_new_user(credentials)
@@ -99,4 +111,6 @@ class SingleSignOn(Resource):
         except KeyError as e:
             response = jsonify(Error=str(e) + " field is mandatory!")
             response.status_code = 400
+            if env['verbose']:
+                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
