@@ -22,12 +22,18 @@ class Authenticate(Resource):
             response = jsonify(token=create_access_token(str(user.id), expires_delta=datetime.timedelta(hours=3)),
                                userId=str(user.id))
             response.status_code = 200
+            if env['verbose']:
+                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
         elif "password" not in user:
             response = jsonify(message="User previously signed in via SSO.")
             response.status_code = 400
+            if env['verbose']:
+                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
         else:
             response = jsonify(message="Bad Email and Password!")
             response.status_code = 401
+            if env['verbose']:
+                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
