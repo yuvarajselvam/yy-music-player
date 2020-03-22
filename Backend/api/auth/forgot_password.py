@@ -5,9 +5,8 @@ from flask import request, jsonify
 from flask_restful import Resource
 from mongoengine import ValidationError
 
-from User import Retrieve
+from utils import retrieve
 from models.PasswordChangeTokenModel import PasswordChangeToken
-from utils import EmailUtils
 from hmac import compare_digest
 
 
@@ -18,13 +17,13 @@ class ForgotPassword(Resource):
         token = int(random() * 1000000)
         subject = "Password reset - Weplay"
         msg = f"Your 6-Digit verification code is We-{token}"
-        user = Retrieve.get_user_by_email(email)
+        user = retrieve.get_user_by_email(email)
         print(email, token, user)
         if user:
             if "password" in user:
                 try:
                     password_change_token = PasswordChangeToken(user=user, token=token)
-                    is_mail_sent = EmailUtils.send_message(email, subject, msg)
+                    is_mail_sent = email.send_message(email, subject, msg)
                     print(is_mail_sent)
                     password_change_token.save()
 
@@ -61,8 +60,8 @@ class ValidatePasswordChangeToken(Resource):
             token = req['token']
             timestamp = req['timestamp']
             datetime_object = datetime.strptime(timestamp, '%d/%m/%y %H:%M:%S')
-            user = Retrieve.get_user_by_email(email)
-            forgot_password_token = Retrieve.get_token_by_user(user)
+            user = retrieve.get_user_by_email(email)
+            forgot_password_token = retrieve.get_token_by_user(user)
             print(forgot_password_token['token'], forgot_password_token['createdAt'])
             is_expired = (timedelta.total_seconds(datetime_object - forgot_password_token['createdAt']) / 60) > 60
             print(timedelta.total_seconds(datetime_object - forgot_password_token['createdAt']) / 60, is_expired)

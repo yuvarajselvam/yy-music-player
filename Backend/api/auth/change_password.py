@@ -2,7 +2,7 @@ from flask import request, jsonify
 from flask_restful import Resource
 from passlib.handlers.sha2_crypt import sha256_crypt
 
-from User import Retrieve
+from utils import retrieve
 
 
 class ChangePassword(Resource):
@@ -11,9 +11,9 @@ class ChangePassword(Resource):
         credentials = request.get_json()
         try:
             if credentials["grantType"] == "forgot_password_token":
-                user = Retrieve.get_user_by_email(credentials["email"])
+                user = retrieve.get_user_by_email(credentials["email"])
                 if user:
-                    token = Retrieve.get_token_by_user(user)
+                    token = retrieve.get_token_by_user(user)
                     if token["consumed"]:
                         response = jsonify(message="Token already consumed.")
                         response.status_code = 401
