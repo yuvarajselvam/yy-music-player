@@ -5,14 +5,18 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
-from User.Authenticate import Authenticate
-from User.ChangePassword import ChangePassword
-from User.CreateUser import CreateUser
-from User.ForgotPassword import ForgotPassword, ValidatePasswordChangeToken
-from User.SingleSignOn import SingleSignOn
-from utils.DbUtils import DbUtils
-from utils.SecretsUtils import Secrets
+from api.auth.authenticate import Authenticate
+from api.auth.change_password import ChangePassword
+from api.auth.create_user import CreateUser
+from api.auth.forgot_password import ForgotPassword, ValidatePasswordChangeToken
+from api.auth.single_sign_on import SingleSignOn
+from utils.db import DbUtils
+from utils.secrets import Secrets
 
+
+os.environ.__setitem__('verbose', 'abs')
+if os.environ['verbose']:
+    print("[INFO] Running in verbose mode. \n")
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = Secrets.JWT_SECRET_KEY
@@ -37,4 +41,4 @@ DbUtils().db_connect()
 
 
 port = int(os.environ.get("PORT", 5000))
-app.run(host="0.0.0.0", port=port)
+app.run(host="0.0.0.0", port=port, debug=True)
