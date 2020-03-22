@@ -1,3 +1,4 @@
+from os import environ as env
 import json
 
 from flask import request, jsonify
@@ -18,23 +19,33 @@ class CreateUser(Resource):
     @staticmethod
     def post():
         user = request.get_json()
+        if env['verbose']:
+            print("User sign up:", json.dumps(user, indent=2, sort_keys=True))
         try:
-            if len(user["password"]) > 6:
+            if len(user["password"]) >= 6:
                 user["password"] = sha256_crypt.encrypt(user["password"])
                 user_json = json.dumps(user)
                 response = create_user(user_json)
+                if env['verbose']:
+                    print(json.dumps(json.loads(response.to_json()), indent=2, sort_keys=True))
                 return response.to_json(), 201
             else:
                 raise ValidationError("Password field must be at least 6 characters long!")
         except ValidationError as e:
             response = jsonify(Error=str(e))
             response.status_code = 400
+            if env['verbose']:
+                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
         except NotUniqueError as e:
             response = jsonify(Error=str(e))
             response.status_code = 409
+            if env['verbose']:
+                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
         except KeyError as e:
             response = jsonify(Error=str(e) + " field is mandatory!")
             response.status_code = 400
+            if env['verbose']:
+                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
