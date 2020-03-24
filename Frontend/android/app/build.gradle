@@ -144,10 +144,10 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file('yy-mp-key.keystore')
-            storePassword 'Musiqplayer@123'
-            keyAlias 'yy-mp-alias'
-            keyPassword 'Musiqplayer@123'
+            storeFile file('yy-music-key.keystore')
+            storePassword 'Musicplayer@123'
+            keyAlias 'yy-music-alias'
+            keyPassword 'Musicplayer@123'
         }
     }
     buildTypes {
