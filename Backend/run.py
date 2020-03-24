@@ -10,9 +10,9 @@ from api.auth.change_password import ChangePassword
 from api.auth.create_user import CreateUser
 from api.auth.forgot_password import ForgotPassword, ValidatePasswordChangeToken
 from api.auth.single_sign_on import SingleSignOn
+from api.search.test import Track
 from utils.db import DbUtils
 from utils.secrets import Secrets
-
 
 os.environ.__setitem__('verbose', 'abs')
 if os.environ['verbose']:
@@ -36,9 +36,10 @@ api.add_resource(SingleSignOn, '/sso/')
 api.add_resource(ForgotPassword, '/forgot_password/')
 api.add_resource(ValidatePasswordChangeToken, '/forgot_password/validate/')
 api.add_resource(ChangePassword, '/change_password/')
+api.add_resource(Track, '/get_track_url/')
 
 DbUtils().db_connect()
 
-
 port = int(os.environ.get("PORT", 5000))
-app.run(host="0.0.0.0", port=port, debug=True)
+app.run(port=port)
+# host="0.0.0.0"

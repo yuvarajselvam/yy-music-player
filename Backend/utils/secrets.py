@@ -19,7 +19,7 @@ class Secrets:
     # DB_HOST_NAME = get_secret("db_host_name")
     JWT_SECRET_KEY = "Musiqplayer@123"
     IOS_CLIENT_ID = "156841541425-5iehdba23m6iejp3bbi40b5d2dfr7emn.apps.googleusercontent.com"
-    ANDROID_CLIENT_ID = "156841541425-lc9o7vpqv3p75n60ncetlh8er8p93jhn.apps.googleusercontent.com"
+    ANDROID_CLIENT_ID = "156841541425-i10f8nvlbrotbh13gl0jfk997j342d52.apps.googleusercontent.com"
     DB_HOST_NAME = "mongodb+srv://yympserver:Musiqplayer%40123@yy-music-player-dev-fygew.mongodb.net" \
                    "/YY-MP-DB?retryWrites=true&w=majority"
     OAUTH_CLIENT_CONFIG = '''{"installed":{

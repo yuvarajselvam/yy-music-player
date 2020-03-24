@@ -14,21 +14,22 @@ GMAIL_SCOPES = ['https://mail.google.com/']
 CLIENT_CONFIG = json.loads(Secrets.OAUTH_CLIENT_CONFIG)
 
 
-credentials = None
-if os.path.exists('token.pickle'):
-    with open('token.pickle', 'rb') as token:
-        credentials = pickle.load(token)
-if not credentials or not credentials.valid:
-    if credentials and credentials.expired and credentials.refresh_token:
-        credentials.refresh(Request())
-    else:
-        flow = InstalledAppFlow.from_client_config(
-            CLIENT_CONFIG, GMAIL_SCOPES)
-        credentials = flow.run_local_server(port=0)
-    with open('token.pickle', 'wb') as token:
-        pickle.dump(credentials, token)
+def get_service():
+    credentials = None
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            credentials = pickle.load(token)
+    if not credentials or not credentials.valid:
+        if credentials and credentials.expired and credentials.refresh_token:
+            credentials.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_config(
+                CLIENT_CONFIG, GMAIL_SCOPES)
+            credentials = flow.run_local_server(port=0)
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(credentials, token)
 
-service = build('gmail', 'v1', credentials=credentials)
+    return build('gmail', 'v1', credentials=credentials)
 
 
 def create_message(sender, to, subject, message_text):
@@ -37,11 +38,11 @@ def create_message(sender, to, subject, message_text):
     message['from'] = sender
     message['subject'] = subject
     if os.environ['verbose']:
-        print("Email message:", message)
+        print("Email message:", message_text)
     return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
 
 
-def send_message(to_address, subject, message_text, from_address="yymusicplayer@gmail.com"):
+def send_message(service, to_address, subject, message_text, from_address="yymusicplayer@gmail.com"):
     try:
         message = create_message(sender=from_address,
                                  to=to_address,
