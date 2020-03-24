@@ -7,7 +7,7 @@ from mongoengine import StringField, DateTimeField, EmailField, DynamicDocument,
 class Google(DynamicEmbeddedDocument):
     userId = StringField(required=True)
     accessToken = StringField()
-    refreshToken = StringField(required=True)
+    idToken = StringField(required=True)
     photoUrl = URLField()
 
 

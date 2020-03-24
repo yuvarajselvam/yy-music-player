@@ -14,7 +14,7 @@ class Authenticate(Resource):
     def post():
         credentials = request.get_json()
         if env['verbose']:
-            print(json.dumps(credentials, indent=2, sort_keys=True))
+            print("\nUser sign in:", json.dumps(credentials, indent=2, sort_keys=True))
 
         user = retrieve.get_user_by_email(credentials["email"])
 
@@ -23,17 +23,17 @@ class Authenticate(Resource):
                                userId=str(user.id))
             response.status_code = 200
             if env['verbose']:
-                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
+                print("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
         elif "password" not in user:
             response = jsonify(message="User previously signed in via SSO.")
             response.status_code = 400
             if env['verbose']:
-                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
+                print("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
         else:
             response = jsonify(message="Bad Email and Password!")
             response.status_code = 401
             if env['verbose']:
-                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
+                print("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
