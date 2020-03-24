@@ -1,0 +1,10 @@
+{
+  "firstName": "Bruce",
+  "lastName": "Wayne",
+  "email": "batman@waynecorps.com",
+  "phone": 1234567890,
+  "country": "+91",
+  "city": "Gotham",
+  "state": "New York",
+  "password": "iamrich"
+}
