@@ -1,72 +1,54 @@
-import "react-native-gesture-handler";
-import React, { useEffect, useState, useReducer } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator, HeaderTitle } from "@react-navigation/stack";
-import { AppLoading } from "expo";
-import * as Font from "expo-font";
+import 'react-native-gesture-handler';
+import React, {useReducer} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 
-import { Entry } from "./authorization/entry";
-import { Login } from "./authorization/login";
-import { Signup } from "./authorization/signup";
-import { ForgotPassword } from "./authorization/forgotPassword";
-import { ChangePassword } from "./authorization/changePassword";
-import { EnterOTP } from "./authorization/checkOTP";
+import {Entry} from './authorization/entry';
+import {Login} from './authorization/login';
+import {Signup} from './authorization/signup';
+import {ForgotPassword} from './authorization/forgotPassword';
+import {ChangePassword} from './authorization/changePassword';
+import {EnterOTP} from './authorization/checkOTP';
 
-import { Home } from "./home";
+import {Home} from './home';
 
-import AuthContext from "./contexts/auth.context";
+import AuthContext from './contexts/auth.context';
 
 const Stack = createStackNavigator();
 
-const PoppinsLocation = require("./assets/fonts/Poppins-Regular.ttf");
-const JosefinSansLocation = require("./assets/fonts/JosefinSans-Regular.ttf");
-
 function reducer(state, action) {
   switch (action.type) {
-    case "RESTORE_TOKEN":
+    case 'RESTORE_TOKEN':
       return {
         ...state,
         userToken: action.token,
-        isLoading: false
+        isLoading: false,
       };
-    case "SIGN_IN":
+    case 'SIGN_IN':
       return {
         ...state,
         isSignout: false,
         userToken: action.token,
-        loggedIn: true
+        loggedIn: true,
       };
-    case "SIGN_OUT":
+    case 'SIGN_OUT':
       return {
         ...state,
         isSignout: true,
-        userToken: null
+        userToken: null,
       };
   }
 }
 
 export default function App() {
-  const [isReady, setIsReady] = useState(false);
-
   const initialState = {
     isLoading: true,
     isSignout: false,
     userToken: null,
-    loggedIn: false
+    loggedIn: false,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  useEffect(() => {
-    const loadingFontHandler = async () => {
-      await Font.loadAsync({
-        "Poppins-Regular": PoppinsLocation,
-        "JosefinSans-Regular": JosefinSansLocation
-      });
-      setIsReady(true);
-    };
-    loadingFontHandler();
-  }, [isReady]);
 
   const authContext = React.useMemo(
     () => ({
@@ -75,123 +57,119 @@ export default function App() {
         // We will also need to handle errors if sign in failed
         // After getting token, we need to persist the token using `AsyncStorage`
         // In the example, we'll use a dummy token
-        dispatch({ type: "SIGN_IN", token: token });
+        dispatch({type: 'SIGN_IN', token: token});
       },
-      signOut: () => dispatch({ type: "SIGN_OUT" }),
+      signOut: () => dispatch({type: 'SIGN_OUT'}),
       signUp: async data => {
-        dispatch({ type: "SIGN_IN", token: "dummy-auth-token" });
-      }
+        dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'});
+      },
     }),
-    []
+    [],
   );
 
-  if (!isReady) {
-    return <AppLoading />;
-  } else {
-    return (
-      <AuthContext.Provider value={authContext}>
-        <NavigationContainer>
-          <Stack.Navigator headerMode="screen">
-            {state.userToken && state.loggedIn ? (
+  return (
+    <AuthContext.Provider value={authContext}>
+      <NavigationContainer>
+        <Stack.Navigator headerMode="screen">
+          {state.userToken && state.loggedIn ? (
+            <Stack.Screen
+              name="Home"
+              component={Home}
+              options={{
+                title: '',
+                headerStyle: {
+                  backgroundColor: '#020204',
+                },
+                headerLeftContainerStyle: {
+                  color: '#FFFFFF',
+                },
+              }}
+            />
+          ) : (
+            <React.Fragment>
               <Stack.Screen
-                name="Home"
-                component={Home}
+                name="Entry"
+                component={Entry}
                 options={{
-                  title: "",
+                  title: '',
                   headerStyle: {
-                    backgroundColor: "#020204"
+                    backgroundColor: '#020204',
                   },
-                  headerLeftContainerStyle: {
-                    color: "#FFFFFF"
-                  }
+                  headerTitleStyle: {
+                    color: '#ABB4BD',
+                  },
+                  headerShown: false,
                 }}
               />
-            ) : (
-              <React.Fragment>
-                <Stack.Screen
-                  name="Entry"
-                  component={Entry}
-                  options={{
-                    title: "",
-                    headerStyle: {
-                      backgroundColor: "#020204"
-                    },
-                    headerTitleStyle: {
-                      color: "#ABB4BD"
-                    },
-                    headerShown: false
-                  }}
-                />
-                <Stack.Screen
-                  name="Login"
-                  component={Login}
-                  options={{
-                    title: "",
-                    headerStyle: {
-                      backgroundColor: "#020204"
-                    },
-                    headerTitleStyle: {
-                      color: "#ABB4BD"
-                    }
-                  }}
-                />
-                <Stack.Screen
-                  name="Signup"
-                  component={Signup}
-                  options={{
-                    title: "",
-                    headerStyle: {
-                      backgroundColor: "#020204"
-                    },
-                    headerLeftContainerStyle: {
-                      color: "#FFFFFF"
-                    }
-                  }}
-                />
-                <Stack.Screen
-                  name="ForgotPassword"
-                  component={ForgotPassword}
-                  options={{
-                    title: "",
-                    headerStyle: {
-                      backgroundColor: "#020204"
-                    },
-                    headerLeftContainerStyle: {
-                      color: "#FFFFFF"
-                    }
-                  }}
-                />
-                <Stack.Screen
-                  name="EnterOTP"
-                  component={EnterOTP}
-                  options={{
-                    title: "",
-                    headerStyle: {
-                      backgroundColor: "#020204"
-                    },
-                    headerLeftContainerStyle: {
-                      color: "#FFFFFF"
-                    }
-                  }}
-                />
-                <Stack.Screen
-                  name="ChangePassword"
-                  component={ChangePassword}
-                  options={{
-                    title: "",
-                    headerStyle: {
-                      backgroundColor: "#020204"
-                    },
-                    headerLeftContainerStyle: {
-                      color: "#FFFFFF"
-                    }
-                  }}
-                />
-              </React.Fragment>
-            )}
-          </Stack.Navigator>
-        </NavigationContainer>
-      </AuthContext.Provider>
-    );
-  }
+              <Stack.Screen
+                name="Login"
+                component={Login}
+                options={{
+                  title: '',
+                  headerStyle: {
+                    backgroundColor: '#020204',
+                  },
+                  headerTitleStyle: {
+                    color: '#ABB4BD',
+                  },
+                }}
+              />
+              <Stack.Screen
+                name="Signup"
+                component={Signup}
+                options={{
+                  title: '',
+                  headerStyle: {
+                    backgroundColor: '#020204',
+                  },
+                  headerLeftContainerStyle: {
+                    color: '#FFFFFF',
+                  },
+                }}
+              />
+              <Stack.Screen
+                name="ForgotPassword"
+                component={ForgotPassword}
+                options={{
+                  title: '',
+                  headerStyle: {
+                    backgroundColor: '#020204',
+                  },
+                  headerLeftContainerStyle: {
+                    color: '#FFFFFF',
+                  },
+                }}
+              />
+              <Stack.Screen
+                name="EnterOTP"
+                component={EnterOTP}
+                options={{
+                  title: '',
+                  headerStyle: {
+                    backgroundColor: '#020204',
+                  },
+                  headerLeftContainerStyle: {
+                    color: '#FFFFFF',
+                  },
+                }}
+              />
+              <Stack.Screen
+                name="ChangePassword"
+                component={ChangePassword}
+                options={{
+                  title: '',
+                  headerStyle: {
+                    backgroundColor: '#020204',
+                  },
+                  headerLeftContainerStyle: {
+                    color: '#FFFFFF',
+                  },
+                }}
+              />
+            </React.Fragment>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthContext.Provider>
+  );
 }
