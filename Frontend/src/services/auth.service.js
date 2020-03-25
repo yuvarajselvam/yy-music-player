@@ -1,4 +1,4 @@
-const URL_LINK = 'http://9c0a256b.ngrok.io/';
+const URL_LINK = 'http://192.168.0.102:5000/';
 
 export const authService = {
   userSSO: data => {
