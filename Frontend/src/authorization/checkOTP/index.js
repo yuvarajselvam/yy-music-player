@@ -1,9 +1,9 @@
-import {View} from 'react-native';
+import {View, KeyboardAvoidingView, ScrollView} from 'react-native';
 import React, {useState} from 'react';
 import {Input, Image, Text, Button} from 'react-native-elements';
 
 import {styles} from '../auth.styles';
-import {authService} from '../../utils/auth.service';
+import {authService} from '../../services/auth.service';
 import {getLocalStore} from '../../utils/funtions';
 
 export function EnterOTP({navigation}) {
@@ -47,34 +47,36 @@ export function EnterOTP({navigation}) {
   };
 
   return (
-    <View style={styles.main}>
-      <View style={styles.signupContainer}>
-        <Image
-          source={require('../../assets/logo6.png')}
-          style={styles.signupLogo}
-        />
-        <Text style={styles.signupHeading}>Verify the OTP</Text>
-        <Input
-          labelStyle={styles.inputLabel}
-          containerStyle={styles.inputBoxContainer}
-          inputStyle={styles.inputText}
-          label="Enter the OTP"
-          returnKeyType={'next'}
-          blurOnSubmit={false}
-          maxLength={6}
-          textContentType="namePrefix"
-          value={otp}
-          onChangeText={setOtp}
-        />
-        <Button
-          raised
-          containerStyle={styles.buttonContainer}
-          buttonStyle={styles.button}
-          titleStyle={styles.buttonTitle}
-          title="Submit OTP"
-          onPress={submitOTP}
-        />
-      </View>
-    </View>
+    <KeyboardAvoidingView style={styles.main}>
+      <ScrollView>
+        <View style={styles.signupContainer}>
+          <Image
+            source={require('../../assets/logo.png')}
+            style={styles.signupLogo}
+          />
+          <Text style={styles.signupHeading}>Verify the OTP</Text>
+          <Input
+            labelStyle={styles.inputLabel}
+            containerStyle={styles.inputBoxContainer}
+            inputStyle={styles.inputText}
+            label="Enter the OTP"
+            returnKeyType={'next'}
+            blurOnSubmit={false}
+            maxLength={6}
+            textContentType="namePrefix"
+            value={otp}
+            onChangeText={setOtp}
+          />
+          <Button
+            raised
+            containerStyle={styles.buttonContainer}
+            buttonStyle={styles.button}
+            titleStyle={styles.buttonTitle}
+            title="Submit OTP"
+            onPress={submitOTP}
+          />
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

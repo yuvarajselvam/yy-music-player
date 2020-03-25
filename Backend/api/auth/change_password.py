@@ -23,7 +23,7 @@ class ChangePassword(Resource):
                         response = jsonify(message="Token already consumed.")
                         response.status_code = 401
                         if env['verbose']:
-                            print("Response:", json.dumps(json.loads(response.to_json()), indent=2, sort_keys=True))
+                            print("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
                         return response
                     else:
                         user.update(set__password=sha256_crypt.encrypt(credentials["newPassword"]))
@@ -33,13 +33,13 @@ class ChangePassword(Resource):
                         response = jsonify(message="Password change successful.")
                         response.status_code = 200
                         if env['verbose']:
-                            print("Response:", json.dumps(json.loads(response.to_json()), indent=2, sort_keys=True))
+                            print("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
                         return response
                 else:
                     response = jsonify(message="Bad request.")
                     response.status_code = 400
                     if env['verbose']:
-                        print("Response:", json.dumps(json.loads(response.to_json()), indent=2, sort_keys=True))
+                        print("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
                     return response
             else:
                 pass
@@ -47,5 +47,5 @@ class ChangePassword(Resource):
             response = jsonify(Error=str(e) + " field is mandatory!")
             response.status_code = 400
             if env['verbose']:
-                print("Response:", json.dumps(json.loads(response.to_json()), indent=2, sort_keys=True))
+                print("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
