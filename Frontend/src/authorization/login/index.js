@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import {Input, Button, Image, Text} from 'react-native-elements';
 
-import {authService} from '../../utils/auth.service';
+import {authService} from '../../services/auth.service';
 import AuthContext from '../../contexts/auth.context';
 import {styles} from '../auth.styles';
 
@@ -44,7 +44,7 @@ export function Login({navigation}) {
       <ScrollView>
         <View style={styles.loginContainer}>
           <Image
-            source={require('../../assets/logo6.png')}
+            source={require('../../assets/logo.png')}
             style={styles.logoImage}
           />
           <Text style={styles.appName}>WePlay</Text>
