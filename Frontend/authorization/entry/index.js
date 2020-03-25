@@ -74,6 +74,8 @@ export function Entry({navigation}) {
             await GoogleSignin.configure({
               webClientId:
                 '156841541425-huk5t0djuibtbq972s5s901v9d1ebav5.apps.googleusercontent.com',
+              iosClientId:
+                '156841541425-5iehdba23m6iejp3bbi40b5d2dfr7emn.apps.googleusercontent.com',
             });
             GoogleSignin.signIn().then(
               async result => {
