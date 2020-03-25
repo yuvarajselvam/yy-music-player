@@ -3,16 +3,15 @@ import React, {useReducer} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
-import {Entry} from './authorization/entry';
-import {Login} from './authorization/login';
-import {Signup} from './authorization/signup';
-import {ForgotPassword} from './authorization/forgotPassword';
-import {ChangePassword} from './authorization/changePassword';
-import {EnterOTP} from './authorization/checkOTP';
+import {Entry} from './src/authorization/entry';
+import {Login} from './src/authorization/login';
+import {Signup} from './src/authorization/signup';
+import {ForgotPassword} from './src/authorization/forgotPassword';
+import {ChangePassword} from './src/authorization/changePassword';
+import {EnterOTP} from './src/authorization/checkOTP';
+import {Home} from './src/home';
 
-import {Home} from './home';
-
-import AuthContext from './contexts/auth.context';
+import AuthContext from './src/contexts/auth.context';
 
 const Stack = createStackNavigator();
 

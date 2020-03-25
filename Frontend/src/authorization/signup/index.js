@@ -1,9 +1,15 @@
 import React, {useReducer} from 'react';
-import {ScrollView, Alert, KeyboardAvoidingView, View} from 'react-native';
+import {
+  ScrollView,
+  Alert,
+  KeyboardAvoidingView,
+  View,
+  Platform,
+} from 'react-native';
 import {Input, Button, Image, Text} from 'react-native-elements';
 
 import {styles} from '../auth.styles';
-import {authService} from '../../utils/auth.service';
+import {authService} from '../../services/auth.service';
 
 const initialState = {};
 
@@ -27,27 +33,11 @@ const reducer = (user, action) => {
 export function Signup({navigation}) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const setFullName = val => {
-    dispatch({type: 'FullName', value: val});
+  const setInputValue = (val, inputType) => {
+    dispatch({type: inputType, value: val});
   };
 
-  const setEmail = val => {
-    dispatch({type: 'Email', value: val});
-  };
-
-  const setPhoneNumber = val => {
-    dispatch({type: 'PhoneNumber', value: val});
-  };
-
-  const setPassword = val => {
-    dispatch({type: 'Password', value: val});
-  };
-
-  const setConfirmPassword = val => {
-    dispatch({type: 'ConfirmPassword', value: val});
-  };
-
-  const handleSubmit = val => {
+  const handleSubmit = () => {
     console.log(state);
     if (Object.keys(state).length < 5) {
       Alert.alert('Please fill in all the details');
@@ -81,12 +71,13 @@ export function Signup({navigation}) {
   return (
     <KeyboardAvoidingView
       style={styles.main}
+      behavior={Platform.OS === 'ios' && 'padding'}
       enabled
-    >
+      keyboardVerticalOffset="200">
       <ScrollView>
         <View style={styles.signupContainer}>
           <Image
-            source={require('../../assets/logo6.png')}
+            source={require('../../assets/logo.png')}
             style={styles.signupLogo}
           />
           <Text style={styles.signupHeading}>SIGN UP</Text>
@@ -100,7 +91,7 @@ export function Signup({navigation}) {
             maxLength={30}
             textContentType="namePrefix"
             value={state.fullName}
-            onChangeText={setFullName}
+            onChangeText={value => setInputValue(value, 'FullName')}
           />
           <Input
             labelStyle={styles.inputLabel}
@@ -110,7 +101,7 @@ export function Signup({navigation}) {
             textContentType="emailAddress"
             autoCapitalize="none"
             value={state.email}
-            onChangeText={setEmail}
+            onChangeText={value => setInputValue(value, 'Email')}
             keyboardType="email-address"
           />
           <Input
@@ -121,7 +112,7 @@ export function Signup({navigation}) {
             maxLength={10}
             textContentType="telephoneNumber"
             value={state.phone}
-            onChangeText={setPhoneNumber}
+            onChangeText={value => setInputValue(value, 'PhoneNumber')}
             keyboardType="phone-pad"
           />
           <Input
@@ -133,7 +124,7 @@ export function Signup({navigation}) {
             textContentType="password"
             secureTextEntry={true}
             value={state.password}
-            onChangeText={setPassword}
+            onChangeText={value => setInputValue(value, 'Password')}
           />
           <Input
             labelStyle={styles.inputLabel}
@@ -144,7 +135,7 @@ export function Signup({navigation}) {
             textContentType="password"
             secureTextEntry={true}
             value={state.confirmPassword}
-            onChangeText={setConfirmPassword}
+            onChangeText={value => setInputValue(value, 'ConfirmPassword')}
           />
           <Button
             raised
