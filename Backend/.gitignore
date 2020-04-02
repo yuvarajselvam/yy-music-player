@@ -1,6 +1,0 @@
-venv
-*\__pycache__
-token.pickle
-service_credentials.json
-secrets.py
-ngrok.exe
