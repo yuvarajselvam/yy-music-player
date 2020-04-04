@@ -4,3 +4,5 @@ token.pickle
 service_credentials.json
 secrets.py
 ngrok.exe
+.idea
+.gitignore

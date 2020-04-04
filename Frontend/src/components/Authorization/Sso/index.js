@@ -4,13 +4,13 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {Button, Image, Text} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import AuthContext from '../../contexts/auth.context';
-import {authService} from '../../services/auth.service';
-import {SSOService} from '../../services/sso.service';
-import {SOCIAL_TYPES} from '../../utils/constants';
-import {getLocalStore, setLocalStore} from '../../utils/funtions';
+import AuthContext from '../../../contexts/auth.context';
+import {authService} from '../../../services/auth.service';
+import {SSOService} from '../../../services/sso.service';
+import {SOCIAL_TYPES} from '../../../utils/constants';
+import {getLocalStore, setLocalStore} from '../../../utils/funtions';
 
-import {styles} from './entry.styles';
+import {styles} from './sso.styles';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -21,7 +21,7 @@ function reducer(state, action) {
   }
 }
 
-export function Entry({navigation}) {
+export function Sso({navigation}) {
   const {signIn} = useContext(AuthContext);
   const initialState = {
     isFBLoading: false,
@@ -29,7 +29,7 @@ export function Entry({navigation}) {
   };
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const initialUserAuthentication = async loginType => {
+  const initialUserAuthentication = async (loginType) => {
     console.log('First authentication check');
     let localDataObj = await getLocalStore();
     return new Promise(async (resolve, reject) => {
@@ -50,7 +50,7 @@ export function Entry({navigation}) {
           };
           authService
             .userSSO(data)
-            .then(async response => {
+            .then(async (response) => {
               console.log(await response.json());
               if (response.status === 200) {
                 console.log('Intial User Authentication Response');
@@ -61,7 +61,7 @@ export function Entry({navigation}) {
                 resolve(false);
               }
             })
-            .catch(err => {
+            .catch((err) => {
               console.log(err.message);
             });
         }
@@ -71,10 +71,10 @@ export function Entry({navigation}) {
     });
   };
 
-  const handleSSO = async type => {
+  const handleSSO = async (type) => {
     dispatch({type: type, value: true});
     initialUserAuthentication(type)
-      .then(async response => {
+      .then(async (response) => {
         if (!response) {
           try {
             let data = await SSOService(type);
@@ -86,16 +86,16 @@ export function Entry({navigation}) {
           }
         }
       })
-      .catch(error => {
+      .catch((error) => {
         Alert.alert(error);
         dispatch({type: type, value: false});
       });
   };
 
-  const authentiateUser = data => {
+  const authentiateUser = (data) => {
     authService
       .userSSO(data)
-      .then(async response => {
+      .then(async (response) => {
         console.log('authenticateUser calling ===', await response.json());
         if (response.status === 200 || response.status === 201) {
           let localData = {
@@ -110,7 +110,7 @@ export function Entry({navigation}) {
           signIn(data.email, data.accessToken);
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err.message);
         Alert.alert('Failed!', err.message);
       });
@@ -124,7 +124,7 @@ export function Entry({navigation}) {
     <View style={styles.socialMain}>
       <View style={styles.entryContainer}>
         <Image
-          source={require('../../assets/logo.png')}
+          source={require('../../../assets/logo.png')}
           style={styles.logoImage}
         />
         <Button

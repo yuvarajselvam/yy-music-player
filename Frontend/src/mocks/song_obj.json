@@ -1,0 +1,47 @@
+{
+  "albumId": {
+    "_id": "albumId",
+    "type": "album",
+    "name": "Album Name 1",
+    "artists": [
+      {
+        "_id": "artistId",
+        "name": "Artist Name 1"
+      }
+    ],
+    "imageUrl": "https://i.scdn.co/image/ab67616d0000b2737e8f7121b2f50e47320b0bda",
+    "popularity": "23",
+    "totalTracks": "",
+    "albumType": "",
+    "releaseYear": "year"
+  },
+  "artistId": {
+    "_id": "artistId",
+    "type": "artist",
+    "name": "Artist Name 1",
+    "imageUrl": "https://i.scdn.co/image/c701ca60eb5e276acde4e401a3f41049eec43962",
+    "popularity": "23"
+  },
+  "trackId": {
+    "_id": "trackId",
+    "type": "track",
+    "name": "Track Name 1",
+    "album": {
+      "albumName": "Album Name 1",
+      "albumId": "albumId"
+    },
+    "artists": [
+      {
+        "_id": "artistId1",
+        "name": "Artist Name 1"
+      },
+      {
+        "_id": "artistId",
+        "name": "Artist Name 2"
+      }
+    ],
+    "imageUrl": "https://i.scdn.co/image/c701ca60eb5e276acde4e401a3f41049eec43962",
+    "popularity": "23",
+    "duration": ""
+  }
+}
