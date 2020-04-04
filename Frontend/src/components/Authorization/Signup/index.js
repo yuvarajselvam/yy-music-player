@@ -9,7 +9,7 @@ import {
 import {Input, Button, Image, Text} from 'react-native-elements';
 
 import {styles} from '../auth.styles';
-import {authService} from '../../services/auth.service';
+import {authService} from '../../../services/auth.service';
 
 const initialState = {};
 
@@ -52,13 +52,13 @@ export function Signup({navigation}) {
       };
       authService
         .userSignup(data)
-        .then(response => {
+        .then((response) => {
           if (response.status === 201) {
             navigation.navigate('Login');
             dispatch({});
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           Alert.alert(error.message);
         });
@@ -77,7 +77,7 @@ export function Signup({navigation}) {
       <ScrollView>
         <View style={styles.signupContainer}>
           <Image
-            source={require('../../assets/logo.png')}
+            source={require('../../../assets/logo.png')}
             style={styles.signupLogo}
           />
           <Text style={styles.signupHeading}>SIGN UP</Text>
@@ -91,7 +91,7 @@ export function Signup({navigation}) {
             maxLength={30}
             textContentType="namePrefix"
             value={state.fullName}
-            onChangeText={value => setInputValue(value, 'FullName')}
+            onChangeText={(value) => setInputValue(value, 'FullName')}
           />
           <Input
             labelStyle={styles.inputLabel}
@@ -101,7 +101,7 @@ export function Signup({navigation}) {
             textContentType="emailAddress"
             autoCapitalize="none"
             value={state.email}
-            onChangeText={value => setInputValue(value, 'Email')}
+            onChangeText={(value) => setInputValue(value, 'Email')}
             keyboardType="email-address"
           />
           <Input
@@ -112,7 +112,7 @@ export function Signup({navigation}) {
             maxLength={10}
             textContentType="telephoneNumber"
             value={state.phone}
-            onChangeText={value => setInputValue(value, 'PhoneNumber')}
+            onChangeText={(value) => setInputValue(value, 'PhoneNumber')}
             keyboardType="phone-pad"
           />
           <Input
@@ -124,7 +124,7 @@ export function Signup({navigation}) {
             textContentType="password"
             secureTextEntry={true}
             value={state.password}
-            onChangeText={value => setInputValue(value, 'Password')}
+            onChangeText={(value) => setInputValue(value, 'Password')}
           />
           <Input
             labelStyle={styles.inputLabel}
@@ -135,7 +135,7 @@ export function Signup({navigation}) {
             textContentType="password"
             secureTextEntry={true}
             value={state.confirmPassword}
-            onChangeText={value => setInputValue(value, 'ConfirmPassword')}
+            onChangeText={(value) => setInputValue(value, 'ConfirmPassword')}
           />
           <Button
             raised

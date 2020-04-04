@@ -3,8 +3,8 @@ import {View, KeyboardAvoidingView, ScrollView} from 'react-native';
 import {Input, Image, Text, Button} from 'react-native-elements';
 
 import {styles} from '../auth.styles';
-import {authService} from '../../services/auth.service';
-import {getLocalStore} from '../../utils/funtions';
+import {authService} from '../../../services/auth.service';
+import {getLocalStore} from '../../../utils/funtions';
 
 export function ChangePassword({navigation}) {
   const [newPassword, setnewPassword] = useState('');
@@ -16,7 +16,7 @@ export function ChangePassword({navigation}) {
       newPassword: newPassword,
       email: localData.email,
     };
-    authService.changePassword(data).then(response => {
+    authService.changePassword(data).then((response) => {
       if (response.status === 200) {
         navigation.navigate('Login');
         setnewPassword('');
@@ -29,7 +29,7 @@ export function ChangePassword({navigation}) {
       <ScrollView>
         <View style={styles.signupContainer}>
           <Image
-            source={require('../../assets/logo.png')}
+            source={require('../../../assets/logo.png')}
             style={styles.signupLogo}
           />
           <Text style={styles.signupHeading}>New Password</Text>

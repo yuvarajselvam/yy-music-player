@@ -9,13 +9,13 @@ import {
 
 import {SOCIAL_TYPES} from '../utils/constants';
 
-export const SSOService = type => {
+export const SSOService = (type) => {
   if (type === SOCIAL_TYPES.FACEBOOK) {
     let data;
-    const fbServiceCallback = userData => {
+    const fbServiceCallback = (userData) => {
       data = userData;
     };
-    return facebookService(type, fbServiceCallback).then(response => {
+    return facebookService(type, fbServiceCallback).then((response) => {
       if (response) {
         return data;
       } else {
@@ -38,7 +38,7 @@ const facebookService = (type, fbServiceCallback) => {
     ]);
     if (!result.isCancelled) {
       console.log('Facebook Result not cancelled');
-      AccessToken.getCurrentAccessToken().then(accessData => {
+      AccessToken.getCurrentAccessToken().then((accessData) => {
         let token = accessData.accessToken;
         const infoRequest = new GraphRequest(
           '/me',
@@ -69,7 +69,7 @@ const facebookService = (type, fbServiceCallback) => {
   });
 };
 
-const googleService = async type => {
+const googleService = async (type) => {
   await GoogleSignin.configure({
     webClientId:
       '156841541425-huk5t0djuibtbq972s5s901v9d1ebav5.apps.googleusercontent.com',
