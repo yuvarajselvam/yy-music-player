@@ -7,8 +7,8 @@ import {
 } from 'react-native';
 import {Input, Button, Image, Text} from 'react-native-elements';
 
-import {authService} from '../../services/auth.service';
-import AuthContext from '../../contexts/auth.context';
+import {authService} from '../../../services/auth.service';
+import AuthContext from '../../../contexts/auth.context';
 import {styles} from '../auth.styles';
 
 export function Login({navigation}) {
@@ -24,7 +24,7 @@ export function Login({navigation}) {
     };
     authService
       .userSignIn(data)
-      .then(async response => {
+      .then(async (response) => {
         let responseObj = await response.json();
         if (response.status === 200) {
           signIn(email, responseObj.token);
@@ -34,7 +34,7 @@ export function Login({navigation}) {
         let message = responseObj.message;
         ToastAndroid.show(message, ToastAndroid.LONG);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   };
@@ -44,7 +44,7 @@ export function Login({navigation}) {
       <ScrollView>
         <View style={styles.loginContainer}>
           <Image
-            source={require('../../assets/logo.png')}
+            source={require('../../../assets/logo.png')}
             style={styles.logoImage}
           />
           <Text style={styles.appName}>WePlay</Text>

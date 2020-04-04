@@ -2,8 +2,8 @@ import React, {useState} from 'react';
 import {View, Alert, ScrollView, KeyboardAvoidingView} from 'react-native';
 import {Input, Button, Image, Text} from 'react-native-elements';
 
-import {authService} from '../../services/auth.service';
-import {setLocalStore} from '../../utils/funtions';
+import {authService} from '../../../services/auth.service';
+import {setLocalStore} from '../../../utils/funtions';
 import {styles} from '../auth.styles';
 
 export function ForgotPassword({navigation}) {
@@ -15,7 +15,7 @@ export function ForgotPassword({navigation}) {
     };
     authService
       .forgotPassword(data)
-      .then(async response => {
+      .then(async (response) => {
         console.log(await response.json());
         if (response.status === 200) {
           let localData = {email: recoveryEmail};
@@ -24,7 +24,7 @@ export function ForgotPassword({navigation}) {
           setrecoveryEmail('');
         }
       })
-      .catch(error => {
+      .catch((error) => {
         Alert.alert(error.message);
       });
   };
@@ -34,7 +34,7 @@ export function ForgotPassword({navigation}) {
       <ScrollView>
         <View style={styles.forgotPasswordContainer}>
           <Image
-            source={require('../../assets/logo.png')}
+            source={require('../../../assets/logo.png')}
             style={styles.signupLogo}
           />
           <Text style={styles.signupHeading}>FORGOT PASSWORD</Text>
