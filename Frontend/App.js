@@ -3,13 +3,13 @@ import React, {useReducer} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
-import {Entry} from './src/authorization/entry';
-import {Login} from './src/authorization/login';
-import {Signup} from './src/authorization/signup';
-import {ForgotPassword} from './src/authorization/forgotPassword';
-import {ChangePassword} from './src/authorization/changePassword';
-import {EnterOTP} from './src/authorization/checkOTP';
-import {Home} from './src/home';
+import {Sso} from './src/components/Authorization/Sso';
+import {Login} from './src/components/Authorization/Login';
+import {Signup} from './src/components/Authorization/Signup';
+import {ForgotPassword} from './src/components/Authorization/ForgotPassword';
+import {ChangePassword} from './src/components/Authorization/ChangePassword';
+import {EnterOTP} from './src/components/Authorization/CheckOTP';
+import {Entry} from './src/components/Entry';
 
 import AuthContext from './src/contexts/auth.context';
 
@@ -59,7 +59,7 @@ export default function App() {
         dispatch({type: 'SIGN_IN', token: token});
       },
       signOut: () => dispatch({type: 'SIGN_OUT'}),
-      signUp: async data => {
+      signUp: async (data) => {
         dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'});
       },
     }),
@@ -69,34 +69,21 @@ export default function App() {
   return (
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
-        <Stack.Navigator headerMode="screen">
+        <Stack.Navigator>
           {state.userToken && state.loggedIn ? (
             <Stack.Screen
-              name="Home"
-              component={Home}
+              name="Entry"
+              component={Entry}
               options={{
-                title: '',
-                headerStyle: {
-                  backgroundColor: '#020204',
-                },
-                headerLeftContainerStyle: {
-                  color: '#FFFFFF',
-                },
+                headerShown: false,
               }}
             />
           ) : (
             <React.Fragment>
               <Stack.Screen
-                name="Entry"
-                component={Entry}
+                name="Sso"
+                component={Sso}
                 options={{
-                  title: '',
-                  headerStyle: {
-                    backgroundColor: '#020204',
-                  },
-                  headerTitleStyle: {
-                    color: '#ABB4BD',
-                  },
                   headerShown: false,
                 }}
               />
@@ -104,65 +91,35 @@ export default function App() {
                 name="Login"
                 component={Login}
                 options={{
-                  title: '',
-                  headerStyle: {
-                    backgroundColor: '#020204',
-                  },
-                  headerTitleStyle: {
-                    color: '#ABB4BD',
-                  },
+                  headerShown: false,
                 }}
               />
               <Stack.Screen
                 name="Signup"
                 component={Signup}
                 options={{
-                  title: '',
-                  headerStyle: {
-                    backgroundColor: '#020204',
-                  },
-                  headerLeftContainerStyle: {
-                    color: '#FFFFFF',
-                  },
+                  headerShown: false,
                 }}
               />
               <Stack.Screen
                 name="ForgotPassword"
                 component={ForgotPassword}
                 options={{
-                  title: '',
-                  headerStyle: {
-                    backgroundColor: '#020204',
-                  },
-                  headerLeftContainerStyle: {
-                    color: '#FFFFFF',
-                  },
+                  headerShown: false,
                 }}
               />
               <Stack.Screen
                 name="EnterOTP"
                 component={EnterOTP}
                 options={{
-                  title: '',
-                  headerStyle: {
-                    backgroundColor: '#020204',
-                  },
-                  headerLeftContainerStyle: {
-                    color: '#FFFFFF',
-                  },
+                  headerShown: false,
                 }}
               />
               <Stack.Screen
                 name="ChangePassword"
                 component={ChangePassword}
                 options={{
-                  title: '',
-                  headerStyle: {
-                    backgroundColor: '#020204',
-                  },
-                  headerLeftContainerStyle: {
-                    color: '#FFFFFF',
-                  },
+                  headerShown: false,
                 }}
               />
             </React.Fragment>

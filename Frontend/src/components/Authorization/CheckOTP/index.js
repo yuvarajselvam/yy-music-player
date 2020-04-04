@@ -1,10 +1,10 @@
-import {View, KeyboardAvoidingView, ScrollView} from 'react-native';
 import React, {useState} from 'react';
+import {View, KeyboardAvoidingView, ScrollView} from 'react-native';
 import {Input, Image, Text, Button} from 'react-native-elements';
 
 import {styles} from '../auth.styles';
-import {authService} from '../../services/auth.service';
-import {getLocalStore} from '../../utils/funtions';
+import {authService} from '../../../services/auth.service';
+import {getLocalStore} from '../../../utils/funtions';
 
 export function EnterOTP({navigation}) {
   const [otp, setOtp] = useState('');
@@ -37,7 +37,7 @@ export function EnterOTP({navigation}) {
       timestamp: timestamp,
     };
 
-    authService.validateForgotPassword(data).then(async response => {
+    authService.validateForgotPassword(data).then(async (response) => {
       console.log(await response.json());
       if (response.status === 200) {
         navigation.navigate('ChangePassword');
@@ -51,7 +51,7 @@ export function EnterOTP({navigation}) {
       <ScrollView>
         <View style={styles.signupContainer}>
           <Image
-            source={require('../../assets/logo.png')}
+            source={require('../../../assets/logo.png')}
             style={styles.signupLogo}
           />
           <Text style={styles.signupHeading}>Verify the OTP</Text>
