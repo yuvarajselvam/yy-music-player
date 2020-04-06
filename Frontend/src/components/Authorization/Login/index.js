@@ -5,8 +5,9 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
-import {Input, Button, Image, Text} from 'react-native-elements';
+import {Button, Image, Text} from 'react-native-elements';
 
+import {InputBox} from '../../../widgets/InputBox';
 import {authService} from '../../../services/auth.service';
 import AuthContext from '../../../contexts/auth.context';
 import {styles} from '../auth.styles';
@@ -48,25 +49,15 @@ export function Login({navigation}) {
             style={styles.logoImage}
           />
           <Text style={styles.appName}>WePlay</Text>
-          <Input
-            containerStyle={styles.inputBoxContainer}
-            labelStyle={styles.inputLabel}
-            inputStyle={styles.inputText}
-            textContentType="emailAddress"
-            autoCapitalize="none"
+          <InputBox
+            label="Email"
+            type="email"
             value={email}
-            label={'Email'}
             onChangeText={setEmail}
-            keyboardType="email-address"
           />
-          <Input
-            label={'Password'}
-            labelStyle={styles.inputLabel}
-            containerStyle={styles.inputBoxContainer}
-            inputStyle={styles.inputText}
-            autoCapitalize="none"
-            textContentType="password"
-            secureTextEntry={true}
+          <InputBox
+            label="Password"
+            type="password"
             value={password}
             onChangeText={setPassword}
           />

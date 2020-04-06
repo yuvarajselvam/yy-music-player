@@ -69,61 +69,19 @@ export default function App() {
   return (
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
-        <Stack.Navigator>
-          {state.userToken && state.loggedIn ? (
-            <Stack.Screen
-              name="Entry"
-              component={Entry}
-              options={{
-                headerShown: false,
-              }}
-            />
-          ) : (
-            <React.Fragment>
-              <Stack.Screen
-                name="Sso"
-                component={Sso}
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen
-                name="Login"
-                component={Login}
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen
-                name="Signup"
-                component={Signup}
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen
-                name="ForgotPassword"
-                component={ForgotPassword}
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen
-                name="EnterOTP"
-                component={EnterOTP}
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen
-                name="ChangePassword"
-                component={ChangePassword}
-                options={{
-                  headerShown: false,
-                }}
-              />
-            </React.Fragment>
-          )}
+        <Stack.Navigator headerMode="none">
+          {/* {state.userToken && state.loggedIn ? ( */}
+          <Stack.Screen name="Entry" component={Entry} />
+          {/* ) : ( */}
+          <React.Fragment>
+            <Stack.Screen name="Sso" component={Sso} />
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Signup" component={Signup} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+            <Stack.Screen name="EnterOTP" component={EnterOTP} />
+            <Stack.Screen name="ChangePassword" component={ChangePassword} />
+          </React.Fragment>
+          {/* )} */}
         </Stack.Navigator>
       </NavigationContainer>
     </AuthContext.Provider>
