@@ -6,7 +6,9 @@ import {
   View,
   Platform,
 } from 'react-native';
-import {Input, Button, Image, Text} from 'react-native-elements';
+import {Button, Image, Text} from 'react-native-elements';
+
+import {InputBox} from '../../../widgets/InputBox';
 
 import {styles} from '../auth.styles';
 import {authService} from '../../../services/auth.service';
@@ -81,59 +83,33 @@ export function Signup({navigation}) {
             style={styles.signupLogo}
           />
           <Text style={styles.signupHeading}>SIGN UP</Text>
-          <Input
-            labelStyle={styles.inputLabel}
-            containerStyle={styles.inputBoxContainer}
-            inputStyle={styles.inputText}
+          <InputBox
             label="Full Name"
-            returnKeyType={'next'}
-            blurOnSubmit={false}
-            maxLength={30}
-            textContentType="namePrefix"
+            type="text"
             value={state.fullName}
             onChangeText={(value) => setInputValue(value, 'FullName')}
           />
-          <Input
-            labelStyle={styles.inputLabel}
-            containerStyle={styles.inputBoxContainer}
-            inputStyle={styles.inputText}
+          <InputBox
             label="Email"
-            textContentType="emailAddress"
-            autoCapitalize="none"
+            type="email"
             value={state.email}
             onChangeText={(value) => setInputValue(value, 'Email')}
-            keyboardType="email-address"
           />
-          <Input
-            labelStyle={styles.inputLabel}
-            containerStyle={styles.inputBoxContainer}
-            inputStyle={styles.inputText}
+          <InputBox
             label="Phone Number"
-            maxLength={10}
-            textContentType="telephoneNumber"
+            type="phone"
             value={state.phone}
             onChangeText={(value) => setInputValue(value, 'PhoneNumber')}
-            keyboardType="phone-pad"
           />
-          <Input
-            labelStyle={styles.inputLabel}
-            containerStyle={styles.inputBoxContainer}
-            inputStyle={styles.inputText}
+          <InputBox
             label="Password"
-            autoCapitalize="none"
-            textContentType="password"
-            secureTextEntry={true}
+            type="password"
             value={state.password}
             onChangeText={(value) => setInputValue(value, 'Password')}
           />
-          <Input
-            labelStyle={styles.inputLabel}
-            containerStyle={styles.inputBoxContainer}
-            inputStyle={styles.inputText}
+          <InputBox
             label="Confirm Password"
-            autoCapitalize="none"
-            textContentType="password"
-            secureTextEntry={true}
+            type="password"
             value={state.confirmPassword}
             onChangeText={(value) => setInputValue(value, 'ConfirmPassword')}
           />

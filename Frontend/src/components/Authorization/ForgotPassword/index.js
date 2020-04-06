@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {View, Alert, ScrollView, KeyboardAvoidingView} from 'react-native';
 import {Input, Button, Image, Text} from 'react-native-elements';
 
+import {InputBox} from '../../../widgets/InputBox';
 import {authService} from '../../../services/auth.service';
 import {setLocalStore} from '../../../utils/funtions';
 import {styles} from '../auth.styles';
@@ -38,16 +39,11 @@ export function ForgotPassword({navigation}) {
             style={styles.signupLogo}
           />
           <Text style={styles.signupHeading}>FORGOT PASSWORD</Text>
-          <Input
-            labelStyle={styles.inputLabel}
-            containerStyle={styles.inputBoxContainer}
-            inputStyle={styles.inputText}
+          <InputBox
             label="Email"
-            textContentType="emailAddress"
-            autoCapitalize="none"
+            type="email"
             value={recoveryEmail}
             onChangeText={setrecoveryEmail}
-            keyboardType="email-address"
           />
           <Button
             raised
