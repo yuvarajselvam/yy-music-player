@@ -3,8 +3,15 @@ import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
 import {Colors} from 'react-native-paper';
 
 export const styles = StyleSheet.create({
-  sceneContainer: {backgroundColor: '#0000FF'},
-  drawer: {backgroundColor: '#000000'},
-  drawerItems: {backgroundColor: Colors.grey800},
-  drawerLabel: {color: '#FFFFFF', width: wp(12)},
+  sceneContainer: {backgroundColor: Colors.grey900},
+  drawer: {backgroundColor: Colors.grey900},
+  drawerItems: {backgroundColor: 'transparent', padding: 0, margin: 0},
+  drawerLabel: {
+    color: Colors.grey300,
+    fontSize: wp(3.6),
+    width: wp(30),
+    margin: 0,
+    padding: 0,
+  },
+  drawerIcon: {padding: 0, margin: 0},
 });

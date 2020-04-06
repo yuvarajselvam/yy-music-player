@@ -1,13 +1,21 @@
 import React from 'react';
-import {View} from 'react-native';
-import {ListItem} from 'react-native-elements';
+import {View, Text} from 'react-native';
+import {commonStyles} from '../common/styles';
+import {PlayerMain} from '../Player/player.main';
 
 export function MyLibrary() {
   return (
-    <View>
-      <ListItem />
-      <ListItem />
-      <ListItem />
+    <View style={commonStyles.screenStyle}>
+      <Text
+        style={{
+          flex: 1,
+          color: '#FFFFFF',
+          textAlign: 'center',
+          textAlignVertical: 'center',
+        }}>
+        My Library
+      </Text>
+      <PlayerMain trackObj={{songUrl: '', id: ''}} />
     </View>
   );
 }

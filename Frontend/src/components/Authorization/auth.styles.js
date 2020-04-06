@@ -62,21 +62,6 @@ export const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
 
-  inputBoxContainer: {
-    marginBottom: hp(2),
-  },
-
-  inputText: {
-    color: '#FFFFFF',
-  },
-
-  inputLabel: {
-    fontFamily: 'Poppins-Regular',
-    fontWeight: 'normal',
-    color: '#ABB4BD',
-    fontSize: hp(1.6),
-  },
-
   button: {
     borderRadius: wp(8),
     backgroundColor: '#FF1654',

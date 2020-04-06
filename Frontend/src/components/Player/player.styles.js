@@ -3,41 +3,43 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {Colors} from 'react-native-paper';
 
 export const styles = StyleSheet.create({
-  playerContainer: {
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  playerButtons: {
-    color: '#FFFFFF',
-  },
   miniPlayer: {
-    // flex: 1,
-    borderColor: '#0000FF',
-  },
-  trackBar: {
-    // flex: 1,
-    backgroundColor: '#000000',
-    margin: 0,
+    height: hp(8.4),
+    backgroundColor: Colors.grey800,
     padding: 0,
+    margin: 0,
+    borderWidth: 0,
   },
-  duration: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingLeft: 12,
-    paddingRight: 12,
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-  },
+  // duration: {
+  //   flex: 1,
+  //   flexDirection: 'row',
+  //   paddingLeft: 12,
+  //   paddingRight: 12,
+  //   justifyContent: 'space-between',
+  //   alignItems: 'flex-end',
+  // },
   seekBar: {
-    justifyContent: 'flex-start',
+    justifyContent: 'flex-end',
     flex: 1,
   },
-  seekBarTrack: {height: hp(0.2)},
+  seekBarTrack: {height: hp(0.2), padding: 0, margin: 0},
   miniPlayerControls: {
+    // flex: 1,
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    // height: hp(4),
   },
-  playerButtons: {padding: 0, margin: 0},
+  playerButtonGroup: {
+    borderWidth: 0,
+    backgroundColor: Colors.grey800,
+    padding: wp(1),
+  },
+  playerAlbumImage: {
+    width: wp(16),
+    height: hp(8.4),
+  },
 });

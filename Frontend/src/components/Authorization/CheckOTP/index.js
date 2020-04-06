@@ -56,14 +56,8 @@ export function EnterOTP({navigation}) {
           />
           <Text style={styles.signupHeading}>Verify the OTP</Text>
           <Input
-            labelStyle={styles.inputLabel}
-            containerStyle={styles.inputBoxContainer}
-            inputStyle={styles.inputText}
             label="Enter the OTP"
-            returnKeyType={'next'}
-            blurOnSubmit={false}
-            maxLength={6}
-            textContentType="namePrefix"
+            type="otp"
             value={otp}
             onChangeText={setOtp}
           />
