@@ -1,8 +1,11 @@
 import React, {useEffect, useContext} from 'react';
 import {View} from 'react-native';
-import {Slider} from 'react-native-elements';
-import {IconButton} from 'react-native-paper';
-import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
+import {Slider, ListItem, Image} from 'react-native-elements';
+import {IconButton, Colors} from 'react-native-paper';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 import {PlayerContext} from '../../contexts/player.context';
 
@@ -47,53 +50,71 @@ export function PlayerMain({trackObj}) {
     return () => onDestroy();
   }, []);
 
+  const onFavourite = () => {};
+
+  const FavouriteButton = () => (
+    <IconButton
+      size={hp(4)}
+      icon="heart"
+      color={Colors.grey200}
+      onPress={onFavourite}
+    />
+  );
+
+  const PlayPauseButton = () => {
+    return !isPlaying ? (
+      <IconButton
+        icon="play"
+        size={hp(7.2)}
+        color={Colors.grey200}
+        onPress={onPlay}
+      />
+    ) : (
+      <IconButton
+        color={Colors.grey200}
+        size={hp(7.2)}
+        icon="pause"
+        onPress={onPause}
+      />
+    );
+  };
+
   return (
-    <View style={styles.miniPlayer}>
-      <View style={styles.trackBar}>
-        <Slider
-          style={styles.seekBar}
-          value={position}
-          minimumValue={0}
-          maximumValue={duration}
-          thumbStyle={{display: 'none'}}
-          trackStyle={styles.seekBarTrack}
-          minimumTrackTintColor="#6a0080"
-          maximumTrackTintColor="#d05ce3"
-        />
-        <View style={styles.miniPlayerControls}>
-          <IconButton
-            style={styles.playerButtons}
-            size={wp(12)}
-            icon="skip-previous"
-            color={'#E0E0E0'}
-            onPress={onPrevious}
+    <View>
+      <Slider
+        style={styles.seekBar}
+        value={position}
+        minimumValue={0}
+        maximumValue={duration}
+        thumbStyle={{display: 'none'}}
+        trackStyle={styles.seekBarTrack}
+        minimumTrackTintColor="#6a0080"
+        maximumTrackTintColor="#d05ce3"
+      />
+      <ListItem
+        containerStyle={styles.miniPlayer}
+        leftElement={
+          <Image
+            style={styles.playerAlbumImage}
+            source={{
+              uri:
+                'https://i.scdn.co/image/ab67616d0000b273e2e352d89826aef6dbd5ff8f',
+            }}
           />
-          {!isPlaying ? (
-            <IconButton
-              style={styles.playerButtons}
-              icon="play"
-              size={wp(12)}
-              color={'#E0E0E0'}
-              onPress={onPlay}
-            />
-          ) : (
-            <IconButton
-              style={styles.playerButtons}
-              color={'#E0E0E0'}
-              size={wp(12)}
-              icon="pause"
-              onPress={onPause}
-            />
-          )}
-          <IconButton
-            style={styles.playerButtons}
-            size={wp(12)}
-            icon="skip-next"
-            color={'#E0E0E0'}
-            onPress={onNext}
-          />
-        </View>
-      </View>
+        }
+        buttonGroup={{
+          buttons: [
+            {
+              element: FavouriteButton,
+            },
+            {
+              element: PlayPauseButton,
+            },
+          ],
+          containerStyle: styles.playerButtonGroup,
+          innerBorderStyle: {width: 0},
+        }}
+      />
     </View>
   );
 }

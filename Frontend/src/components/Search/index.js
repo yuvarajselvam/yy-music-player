@@ -1,21 +1,22 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {View, ScrollView, Keyboard, Alert} from 'react-native';
-import {Card, ListItem, Image} from 'react-native-elements';
+import {Card, ListItem, Image, SearchBar} from 'react-native-elements';
 import {authService} from '../../services/auth.service';
-
-import {Searchbar} from 'react-native-paper';
 
 import {PlayerMain} from '../Player/player.main';
 import {styles} from './search.styles';
+import {commonStyles} from '../common/styles';
+
+const initialState = {
+  id: '',
+  songUrl: '',
+};
 
 export function Search() {
   const [keyword, setKeyword] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isMiniPlayerHidden, setIsMiniPlayerHidden] = useState(false);
-  const initialState = {
-    id: '',
-    songUrl: '',
-  };
+
   const [trackObj, setTrackObj] = useState(initialState);
 
   const getUrl = (urlLink, id) => {
@@ -45,7 +46,7 @@ export function Search() {
             let responseSearchList = responseObj.searchResults;
             console.log(responseSearchList);
             setSearchResults(responseSearchList);
-            searchRef.current.root.blur();
+            searchRef.current.blur();
           }
         });
       }, 400);
@@ -72,7 +73,7 @@ export function Search() {
     const onKeyboardHide = () => {
       console.log('Hiding the miniplayer addListener');
       setIsMiniPlayerHidden(false);
-      searchRef.current.root.blur();
+      searchRef.current.blur();
     };
     Keyboard.addListener('keyboardDidHide', onKeyboardHide);
     return () => {
@@ -87,7 +88,7 @@ export function Search() {
   };
 
   const submitSearch = () => {
-    searchRef.current.root.blur();
+    searchRef.current.blur();
   };
 
   const handleListSelect = (id, type, evt) => {
@@ -113,16 +114,13 @@ export function Search() {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: '#121212',
-      }}>
-      <Searchbar
+    <View style={commonStyles.screenStyle}>
+      <SearchBar
         placeholderTextColor="#FFFFFF"
         iconColor="#FFFFFF"
         ref={searchRef}
-        style={styles.searchBar}
+        containerStyle={{padding: 0}}
+        inputContainerStyle={styles.searchBar}
         inputStyle={styles.searchInput}
         placeholder="Search Songs"
         value={keyword}
@@ -141,6 +139,7 @@ export function Search() {
                 onPress={(evt) => handleListSelect(item._id, item.type, evt)}
                 leftElement={
                   <Image
+                    containerStyle={{padding: 0, margin: 0}}
                     style={styles.listImage}
                     source={{
                       uri: item.imageUrl,
@@ -157,6 +156,10 @@ export function Search() {
                 titleProps={{numberOfLines: 1}}
                 bottomDivider
                 containerStyle={styles.listContainer}
+                contentContainerStyle={{
+                  flex: 1,
+                  justifyContent: 'space-between',
+                }}
               />
             );
           })}

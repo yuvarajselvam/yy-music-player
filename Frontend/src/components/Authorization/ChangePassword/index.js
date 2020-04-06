@@ -2,9 +2,10 @@ import React, {useState} from 'react';
 import {View, KeyboardAvoidingView, ScrollView} from 'react-native';
 import {Input, Image, Text, Button} from 'react-native-elements';
 
-import {styles} from '../auth.styles';
+import {InputBox} from '../../../widgets/InputBox';
 import {authService} from '../../../services/auth.service';
 import {getLocalStore} from '../../../utils/funtions';
+import {styles} from '../auth.styles';
 
 export function ChangePassword({navigation}) {
   const [newPassword, setnewPassword] = useState('');
@@ -33,15 +34,9 @@ export function ChangePassword({navigation}) {
             style={styles.signupLogo}
           />
           <Text style={styles.signupHeading}>New Password</Text>
-          <Input
-            labelStyle={styles.inputLabel}
-            containerStyle={styles.inputBoxContainer}
-            inputStyle={styles.inputText}
+          <InputBox
             label="Enter password"
-            returnKeyType={'next'}
-            blurOnSubmit={false}
-            textContentType="password"
-            secureTextEntry={true}
+            type="password"
             value={newPassword}
             onChangeText={setnewPassword}
           />

@@ -10,16 +10,17 @@ export const styles = StyleSheet.create({
   searchBar: {
     padding: 0,
     margin: 0,
-    backgroundColor: Colors.grey800,
+    backgroundColor: Colors.grey700,
     borderRadius: 0,
     borderBottomWidth: 0,
     elevation: 0,
+    height: hp(6.4),
   },
   searchInput: {
     margin: 0,
+    padding: 0,
     fontSize: wp(4),
-    height: hp(6.8),
-    color: '#E0E0E0',
+    color: Colors.grey200,
     borderRadius: 0,
     borderBottomWidth: 0,
     elevation: 0,
@@ -34,7 +35,7 @@ export const styles = StyleSheet.create({
     padding: 0,
     elevation: 0,
     shadowOpacity: 0,
-    backgroundColor: '#000000',
+    backgroundColor: Colors.grey900,
   },
   listImage: {
     width: wp(12),
@@ -43,12 +44,12 @@ export const styles = StyleSheet.create({
   listTitle: {
     width: wp(58),
     fontSize: wp(4),
-    color: '#E0E0E0',
+    color: Colors.grey200,
   },
   listContainer: {
-    backgroundColor: '#000000',
+    backgroundColor: Colors.grey900,
     borderColor: 'transparent',
   },
-  listRightSubtitle: {color: '#E0E0E0', fontSize: wp(3.2)},
-  listSubtitle: {color: '#EEEEEE'},
+  listRightSubtitle: {color: Colors.grey200, fontSize: wp(3.2)},
+  listSubtitle: {color: Colors.grey200, fontSize: wp(3.4)},
 });
