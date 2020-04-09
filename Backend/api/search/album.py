@@ -3,7 +3,7 @@ from os import environ as env
 
 from flask import jsonify
 from flask_restful import Resource
-from run import albums
+from utils.db import albums
 
 
 class Album(Resource):
