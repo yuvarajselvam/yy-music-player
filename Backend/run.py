@@ -18,14 +18,6 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
-from pymongo import MongoClient
-
-client = MongoClient()
-db = client.YYMP
-tracks = db.tracks
-albums = db.album_original
-artists = db.artists
-
 os.environ.__setitem__('verbose', 'abs')
 if os.environ['verbose']:
     print("[INFO] Running in verbose mode. \n")

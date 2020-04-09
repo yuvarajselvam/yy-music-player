@@ -1,7 +1,15 @@
 from mongoengine import connect, disconnect
 import ssl
-
+from pymongo import MongoClient
 from utils.secrets import Secrets
+
+
+client = MongoClient()
+db = client.YYMP
+tracks = db.tracks
+albums = db.albums
+artists = db.artists
+names = db.names
 
 
 class DbUtils:
@@ -13,3 +21,4 @@ class DbUtils:
 
     def db_disconnect(self):
         disconnect(self.db_alias)
+
