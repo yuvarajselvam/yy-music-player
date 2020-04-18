@@ -5,11 +5,14 @@ from utils.secrets import Secrets
 
 
 client = MongoClient()
-db = client.YYMP
+db = client.YYMP_Saavn
 tracks = db.tracks
 albums = db.albums
 artists = db.artists
 names = db.names
+
+albums_telugu = db.albums_telugu
+tracks_telugu = db.tracks_telugu
 
 
 class DbUtils:
