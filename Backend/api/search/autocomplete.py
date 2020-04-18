@@ -48,21 +48,23 @@ class Autocomplete(Resource):
             print("Time taken for searching: ", time() - start_time)
         trimmed_albums = []
         if len(matching_albums):
-            for album in matching_albums[: 20 if 20 <= len(matching_albums) else len(matching_albums)]:
-                if env["verbose"]:
-                    print("Album: ", album["name"], "MatchScore:", album["matchScore"])
-                trimmed_albums.append({
+            for album in matching_albums[: 10 if 10 <= len(matching_albums) else len(matching_albums)]:
+                # if env["verbose"]:
+                    # print("Album: ", album["name"], "MatchScore:", album["matchScore"])
+                trimmed_album = {
                     "name": album["name"],
                     "_id": album["_id"],
                     "imageUrl": album["imageUrl"] if "imageUrl" in album else None,
-                    "artists": album["artists"][0]["name"],
                     "type": album["type"]
-                })
+                }
+                if len(album["artists"]):
+                    trimmed_album["artists"] = album["artists"][0]["name"]
+                trimmed_albums.append(trimmed_album)
         trimmed_tracks = []
         if len(matching_tracks):
-            for track in matching_tracks[: 20 if 20 <= len(matching_tracks) else len(matching_tracks)]:
-                if env["verbose"]:
-                    print("Track: ", track["name"], "MatchScore:", track["matchScore"])
+            for track in matching_tracks[: 10 if 10 <= len(matching_tracks) else len(matching_tracks)]:
+                # if env["verbose"]:
+                    # print("Track: ", track["name"], "MatchScore:", track["matchScore"])
                 track_dict = {
                     "name": track["name"],
                     "_id": track["_id"],
