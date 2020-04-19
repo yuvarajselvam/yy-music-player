@@ -59,7 +59,7 @@ export default function App() {
         dispatch({type: 'SIGN_IN', token: token});
       },
       signOut: () => dispatch({type: 'SIGN_OUT'}),
-      signUp: async (data) => {
+      signUp: async data => {
         dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'});
       },
     }),

@@ -14,7 +14,6 @@ import {styles} from './player.styles';
 export function PlayerMain({trackObj}) {
   const [
     onAddTrack,
-    onSetupPlayer,
     onUpdateOptions,
     onPlay,
     onPause,
@@ -33,19 +32,17 @@ export function PlayerMain({trackObj}) {
 
   useEffect(() => {
     console.log('UseEffect ADD_TRACK', trackObj.songUrl);
-    onAddTrack(trackObj.id, trackObj.songUrl).then(() => {
-      if (trackObj.songUrl.length > 0 && playbackState !== 0) {
-        onReset();
-        console.log('Autoplaying initialising');
-        onPlay();
-        setIsPlaying(true);
-      }
-    });
+    if (trackObj.songUrl.length > 1) {
+      onAddTrack(trackObj.id, trackObj.songUrl);
+      onReset();
+      console.log('Autoplaying initialising');
+      onPlay();
+      setIsPlaying(true);
+    }
   }, [trackObj.songUrl]);
 
   useEffect(() => {
     console.log('UseEffect PLAYER');
-    onSetupPlayer();
     onUpdateOptions();
     return () => onDestroy();
   }, []);
@@ -54,6 +51,7 @@ export function PlayerMain({trackObj}) {
 
   const FavouriteButton = () => (
     <IconButton
+      style={styles.miniPlayerButton}
       size={hp(4)}
       icon="heart"
       color={Colors.grey200}
@@ -64,15 +62,17 @@ export function PlayerMain({trackObj}) {
   const PlayPauseButton = () => {
     return !isPlaying ? (
       <IconButton
+        style={styles.miniPlayerButton}
         icon="play"
-        size={hp(7.2)}
+        size={hp(6)}
         color={Colors.grey200}
         onPress={onPlay}
       />
     ) : (
       <IconButton
+        style={styles.miniPlayerButton}
         color={Colors.grey200}
-        size={hp(7.2)}
+        size={hp(6)}
         icon="pause"
         onPress={onPause}
       />
@@ -88,8 +88,8 @@ export function PlayerMain({trackObj}) {
         maximumValue={duration}
         thumbStyle={{display: 'none'}}
         trackStyle={styles.seekBarTrack}
-        minimumTrackTintColor="#6a0080"
-        maximumTrackTintColor="#d05ce3"
+        minimumTrackTintColor="#0026ca"
+        maximumTrackTintColor="#7a7cff"
       />
       <ListItem
         containerStyle={styles.miniPlayer}
@@ -102,18 +102,12 @@ export function PlayerMain({trackObj}) {
             }}
           />
         }
-        buttonGroup={{
-          buttons: [
-            {
-              element: FavouriteButton,
-            },
-            {
-              element: PlayPauseButton,
-            },
-          ],
-          containerStyle: styles.playerButtonGroup,
-          innerBorderStyle: {width: 0},
-        }}
+        rightElement={
+          <View style={styles.playerButtonGroup}>
+            <FavouriteButton />
+            <PlayPauseButton />
+          </View>
+        }
       />
     </View>
   );

@@ -7,17 +7,19 @@ import {
 
 export const PlayerContext = createContext();
 
-export const PlayerProvider = (props) => {
+export const PlayerProvider = props => {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const {bufferedPosition, duration, position} = useTrackPlayerProgress();
 
   const playbackState = usePlaybackState();
 
-  const onAddTrack = async (id, songUrl) => {
-    await TrackPlayer.add({
-      id: id,
-      url: songUrl,
+  const onAddTrack = (id, songUrl) => {
+    TrackPlayer.setupPlayer().then(async () => {
+      await TrackPlayer.add({
+        id: id,
+        url: songUrl,
+      });
     });
   };
 
@@ -51,9 +53,8 @@ export const PlayerProvider = (props) => {
     TrackPlayer.destroy();
   };
 
-  const onSetupPlayer = () => {
-    TrackPlayer.setupPlayer();
-  };
+  // const onSetupPlayer = () => {
+  // };
 
   const onUpdateOptions = () => {
     TrackPlayer.updateOptions({
@@ -72,7 +73,6 @@ export const PlayerProvider = (props) => {
     <PlayerContext.Provider
       value={[
         onAddTrack,
-        onSetupPlayer,
         onUpdateOptions,
         onPlay,
         onPause,
