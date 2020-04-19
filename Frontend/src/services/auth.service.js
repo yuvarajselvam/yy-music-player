@@ -1,7 +1,7 @@
-const URL_LINK = 'http://192.168.0.3:5000/';
+const URL_LINK = 'http://0ef67011.ngrok.io/';
 
 export const authService = {
-  userSSO: (data) => {
+  userSSO: data => {
     return fetch(URL_LINK + 'sso/', {
       method: 'POST',
       headers: {
@@ -11,7 +11,7 @@ export const authService = {
     });
   },
 
-  userSignIn: (data) => {
+  userSignIn: data => {
     return fetch(URL_LINK + 'signin/', {
       method: 'POST',
       headers: {
@@ -21,7 +21,7 @@ export const authService = {
     });
   },
 
-  userSignup: (data) => {
+  userSignup: data => {
     return fetch(URL_LINK + 'signup/', {
       method: 'POST',
       headers: {
@@ -31,7 +31,7 @@ export const authService = {
     });
   },
 
-  forgotPassword: (data) => {
+  forgotPassword: data => {
     return fetch(URL_LINK + 'forgot_password/', {
       method: 'POST',
       headers: {
@@ -41,7 +41,7 @@ export const authService = {
     });
   },
 
-  validateForgotPassword: (data) => {
+  validateForgotPassword: data => {
     console.log(data);
     return fetch(URL_LINK + 'forgot_password/validate/', {
       method: 'POST',
@@ -52,7 +52,7 @@ export const authService = {
     });
   },
 
-  changePassword: (data) => {
+  changePassword: data => {
     return fetch(URL_LINK + 'change_password/', {
       method: 'POST',
       headers: {
@@ -62,11 +62,16 @@ export const authService = {
     });
   },
 
-  getSearch: (data) => {
-    return fetch(URL_LINK + 'autocomplete/' + `?searchKey=${data.searchKey}`);
+  getSearch: data => {
+    return fetch(
+      URL_LINK +
+        'autocomplete/' +
+        `?searchKey=${data.searchKey}` +
+        `&language=${data.language}`,
+    );
   },
 
-  getTrack: (data) => {
+  getTrack: data => {
     return fetch(URL_LINK + 'track/' + `${data._id}`);
   },
 };

@@ -21,22 +21,17 @@ export const styles = StyleSheet.create({
   //   justifyContent: 'space-between',
   //   alignItems: 'flex-end',
   // },
+  miniPlayerButton: {padding: 0, margin: 0},
   seekBar: {
     justifyContent: 'flex-end',
     flex: 1,
   },
   seekBarTrack: {height: hp(0.2), padding: 0, margin: 0},
-  miniPlayerControls: {
-    // flex: 1,
+  playerButtonGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    // height: hp(4),
-  },
-  playerButtonGroup: {
-    borderWidth: 0,
-    backgroundColor: Colors.grey800,
-    padding: wp(1),
+    padding: 0,
+    margin: 0,
   },
   playerAlbumImage: {
     width: wp(16),

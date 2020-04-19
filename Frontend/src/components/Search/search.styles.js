@@ -42,14 +42,40 @@ export const styles = StyleSheet.create({
     height: hp(6),
   },
   listTitle: {
-    width: wp(58),
+    width: wp('64%'),
+    flex: 1,
     fontSize: wp(4),
     color: Colors.grey200,
   },
   listContainer: {
     backgroundColor: Colors.grey900,
-    borderColor: 'transparent',
+    borderBottomWidth: 0,
   },
-  listRightSubtitle: {color: Colors.grey200, fontSize: wp(3.2)},
-  listSubtitle: {color: Colors.grey200, fontSize: wp(3.4)},
+  listSubtitle: {
+    width: wp(58),
+    flex: 1,
+    color: Colors.grey200,
+    fontSize: wp(3),
+  },
+  listVerticalButton: {
+    alignItems: 'flex-end',
+    margin: 0,
+  },
+  overlayContainer: {flex: 1, opacity: 0.7, backgroundColor: Colors.black},
+  overlay: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+  },
+  overlayContent: {flex: 1, justifyContent: 'space-around'},
+  overlayButtons: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  overlayButtonTitle: {
+    color: Colors.grey300,
+    fontFamily: 'Poppins-Regular',
+    fontSize: wp(4),
+  },
 });
