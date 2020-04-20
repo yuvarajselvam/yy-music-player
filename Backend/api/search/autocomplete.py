@@ -28,15 +28,14 @@ class Autocomplete(Resource):
         matching_tracks = my_tracks.find({"$text": {"$search": search_key}}, {"score": {"$meta": "textScore"}})
 
         matching_albums = sorted(matching_albums, key=lambda t: t["score"], reverse=True)
-        matching_tracks = matching_albums[:min(200, len(matching_albums))]
+        matching_albums = matching_albums[:min(200, len(matching_albums))]
         for alb in matching_albums:
             album_name = re.sub("[(\[].*[)\]]", "", alb["name"]).strip()
             alb["matchScore"] = fuzz.ratio(album_name, search_key)
-
         matching_albums = sorted(matching_albums, key=lambda t: t["matchScore"], reverse=True)
 
         matching_tracks = sorted(matching_tracks, key=lambda t: t["score"], reverse=True)
-        matching_tracks = matching_tracks[:min(200, len(matching_tracks))]
+        matching_tracks = matching_tracks[:min(200, len(matching_albums))]
         for trk in matching_tracks:
             trk["matchScore"] = fuzz.ratio(trk["name"], search_key)
         matching_tracks = sorted(matching_tracks, key=lambda t: t["matchScore"], reverse=True)
