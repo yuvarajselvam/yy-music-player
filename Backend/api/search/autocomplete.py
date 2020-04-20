@@ -24,21 +24,23 @@ class Autocomplete(Resource):
             my_albums = albums_telugu
             my_tracks = tracks_telugu
 
-        matching_albums = my_albums.find({"$text": {"$search": search_key}}, {"score": {"$meta": "textScore"}}) \
-            .collection \
-            .find({"name": re.compile(f".*{search_key}.*", re.IGNORECASE)})
-        matching_albums = sorted(matching_albums, key=lambda t: t["name"], reverse=True)
+        matching_albums = my_albums.find({"$text": {"$search": search_key}}, {"score": {"$meta": "textScore"}})
+        matching_tracks = my_tracks.find({"$text": {"$search": search_key}}, {"score": {"$meta": "textScore"}})
+
+        matching_albums = sorted(matching_albums, key=lambda t: t["score"], reverse=True)
+        matching_tracks = matching_albums[:min(200, len(matching_albums))]
         for alb in matching_albums:
-            alb["matchScore"] = fuzz.ratio(alb["name"], search_key)
+            album_name = re.sub("[(\[].*[)\]]", "", alb["name"]).strip()
+            alb["matchScore"] = fuzz.ratio(album_name, search_key)
+
         matching_albums = sorted(matching_albums, key=lambda t: t["matchScore"], reverse=True)
-        matching_tracks = my_tracks.find({"$text": {"$search": search_key}}, {"score": {"$meta": "textScore"}}) \
-            .collection \
-            .find({"$or": [{"name": re.compile(f".*{search_key}.*", re.IGNORECASE)},
-                           {"album.name": re.compile(f".*{search_key}.*", re.IGNORECASE)}]})
-        matching_tracks = sorted(matching_tracks, key=lambda t: t["name"], reverse=True)
+
+        matching_tracks = sorted(matching_tracks, key=lambda t: t["score"], reverse=True)
+        matching_tracks = matching_tracks[:min(200, len(matching_tracks))]
         for trk in matching_tracks:
             trk["matchScore"] = fuzz.ratio(trk["name"], search_key)
         matching_tracks = sorted(matching_tracks, key=lambda t: t["matchScore"], reverse=True)
+
         # matching_artists = artists.find({"$text": {"$search": search_key}}) \
         #     .collection\
         #     .find({"name": re.compile(f".*{search_key}.*", re.IGNORECASE)})
@@ -50,7 +52,7 @@ class Autocomplete(Resource):
         if len(matching_albums):
             for album in matching_albums[: 10 if 10 <= len(matching_albums) else len(matching_albums)]:
                 # if env["verbose"]:
-                    # print("Album: ", album["name"], "MatchScore:", album["matchScore"])
+                #     print("Album: ", album["name"], "MatchScore:", album["matchScore"])
                 trimmed_album = {
                     "name": album["name"],
                     "_id": album["_id"],
@@ -64,7 +66,7 @@ class Autocomplete(Resource):
         if len(matching_tracks):
             for track in matching_tracks[: 10 if 10 <= len(matching_tracks) else len(matching_tracks)]:
                 # if env["verbose"]:
-                    # print("Track: ", track["name"], "MatchScore:", track["matchScore"])
+                #     print("Track: ", track["name"], "MatchScore:", track["matchScore"])
                 track_dict = {
                     "name": track["name"],
                     "_id": track["_id"],
