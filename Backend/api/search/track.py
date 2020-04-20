@@ -1,3 +1,4 @@
+import re
 import json
 from os import environ as env
 
@@ -34,7 +35,7 @@ class Track(Resource):
                 return response
         else:
             track_name = track["name"]
-            track_album = track["album"]["name"].replace('(Original Motion Picture Soundtrack)', '')
+            track_album = re.sub("[(\[].*[)\]]", "", track["album"]["name"]).strip()
             track_artist = track["artists"][0]["name"]
             try:
                 youtube_search_term = " ".join([track_name, track_album, track_artist])
