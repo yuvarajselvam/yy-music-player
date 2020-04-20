@@ -24,7 +24,6 @@ if os.environ['verbose']:
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = Secrets.JWT_SECRET_KEY
-app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 CORS(app)
 api = Api(app)
 jwt = JWTManager(app)
