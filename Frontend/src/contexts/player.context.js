@@ -1,4 +1,4 @@
-import React, {useState, createContext} from 'react';
+import React, {useState, createContext, useEffect} from 'react';
 import TrackPlayer from 'react-native-track-player';
 import {
   usePlaybackState,
@@ -7,21 +7,31 @@ import {
 
 export const PlayerContext = createContext();
 
-export const PlayerProvider = (props) => {
+export const PlayerProvider = props => {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const {bufferedPosition, duration, position} = useTrackPlayerProgress();
 
   const playbackState = usePlaybackState();
 
+  // useEffect(() => {
+  //   console.log('Setting up the player');
+  //   return () => onDestroy();
+  // }, []);
+
   const onAddTrack = async (id, songUrl) => {
-    await TrackPlayer.add({
-      id: id,
-      url: songUrl,
+    console.log('onAddTrack is called');
+    TrackPlayer.setupPlayer().then(async () => {
+      onUpdateOptions();
+      await TrackPlayer.add({
+        id: id,
+        url: songUrl,
+      });
     });
   };
 
   const onPlay = () => {
+    console.log('OnPlay is called');
     setIsPlaying(true);
     TrackPlayer.play();
   };
@@ -51,10 +61,6 @@ export const PlayerProvider = (props) => {
     TrackPlayer.destroy();
   };
 
-  const onSetupPlayer = () => {
-    TrackPlayer.setupPlayer();
-  };
-
   const onUpdateOptions = () => {
     TrackPlayer.updateOptions({
       stopWithApp: true,
@@ -70,24 +76,22 @@ export const PlayerProvider = (props) => {
 
   return (
     <PlayerContext.Provider
-      value={[
-        onAddTrack,
-        onSetupPlayer,
-        onUpdateOptions,
-        onPlay,
-        onPause,
-        onPrevious,
-        onNext,
-        onReset,
-        onRemove,
-        onDestroy,
-        bufferedPosition,
-        duration,
-        position,
-        playbackState,
-        isPlaying,
-        setIsPlaying,
-      ]}>
+      value={{
+        isPlaying: isPlaying,
+        bufferedPosition: bufferedPosition,
+        duration: duration,
+        position: position,
+        playbackState: playbackState,
+        setIsPlaying: setIsPlaying,
+        onAddTrack: onAddTrack,
+        onPlay: onPlay,
+        onPause: onPause,
+        onPrevious: onPrevious,
+        onNext: onNext,
+        onReset: onReset,
+        onRemove: onRemove,
+        onDestroy: onDestroy,
+      }}>
       {props.children}
     </PlayerContext.Provider>
   );

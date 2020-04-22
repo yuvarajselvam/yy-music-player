@@ -4,12 +4,9 @@ import {
   DrawerContentScrollView,
   DrawerItem,
 } from '@react-navigation/drawer';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
 import {Colors, IconButton} from 'react-native-paper';
-import {Avatar, Text} from 'react-native-elements';
+import {Divider} from 'react-native-elements';
 import {View} from 'react-native';
 
 import {Main} from '../Main';
@@ -21,38 +18,11 @@ const Drawer = createDrawerNavigator();
 function CustomDrawerContent({navigation}) {
   return (
     <DrawerContentScrollView>
-      <View
-        style={{
-          // flex: 1,
-          // margin: wp(1),
-          padding: wp(4),
-          backgroundColor: Colors.grey700,
-        }}>
-        <Avatar
-          size={hp(8)}
-          rounded
-          source={{
-            uri:
-              'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-          }}
-        />
-        <View
-          style={{
-            marginTop: hp(2),
-          }}>
-          <Text
-            style={{
-              fontSize: wp(4.8),
-              fontWeight: 'bold',
-              color: Colors.grey300,
-            }}>
-            Jon Snow
-          </Text>
-          <Text style={{fontSize: wp(3.8), color: Colors.grey300}}>
-            jonsnow@gmail.com
-          </Text>
-        </View>
-      </View>
+      <DrawerItem
+        label="YY Music Player"
+        labelStyle={styles.drawerHeaderLabel}
+      />
+      <Divider style={{backgroundColor: Colors.grey300}} />
       <View>
         <DrawerItem
           label="Home"
@@ -61,8 +31,8 @@ function CustomDrawerContent({navigation}) {
             <IconButton
               style={styles.drawerIcon}
               color={Colors.grey300}
-              size={wp(4.8)}
-              icon={'home'}
+              size={wp(6.4)}
+              icon={'home-outline'}
             />
           )}
           onPress={() =>
@@ -78,8 +48,8 @@ function CustomDrawerContent({navigation}) {
             <IconButton
               style={styles.drawerIcon}
               color={Colors.grey300}
-              size={wp(4.8)}
-              icon={'account-multiple'}
+              size={wp(6.4)}
+              icon={'account-multiple-outline'}
             />
           )}
           onPress={() => navigation.navigate('Home')}
@@ -91,8 +61,8 @@ function CustomDrawerContent({navigation}) {
             <IconButton
               style={styles.drawerIcon}
               color={Colors.grey300}
-              size={wp(4.8)}
-              icon={'map-marker'}
+              size={wp(6.4)}
+              icon={'map-marker-outline'}
             />
           )}
           onPress={() => navigation.navigate('Settings')}
@@ -104,7 +74,7 @@ function CustomDrawerContent({navigation}) {
             <IconButton
               style={styles.drawerIcon}
               color={Colors.grey300}
-              size={wp(4.8)}
+              size={wp(6.4)}
               icon={'tune'}
             />
           )}
@@ -115,14 +85,15 @@ function CustomDrawerContent({navigation}) {
           }
         />
         <DrawerItem
+          style={{margin: 0, padding: 0}}
           label="Settings"
           labelStyle={styles.drawerLabel}
           icon={() => (
             <IconButton
               style={styles.drawerIcon}
               color={Colors.grey300}
-              size={wp(4.8)}
-              icon={'settings'}
+              size={wp(6.4)}
+              icon={'settings-outline'}
             />
           )}
           onPress={() => navigation.navigate('Settings')}
@@ -135,16 +106,12 @@ function CustomDrawerContent({navigation}) {
 export function Entry() {
   return (
     <Drawer.Navigator
-      minSwipeDistance={wp(12)}
       sceneContainerStyle={styles.sceneContainer}
       drawerStyle={styles.drawer}
-      drawerContentOptions={{
-        itemStyle: styles.drawerItems,
-        labelStyle: styles.drawerLabel,
-      }}
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      drawerContent={props => <CustomDrawerContent {...props} />}
+      edgeWidth={wp(24)}
       initialRouteName="Main">
-      <Drawer.Screen name="Home" component={Main} />
+      <Drawer.Screen name="Main" component={Main} />
       <Drawer.Screen name="Settings" component={Settings} />
     </Drawer.Navigator>
   );

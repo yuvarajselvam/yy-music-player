@@ -12,6 +12,7 @@ import {EnterOTP} from './src/components/Authorization/CheckOTP';
 import {Entry} from './src/components/Entry';
 
 import AuthContext from './src/contexts/auth.context';
+import {PlayerProvider} from './src/contexts/player.context';
 
 const Stack = createStackNavigator();
 
@@ -59,7 +60,7 @@ export default function App() {
         dispatch({type: 'SIGN_IN', token: token});
       },
       signOut: () => dispatch({type: 'SIGN_OUT'}),
-      signUp: async (data) => {
+      signUp: async data => {
         dispatch({type: 'SIGN_IN', token: 'dummy-auth-token'});
       },
     }),
@@ -68,22 +69,24 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={authContext}>
-      <NavigationContainer>
-        <Stack.Navigator headerMode="none">
-          {/* {state.userToken && state.loggedIn ? ( */}
-          <Stack.Screen name="Entry" component={Entry} />
-          {/* ) : ( */}
-          <React.Fragment>
-            <Stack.Screen name="Sso" component={Sso} />
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Signup" component={Signup} />
-            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-            <Stack.Screen name="EnterOTP" component={EnterOTP} />
-            <Stack.Screen name="ChangePassword" component={ChangePassword} />
-          </React.Fragment>
-          {/* )} */}
-        </Stack.Navigator>
-      </NavigationContainer>
+      <PlayerProvider>
+        <NavigationContainer>
+          <Stack.Navigator headerMode="none">
+            {/* {state.userToken && state.loggedIn ? ( */}
+            <Stack.Screen name="Entry" component={Entry} />
+            {/* ) : ( */}
+            <React.Fragment>
+              <Stack.Screen name="Sso" component={Sso} />
+              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="Signup" component={Signup} />
+              <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+              <Stack.Screen name="EnterOTP" component={EnterOTP} />
+              <Stack.Screen name="ChangePassword" component={ChangePassword} />
+            </React.Fragment>
+            {/* )} */}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </PlayerProvider>
     </AuthContext.Provider>
   );
 }

@@ -1,4 +1,4 @@
-export const searchResults = [
+export const searchResultsMock = [
   {
     name: 'Roses - Imanbek Remix',
     _id: '24Yi9hE78yPEbZ4kxyoXAI',
@@ -6,6 +6,8 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b2735125b397750a23a76b21def0',
     artists: 'SAINt JHN',
     type: 'track',
+    language: 'Tamil',
+    isSelect: false,
   },
   {
     name: 'Aathaalai Engal - Chellaatha - Language: Tamil; Genre: Amman',
@@ -14,6 +16,8 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b2732edcf3acb884a9b015f81313',
     artists: 'L. R. Eswari',
     type: 'track',
+    language: 'Tamil',
+    isSelect: false,
   },
   {
     name: 'Karpoora Nayagiyae - Language: Tamil; Genre: Amman',
@@ -22,6 +26,8 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b2732edcf3acb884a9b015f81313',
     artists: 'L. R. Eswari',
     type: 'track',
+    language: 'Tamil',
+    isSelect: false,
   },
   {
     name: 'Mere Liye Tum Kaafi Ho (From "Shubh Mangal Zyada Saavdhan")',
@@ -30,6 +36,8 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b273cb75480c8f75cf7d5d422996',
     artists: 'Ayushmann Khurrana',
     type: 'album',
+    language: 'Tamil',
+    isSelect: false,
   },
   {
     name: 'Guitar Cafe - Ayushmann Khurrana',
@@ -38,6 +46,8 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b2736734eb71732fc62757ee0926',
     artists: 'Ayushmann Khurrana',
     type: 'album',
+    language: 'Tamil',
+    isSelect: false,
   },
   {
     name:
@@ -47,6 +57,8 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b273e2e352d89826aef6dbd5ff8f',
     artists: 'Various Artists',
     type: 'album',
+    language: 'Tamil',
+    isSelect: false,
   },
   {
     name:
@@ -56,6 +68,8 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b273e2e352d89826aef6dbd5ff8f',
     artists: 'Various Artists',
     type: 'album',
+    language: 'Tamil',
+    isSelect: false,
   },
   {
     name:
@@ -65,6 +79,8 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b273e2e352d89826aef6dbd5ff8f',
     artists: 'Various Artists',
     type: 'album',
+    language: 'Tamil',
+    isSelect: false,
   },
   {
     name:
@@ -74,6 +90,8 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b273e2e352d89826aef6dbd5ff8f',
     artists: 'Various Artists',
     type: 'album',
+    language: 'Tamil',
+    isSelect: false,
   },
   {
     name:
@@ -83,6 +101,8 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b273e2e352d89826aef6dbd5ff8f',
     artists: 'Various Artists',
     type: 'album',
+    language: 'Tamil',
+    isSelect: false,
   },
   {
     name:
@@ -92,6 +112,8 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b273e2e352d89826aef6dbd5ff8f',
     artists: 'Various Artists',
     type: 'album',
+    language: 'Tamil',
+    isSelect: false,
   },
   {
     name:
@@ -101,6 +123,8 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b273e2e352d89826aef6dbd5ff8f',
     artists: 'Various Artists',
     type: 'album',
+    language: 'Tamil',
+    isSelect: false,
   },
   {
     name: 'Spider-Man Test',
@@ -109,5 +133,7 @@ export const searchResults = [
       'https://i.scdn.co/image/ab67616d0000b273e2e352d89826aef6dbd5ff8f',
     artists: 'Various Artists',
     type: 'album',
+    language: 'Tamil',
+    isSelect: false,
   },
 ];

@@ -1,52 +1,77 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import {View, ScrollView, Keyboard, Alert} from 'react-native';
-import {Card, ListItem, Image, SearchBar} from 'react-native-elements';
-import {authService} from '../../services/auth.service';
+import {
+  Card,
+  ListItem,
+  Image,
+  SearchBar,
+  Overlay,
+  Button,
+} from 'react-native-elements';
+import {IconButton, Colors, Appbar} from 'react-native-paper';
+import {useFocusEffect} from '@react-navigation/native';
+import {
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from 'react-native-responsive-screen';
 
-import {PlayerMain} from '../Player/player.main';
+import {authService} from '../../services/auth.service';
+import {PlayerContext} from '../../contexts/player.context';
+// import {searchResultsMock} from '../../mocks/search.list';
+
 import {styles} from './search.styles';
 import {commonStyles} from '../common/styles';
 
-const initialState = {
-  id: '',
-  songUrl: '',
-};
-
-export function Search() {
+export function Search({navigation}) {
   const [keyword, setKeyword] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [isMiniPlayerHidden, setIsMiniPlayerHidden] = useState(false);
+  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
+  const [selectedTrackItems, setSelectedTrackItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState(new Set());
+  const [isSelectable, setIsSelectable] = useState(false);
 
-  const [trackObj, setTrackObj] = useState(initialState);
+  const searchRef = useRef();
+  const {onAddTrack, onPlay, onReset} = useContext(PlayerContext);
 
   const getUrl = (urlLink, id) => {
     console.log('URL_LINK', urlLink);
-    let obj = {
-      songUrl: urlLink,
-      id: id,
-    };
-    setTrackObj(obj);
+    // onRemove();
+    onAddTrack(id, urlLink).then(() => {
+      onReset();
+      onPlay();
+    });
   };
 
-  const searchRef = useRef();
+  useFocusEffect(
+    React.useCallback(() => {
+      // Do something when the screen is focused
+      searchRef.current.focus();
+      return () => {
+        setSearchResults([]);
+        setKeyword('');
+      };
+    }, []),
+  );
 
   useEffect(() => {
     let currentKeyword = searchRef.current.props.value;
     let timer;
-    if (keyword === currentKeyword) {
+    if (currentKeyword.length > 0 && keyword === currentKeyword) {
       timer = setTimeout(() => {
-        // console.log('First SetTimeout Started');
         console.log('SEARCH KEYWORD', keyword);
         let data = {
           searchKey: currentKeyword,
+          languages: ['Tamil', 'Telugu'],
         };
-        authService.getSearch(data).then(async (response) => {
+        authService.getSearch(data).then(async response => {
           if (response.status === 200) {
             let responseObj = await response.json();
             let responseSearchList = responseObj.searchResults;
-            console.log(responseSearchList);
-            setSearchResults(responseSearchList);
-            searchRef.current.blur();
+            let edittedSearchList = responseSearchList.map(value => {
+              value.isSelect = false;
+              return value;
+            });
+            setSearchResults(edittedSearchList);
           }
         });
       }, 400);
@@ -54,118 +79,298 @@ export function Search() {
     return () => {
       console.log('Clear Interval');
       clearTimeout(timer);
+      setSearchResults([]);
     };
   }, [keyword]);
 
-  useEffect(() => {
-    const onKeyboardShow = () => {
-      console.log('Hiding the miniplayer addListener');
-      setIsMiniPlayerHidden(true);
-    };
-    Keyboard.addListener('keyboardDidShow', onKeyboardShow);
-    return () => {
-      console.log('Hiding the miniplayer removeListener');
-      Keyboard.removeListener('keyboardDidShow', onKeyboardShow);
-    };
-  }, [isMiniPlayerHidden]);
-
-  useEffect(() => {
-    const onKeyboardHide = () => {
-      console.log('Hiding the miniplayer addListener');
-      setIsMiniPlayerHidden(false);
-      searchRef.current.blur();
-    };
-    Keyboard.addListener('keyboardDidHide', onKeyboardHide);
-    return () => {
-      console.log('Hiding the miniplayer removeListener');
-      Keyboard.removeListener('keyboardDidHide', onKeyboardHide);
-    };
-  }, [isMiniPlayerHidden]);
-
-  const handleSearch = (value) => {
+  const handleSearch = value => {
     console.log(value);
     setKeyword(value);
   };
 
-  const submitSearch = () => {
-    searchRef.current.blur();
-  };
-
-  const handleListSelect = (id, type, evt) => {
-    evt.persist();
+  const handleListSelect = (item, evt) => {
+    if (isSelectable) {
+      return handleLongPress(item);
+    }
     let data = {
-      _id: id,
-      type: type,
+      _id: item._id,
+      language: item.language,
     };
-    // Need to get the track URL or the album details from backend
     console.log(data);
-    if (type === 'track') {
-      authService.getTrack(data).then(async (response) => {
+    if (item.type === 'track') {
+      authService.getTrack(data).then(async response => {
         if (response.status === 200) {
           let responseObj = await response.json();
-          let trackUrl = responseObj.url;
+          let trackUrl = responseObj.trackUrl;
           let trackId = responseObj._id;
           getUrl(trackUrl, trackId);
         } else {
           Alert.alert('Song cannot be played at this moment');
         }
       });
+    } else {
+      navigation.navigate('Album', data);
     }
+  };
+
+  const handleMultiTrackAction = () => {
+    console.log(selectedItems);
+    setSelectedTrackItems([...selectedItems]);
+    setIsOverlayVisible(prevState => !prevState);
+  };
+
+  const trackVerticalButton = item => {
+    setIsOverlayVisible(prevState => !prevState);
+    setSelectedTrackItems([item]);
+  };
+
+  const handleLongPress = itemObj => {
+    let itemId = itemObj._id;
+    setIsSelectable(true);
+    if (selectedItems.has(itemObj)) {
+      selectedItems.delete(itemObj);
+    } else {
+      selectedItems.add(itemObj);
+    }
+    itemObj.isSelect = !itemObj.isSelect;
+    let updatedSearchResults = [...searchResults];
+    const index = updatedSearchResults.findIndex(item => itemId === item._id);
+    updatedSearchResults[index] = itemObj;
+    setSearchResults(updatedSearchResults);
+  };
+
+  const handleRemoveSelectedItems = () => {
+    let revertItems = [...searchResults];
+    console.log(selectedItems);
+    selectedItems.forEach(itemObj => {
+      let itemToBeRemoved = searchResults.find(item => {
+        return item._id === itemObj._id;
+      });
+      let itemIndex = searchResults.find(item => item._id === itemObj._id);
+      itemToBeRemoved.isSelect = !itemToBeRemoved.isSelect;
+      revertItems[itemIndex] = itemToBeRemoved;
+    });
+    setSearchResults(revertItems);
+    setIsSelectable(false);
+    setSelectedTrackItems([]);
+    selectedItems.clear();
+  };
+
+  let selectedItemStyle = {
+    backgroundColor: Colors.deepPurpleA700,
+    opacity: 0.9,
   };
 
   return (
     <View style={commonStyles.screenStyle}>
-      <SearchBar
-        placeholderTextColor="#FFFFFF"
-        iconColor="#FFFFFF"
-        ref={searchRef}
-        containerStyle={{padding: 0}}
-        inputContainerStyle={styles.searchBar}
-        inputStyle={styles.searchInput}
-        placeholder="Search Songs"
-        value={keyword}
-        onChangeText={handleSearch}
-        blurOnSubmit={false}
-        onSubmitEditing={submitSearch}
-      />
+      {isOverlayVisible && (
+        <OverlayMenu
+          handleMultiTrackAction={handleMultiTrackAction}
+          isOverlayVisible={isOverlayVisible}
+          setIsOverlayVisible={setIsOverlayVisible}
+          selectedTrackItems={selectedTrackItems}
+          setIsSelectable={setIsSelectable}
+          setSelectedTrackItems={setSelectedTrackItems}
+        />
+      )}
+      {isSelectable ? (
+        <Appbar style={styles.searchAppBar}>
+          <Appbar.Action
+            icon="close"
+            onPress={handleRemoveSelectedItems}
+            color="#FFFFFF"
+          />
+          <View style={{flexDirection: 'row'}}>
+            <Appbar.Action icon="select-all" color="#FFFFFF" />
+            <Appbar.Action
+              icon="dots-vertical"
+              color="#FFFFFF"
+              onPress={handleMultiTrackAction}
+            />
+          </View>
+        </Appbar>
+      ) : (
+        <SearchBar
+          placeholderTextColor="#FFFFFF"
+          iconColor="#FFFFFF"
+          ref={searchRef}
+          containerStyle={styles.searchContainer}
+          inputContainerStyle={styles.searchBar}
+          inputStyle={styles.searchInput}
+          placeholder="Search Songs"
+          value={keyword}
+          onChangeText={handleSearch}
+          blurOnSubmit={false}
+        />
+      )}
       <Card containerStyle={styles.card}>
         <ScrollView
           onScrollBeginDrag={Keyboard.dismiss}
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="on-drag">
-          {searchResults.map((item) => {
+          {searchResults.map((item, index) => {
             return (
               <ListItem
-                onPress={(evt) => handleListSelect(item._id, item.type, evt)}
+                disabledStyle={{opacity: 0.4}}
+                disabled={isSelectable && item.type === 'album'}
+                onLongPress={() => handleLongPress(item)}
+                onPress={evt => handleListSelect(item, evt)}
                 leftElement={
-                  <Image
-                    containerStyle={{padding: 0, margin: 0}}
-                    style={styles.listImage}
-                    source={{
-                      uri: item.imageUrl,
-                    }}
-                  />
+                  <View>
+                    <Image
+                      // containerStyle={{opacity: 0.5}}
+                      style={styles.listImage}
+                      source={{
+                        uri: item.imageUrl,
+                      }}
+                    />
+                  </View>
                 }
-                key={item._id}
-                rightSubtitle={item.type}
-                rightSubtitleStyle={styles.listRightSubtitle}
-                subtitle={item.artists}
+                key={index}
+                subtitle={
+                  item.artists +
+                  ' - ' +
+                  item.type.charAt(0).toUpperCase() +
+                  item.type.slice(1)
+                }
                 subtitleStyle={styles.listSubtitle}
                 title={item.name}
                 titleStyle={styles.listTitle}
                 titleProps={{numberOfLines: 1}}
                 bottomDivider
-                containerStyle={styles.listContainer}
+                containerStyle={[
+                  styles.listContainer,
+                  isSelectable && item.isSelect && selectedItemStyle,
+                ]}
+                rightElement={
+                  !isSelectable && (
+                    <IconButton
+                      style={styles.listVerticalButton}
+                      color={Colors.grey300}
+                      size={heightPercentageToDP(2.8)}
+                      icon="dots-vertical"
+                      onPress={() => trackVerticalButton(item)}
+                    />
+                  )
+                }
                 contentContainerStyle={{
-                  flex: 1,
-                  justifyContent: 'space-between',
+                  width: widthPercentageToDP(58),
                 }}
               />
             );
           })}
         </ScrollView>
       </Card>
-      {!isMiniPlayerHidden && <PlayerMain trackObj={trackObj} />}
     </View>
+  );
+}
+
+function OverlayMenu(props) {
+  const {
+    isOverlayVisible,
+    setIsOverlayVisible,
+    selectedTrackItems,
+    setIsSelectable,
+    setSelectedTrackItems,
+  } = props;
+
+  console.log('Overlay menu', selectedTrackItems);
+
+  const handleBackdropPress = () => {
+    setIsOverlayVisible(false);
+  };
+
+  const handlePlaylistTrackEdit = type => {
+    // _id and owner need to updated dynamically from local DB
+    let playlist = {
+      _id: '5ea02357c776e189f701b922',
+      owner: '5e7baa1a88a82254f4f8daed',
+      tracks: [],
+    };
+    selectedTrackItems.forEach(track => {
+      let trackItem = {};
+      trackItem.name = track.name;
+      trackItem.id = track._id;
+      trackItem.type = 'library';
+      trackItem.artists = track.artists;
+      playlist.tracks.push(trackItem);
+    });
+
+    if (type === 'add') {
+      authService.addToPlaylist(playlist).then(response => {
+        if (response.status === 200) {
+          setIsSelectable(false);
+          setIsOverlayVisible(false);
+          setSelectedTrackItems([]);
+          Alert.alert('Tracks added to playlist successfully');
+        } else {
+          Alert.alert('Tracks cannot be added to Playlist');
+        }
+      });
+    } else if (type === 'remove') {
+      authService.removeFromPlaylist(playlist).then(response => {
+        if (response.status === 200) {
+          setIsSelectable(false);
+          setIsOverlayVisible(false);
+          setSelectedTrackItems([]);
+          Alert.alert('Tracks removed from playlist successfully');
+        } else {
+          Alert.alert('Tracks cannot be removed from Playlist');
+        }
+      });
+    }
+  };
+
+  return (
+    <Overlay
+      height={heightPercentageToDP('32%')}
+      width={widthPercentageToDP('100%')}
+      containerStyle={styles.overlayContainer}
+      transparent={true}
+      overlayStyle={styles.overlay}
+      animationType="fade"
+      overlayBackgroundColor={Colors.grey900}
+      isVisible={isOverlayVisible}
+      onBackdropPress={handleBackdropPress}>
+      <View style={styles.overlayContent}>
+        <Button
+          icon={<IconButton color={Colors.grey300} icon="heart-outline" />}
+          buttonStyle={styles.overlayButtons}
+          type="clear"
+          title="Like"
+          titleStyle={styles.overlayButtonTitle}
+        />
+        <Button
+          icon={<IconButton color={Colors.grey300} icon="share-variant" />}
+          buttonStyle={styles.overlayButtons}
+          type="clear"
+          title="Share"
+          titleStyle={styles.overlayButtonTitle}
+        />
+        <Button
+          icon={<IconButton color={Colors.grey300} icon="playlist-plus" />}
+          buttonStyle={styles.overlayButtons}
+          type="clear"
+          title="Add to Playlist"
+          titleStyle={styles.overlayButtonTitle}
+          onPress={() => handlePlaylistTrackEdit('add')}
+        />
+        <Button
+          icon={<IconButton color={Colors.grey300} icon="playlist-remove" />}
+          buttonStyle={styles.overlayButtons}
+          type="clear"
+          title="Remove from Playlist"
+          titleStyle={styles.overlayButtonTitle}
+          onPress={() => handlePlaylistTrackEdit('remove')}
+        />
+        <Button
+          icon={<IconButton color={Colors.grey300} icon="playlist-plus" />}
+          buttonStyle={styles.overlayButtons}
+          type="clear"
+          title="Add to Queue"
+          titleStyle={styles.overlayButtonTitle}
+        />
+      </View>
+    </Overlay>
   );
 }

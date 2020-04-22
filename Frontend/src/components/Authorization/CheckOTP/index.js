@@ -37,7 +37,7 @@ export function EnterOTP({navigation}) {
       timestamp: timestamp,
     };
 
-    authService.validateForgotPassword(data).then(async (response) => {
+    authService.validateForgotPassword(data).then(async response => {
       console.log(await response.json());
       if (response.status === 200) {
         navigation.navigate('ChangePassword');

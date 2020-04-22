@@ -65,8 +65,9 @@ export function InputBox(props) {
   return (
     <Input
       containerStyle={styles.inputBoxContainer}
+      inputContainerStyle={styles.inputContainer}
+      inputStyle={styles.input}
       labelStyle={styles.inputLabel}
-      inputStyle={styles.inputText}
       textContentType={inputConfigObj.textContentType}
       autoCapitalize={inputConfigObj.autoCapitalize}
       keyboardType={inputConfigObj.keyboardType}
