@@ -1,12 +1,21 @@
 import {StyleSheet} from 'react-native';
-import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP,
+} from 'react-native-responsive-screen';
 
 export const styles = StyleSheet.create({
   inputBoxContainer: {
-    marginBottom: hp(2),
+    padding: 0,
+    margin: 0,
   },
-
-  inputText: {
+  inputContainer: {
+    padding: 0,
+    margin: 0,
+  },
+  input: {
+    padding: 0,
+    margin: 0,
     color: '#FFFFFF',
   },
 

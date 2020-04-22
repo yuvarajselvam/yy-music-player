@@ -4,18 +4,14 @@ import {
   DrawerContentScrollView,
   DrawerItem,
 } from '@react-navigation/drawer';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
 import {Colors, IconButton} from 'react-native-paper';
-import {Avatar, Text, Divider} from 'react-native-elements';
+import {Divider} from 'react-native-elements';
 import {View} from 'react-native';
 
 import {Main} from '../Main';
 import {Settings} from '../Settings';
 import {styles} from './entry.styles';
-import {Search} from '../Search';
 
 const Drawer = createDrawerNavigator();
 
@@ -115,9 +111,8 @@ export function Entry() {
       drawerContent={props => <CustomDrawerContent {...props} />}
       edgeWidth={wp(24)}
       initialRouteName="Main">
-      <Drawer.Screen name="Home" component={Main} />
+      <Drawer.Screen name="Main" component={Main} />
       <Drawer.Screen name="Settings" component={Settings} />
-      <Drawer.Screen name="Search" component={Search} />
     </Drawer.Navigator>
   );
 }

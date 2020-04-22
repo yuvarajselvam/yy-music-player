@@ -1,12 +1,14 @@
 import React from 'react';
-import {View, Text} from 'react-native';
-import {commonStyles} from '../common/styles';
-import {PlayerMain} from '../Player/player.main';
-import {PlayerProvider} from '../../contexts/player.context';
+import {View} from 'react-native';
+import {Text} from 'react-native-elements';
 
-export function MyMusic() {
+import {commonStyles} from '../common/styles';
+import {Header} from '../../widgets/Header';
+
+export function MyMusic({navigation}) {
   return (
     <View style={commonStyles.screenStyle}>
+      <Header navigation={navigation} />
       <Text
         style={{
           flex: 1,
@@ -16,9 +18,6 @@ export function MyMusic() {
         }}>
         My Library
       </Text>
-      <PlayerProvider>
-        <PlayerMain trackObj={{songUrl: '', id: ''}} />
-      </PlayerProvider>
     </View>
   );
 }
