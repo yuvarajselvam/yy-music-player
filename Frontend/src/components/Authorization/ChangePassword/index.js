@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, KeyboardAvoidingView, ScrollView} from 'react-native';
-import {Input, Image, Text, Button} from 'react-native-elements';
+import {Image, Text, Button} from 'react-native-elements';
 
 import {InputBox} from '../../../widgets/InputBox';
 import {authService} from '../../../services/auth.service';
@@ -17,7 +17,7 @@ export function ChangePassword({navigation}) {
       newPassword: newPassword,
       email: localData.email,
     };
-    authService.changePassword(data).then((response) => {
+    authService.changePassword(data).then(response => {
       if (response.status === 200) {
         navigation.navigate('Login');
         setnewPassword('');
