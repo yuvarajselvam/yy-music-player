@@ -54,13 +54,13 @@ export function Signup({navigation}) {
       };
       authService
         .userSignup(data)
-        .then((response) => {
+        .then(response => {
           if (response.status === 201) {
             navigation.navigate('Login');
             dispatch({});
           }
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           Alert.alert(error.message);
         });
@@ -87,31 +87,31 @@ export function Signup({navigation}) {
             label="Full Name"
             type="text"
             value={state.fullName}
-            onChangeText={(value) => setInputValue(value, 'FullName')}
+            onChangeText={value => setInputValue(value, 'FullName')}
           />
           <InputBox
             label="Email"
             type="email"
             value={state.email}
-            onChangeText={(value) => setInputValue(value, 'Email')}
+            onChangeText={value => setInputValue(value, 'Email')}
           />
           <InputBox
             label="Phone Number"
             type="phone"
             value={state.phone}
-            onChangeText={(value) => setInputValue(value, 'PhoneNumber')}
+            onChangeText={value => setInputValue(value, 'PhoneNumber')}
           />
           <InputBox
             label="Password"
             type="password"
             value={state.password}
-            onChangeText={(value) => setInputValue(value, 'Password')}
+            onChangeText={value => setInputValue(value, 'Password')}
           />
           <InputBox
             label="Confirm Password"
             type="password"
             value={state.confirmPassword}
-            onChangeText={(value) => setInputValue(value, 'ConfirmPassword')}
+            onChangeText={value => setInputValue(value, 'ConfirmPassword')}
           />
           <Button
             raised

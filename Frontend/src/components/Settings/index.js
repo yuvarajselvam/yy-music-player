@@ -1,20 +1,15 @@
 import React from 'react';
-import {View, Text} from 'react-native';
-import {Appbar, IconButton, Colors} from 'react-native-paper';
+import {View} from 'react-native';
 import {Header} from '../../widgets/Header';
+
+import {commonStyles} from '../common/styles';
+import {PlayerMain} from '../Player';
 
 export function Settings({navigation}) {
   return (
-    <React.Fragment>
+    <View style={commonStyles.screenStyle}>
       <Header navigation={navigation} />
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text
-          style={{
-            color: Colors.grey300,
-          }}>
-          Settings Page
-        </Text>
-      </View>
-    </React.Fragment>
+      <PlayerMain />
+    </View>
   );
 }

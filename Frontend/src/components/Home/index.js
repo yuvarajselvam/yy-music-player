@@ -1,15 +1,18 @@
 import React, {useEffect} from 'react';
-import {View, Text} from 'react-native';
-import {PlayerMain} from '../Player/player.main';
-import {commonStyles} from '../common/styles';
+import {View} from 'react-native';
 
-export function Home() {
+import {commonStyles} from '../common/styles';
+import {Header} from '../../widgets/Header';
+
+export function Home({navigation}) {
   useEffect(() => {
-    console.log('Rendering Main.js');
-  });
+    console.log('Rendering Home.js');
+  }, []);
+
   return (
     <View style={commonStyles.screenStyle}>
-      <PlayerMain trackObj={{id: '', songUrl: ''}} />
+      <Header navigation={navigation} />
+      <View />
     </View>
   );
 }

@@ -1,4 +1,4 @@
-import {useEffect, useState, useDebugValue, useRef} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import TrackPlayer from 'react-native-track-player';
 import TrackPlayerEvents from './eventTypes';
 
@@ -68,7 +68,7 @@ const useTrackPlayerEvents = (events, handler) => {
     return () => {
       subs.forEach(sub => sub.remove());
     };
-  }, events);
+  }, [events]);
 };
 
 const useInterval = (callback, delay) => {
@@ -79,7 +79,9 @@ const useInterval = (callback, delay) => {
   });
 
   useEffect(() => {
-    if (!delay) return;
+    if (!delay) {
+      return;
+    }
     const id = setInterval(savedCallback.current, delay);
     return () => clearInterval(id);
   }, [delay]);
@@ -101,6 +103,7 @@ const useWhenPlaybackStateChanges = callback => {
     return () => {
       didCancel = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };
 

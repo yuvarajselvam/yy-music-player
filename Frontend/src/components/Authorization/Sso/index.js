@@ -29,7 +29,7 @@ export function Sso({navigation}) {
   };
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const initialUserAuthentication = async (loginType) => {
+  const initialUserAuthentication = async loginType => {
     console.log('First authentication check');
     let localDataObj = await getLocalStore();
     return new Promise(async (resolve, reject) => {
@@ -50,7 +50,7 @@ export function Sso({navigation}) {
           };
           authService
             .userSSO(data)
-            .then(async (response) => {
+            .then(async response => {
               console.log(await response.json());
               if (response.status === 200) {
                 console.log('Intial User Authentication Response');
@@ -61,7 +61,7 @@ export function Sso({navigation}) {
                 resolve(false);
               }
             })
-            .catch((err) => {
+            .catch(err => {
               console.log(err.message);
             });
         }
@@ -71,10 +71,10 @@ export function Sso({navigation}) {
     });
   };
 
-  const handleSSO = async (type) => {
+  const handleSSO = async type => {
     dispatch({type: type, value: true});
     initialUserAuthentication(type)
-      .then(async (response) => {
+      .then(async response => {
         if (!response) {
           try {
             let data = await SSOService(type);
@@ -86,16 +86,16 @@ export function Sso({navigation}) {
           }
         }
       })
-      .catch((error) => {
+      .catch(error => {
         Alert.alert(error);
         dispatch({type: type, value: false});
       });
   };
 
-  const authentiateUser = (data) => {
+  const authentiateUser = data => {
     authService
       .userSSO(data)
-      .then(async (response) => {
+      .then(async response => {
         console.log('authenticateUser calling ===', await response.json());
         if (response.status === 200 || response.status === 201) {
           let localData = {
@@ -110,7 +110,7 @@ export function Sso({navigation}) {
           signIn(data.email, data.accessToken);
         }
       })
-      .catch((err) => {
+      .catch(err => {
         console.log(err.message);
         Alert.alert('Failed!', err.message);
       });

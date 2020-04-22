@@ -10,8 +10,15 @@ export const styles = StyleSheet.create({
     color: Colors.grey300,
     fontSize: wp(3.6),
     width: wp(30),
-    margin: 0,
+    marginLeft: wp(2.8),
     padding: 0,
   },
-  drawerIcon: {padding: 0, margin: 0},
+  drawerHeaderLabel: {
+    color: Colors.grey300,
+    fontSize: wp(4),
+    fontWeight: 'bold',
+    width: wp(30),
+    padding: 0,
+  },
+  drawerIcon: {position: 'absolute', padding: 0, margin: 0},
 });

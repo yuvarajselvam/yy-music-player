@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, Alert, ScrollView, KeyboardAvoidingView} from 'react-native';
-import {Input, Button, Image, Text} from 'react-native-elements';
+import {Button, Image, Text} from 'react-native-elements';
 
 import {InputBox} from '../../../widgets/InputBox';
 import {authService} from '../../../services/auth.service';
@@ -16,7 +16,7 @@ export function ForgotPassword({navigation}) {
     };
     authService
       .forgotPassword(data)
-      .then(async (response) => {
+      .then(async response => {
         console.log(await response.json());
         if (response.status === 200) {
           let localData = {email: recoveryEmail};
@@ -25,7 +25,7 @@ export function ForgotPassword({navigation}) {
           setrecoveryEmail('');
         }
       })
-      .catch((error) => {
+      .catch(error => {
         Alert.alert(error.message);
       });
   };
