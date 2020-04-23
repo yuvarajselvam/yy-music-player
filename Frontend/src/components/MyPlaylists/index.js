@@ -38,9 +38,7 @@ export function MyPlaylists({navigation}) {
           setPlaylists(responseData);
         }
       });
-      return () => {
-        setPlaylists([]);
-      };
+      return () => {};
     }, []),
   );
 
@@ -74,14 +72,14 @@ export function MyPlaylists({navigation}) {
               rightElement={
                 <IconButton
                   style={{alignItems: 'flex-end', margin: 0}}
-                  color={Colors.grey300}
+                  color={Colors.grey200}
                   size={heightPercentageToDP(2.8)}
                   icon="dots-vertical"
                   onPress={() => handleVerticalDotButton(playlist._id)}
                 />
               }
               key={index}
-              titleStyle={{color: Colors.grey300}}
+              titleStyle={{color: Colors.grey200}}
               onPress={() => handlePlaylistSelect(playlist)}
             />
           );
@@ -217,7 +215,7 @@ function OverlayMenu(props) {
       onBackdropPress={() => setIsPlaylistMenuOverlayOpen(false)}>
       <View style={styles.overlayContent}>
         <Button
-          icon={<IconButton color={Colors.grey300} icon="playlist-remove" />}
+          icon={<IconButton color={Colors.grey200} icon="playlist-remove" />}
           buttonStyle={styles.overlayButtons}
           type="clear"
           title="Delete Playlist"
@@ -225,7 +223,7 @@ function OverlayMenu(props) {
           onPress={handleDeletePlaylist}
         />
         <Button
-          icon={<IconButton color={Colors.grey300} icon="playlist-edit" />}
+          icon={<IconButton color={Colors.grey200} icon="playlist-edit" />}
           buttonStyle={styles.overlayButtons}
           type="clear"
           title="Change Playlist Name"

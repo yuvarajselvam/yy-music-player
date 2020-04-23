@@ -8,7 +8,7 @@ import {Colors} from 'react-native-paper';
 export const styles = StyleSheet.create({
   miniPlayer: {
     height: hp(8.4),
-    backgroundColor: Colors.grey800,
+    backgroundColor: '#4d4d4d',
     padding: 0,
     margin: 0,
     borderWidth: 0,
@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     flex: 1,
   },
-  seekBarTrack: {height: hp(0.2), padding: 0, margin: 0},
+  seekBarTrack: {height: hp(0.4), padding: 0, margin: 0},
   playerButtonGroup: {
     flexDirection: 'row',
     alignItems: 'center',

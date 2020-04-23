@@ -95,7 +95,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   overlayButtonTitle: {
-    color: Colors.grey300,
+    color: Colors.grey200,
     fontFamily: 'Poppins-Regular',
     fontSize: wp(4),
   },
