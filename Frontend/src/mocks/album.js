@@ -1,4 +1,4 @@
-export const album = {
+export const mockAlbum = {
   _id: 'eM,RiQKtWDY_',
   artists: [
     {

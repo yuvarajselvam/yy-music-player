@@ -9,9 +9,14 @@ import {PlayerContext} from '../../contexts/player.context';
 import {styles} from './player.styles';
 
 export function PlayerMain() {
-  const {isPlaying, duration, position, onPlay, onPause} = useContext(
-    PlayerContext,
-  );
+  const {
+    isPlaying,
+    duration,
+    position,
+    onPlay,
+    onPause,
+    trackDetails,
+  } = useContext(PlayerContext);
 
   const onFavourite = () => {};
 
@@ -45,6 +50,10 @@ export function PlayerMain() {
     );
   };
 
+  let trackImageUrl =
+    trackDetails.imageUrl ||
+    'https://imgplaceholder.com/420x320/cccccc/757575/glyphicon-cd';
+
   return (
     <View>
       <Slider
@@ -52,19 +61,31 @@ export function PlayerMain() {
         value={position}
         minimumValue={0}
         maximumValue={duration}
-        thumbStyle={{display: 'none'}}
+        thumbStyle={{width: 0, height: 0}}
+        thumbTouchSize={{width: 0, height: 0}}
         trackStyle={styles.seekBarTrack}
-        minimumTrackTintColor="#0026ca"
-        maximumTrackTintColor="#7a7cff"
+        minimumTrackTintColor="#651fff"
+        maximumTrackTintColor="#FFFFFF"
       />
       <ListItem
         containerStyle={styles.miniPlayer}
+        title={trackDetails.name}
+        titleStyle={{
+          fontSize: 13.2,
+          paddingBottom: 2,
+          fontWeight: 'bold',
+          color: Colors.grey200,
+        }}
+        subtitle={trackDetails.artists}
+        subtitleStyle={{
+          fontSize: 12,
+          color: Colors.grey200,
+        }}
         leftElement={
           <Image
             style={styles.playerAlbumImage}
             source={{
-              uri:
-                'https://i.scdn.co/image/ab67616d0000b273e2e352d89826aef6dbd5ff8f',
+              uri: trackImageUrl,
             }}
           />
         }
