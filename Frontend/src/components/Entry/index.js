@@ -22,7 +22,7 @@ function CustomDrawerContent({navigation}) {
         label="YY Music Player"
         labelStyle={styles.drawerHeaderLabel}
       />
-      <Divider style={{backgroundColor: Colors.grey300}} />
+      <Divider style={{backgroundColor: Colors.grey200}} />
       <View>
         <DrawerItem
           label="Home"
@@ -30,7 +30,7 @@ function CustomDrawerContent({navigation}) {
           icon={() => (
             <IconButton
               style={styles.drawerIcon}
-              color={Colors.grey300}
+              color={Colors.grey200}
               size={wp(6.4)}
               icon={'home-outline'}
             />
@@ -47,7 +47,7 @@ function CustomDrawerContent({navigation}) {
           icon={() => (
             <IconButton
               style={styles.drawerIcon}
-              color={Colors.grey300}
+              color={Colors.grey200}
               size={wp(6.4)}
               icon={'account-multiple-outline'}
             />
@@ -60,7 +60,7 @@ function CustomDrawerContent({navigation}) {
           icon={() => (
             <IconButton
               style={styles.drawerIcon}
-              color={Colors.grey300}
+              color={Colors.grey200}
               size={wp(6.4)}
               icon={'map-marker-outline'}
             />
@@ -73,7 +73,7 @@ function CustomDrawerContent({navigation}) {
           icon={() => (
             <IconButton
               style={styles.drawerIcon}
-              color={Colors.grey300}
+              color={Colors.grey200}
               size={wp(6.4)}
               icon={'tune'}
             />
@@ -91,7 +91,7 @@ function CustomDrawerContent({navigation}) {
           icon={() => (
             <IconButton
               style={styles.drawerIcon}
-              color={Colors.grey300}
+              color={Colors.grey200}
               size={wp(6.4)}
               icon={'settings-outline'}
             />

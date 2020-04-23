@@ -4,28 +4,48 @@ import {
   usePlaybackState,
   useTrackPlayerProgress,
 } from '../components/Player/player.hooks';
+import {Alert} from 'react-native';
 
 export const PlayerContext = createContext();
 
 export const PlayerProvider = props => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [trackDetails, setTrackDetails] = useState({});
 
   const {bufferedPosition, duration, position} = useTrackPlayerProgress();
 
   const playbackState = usePlaybackState();
 
-  // useEffect(() => {
-  //   console.log('Setting up the player');
-  //   return () => onDestroy();
-  // }, []);
-
-  const onAddTrack = async (id, songUrl) => {
-    console.log('onAddTrack is called');
-    TrackPlayer.setupPlayer().then(async () => {
+  useEffect(() => {
+    TrackPlayer.setupPlayer().then(() => {
+      console.log('Setting up the player');
       onUpdateOptions();
+    });
+    return () => onDestroy();
+  }, []);
+
+  const onAddTrack = async track => {
+    console.log('onAddTrack is called');
+
+    if (!track.trackUrl) {
+      Alert.alert('No Songs Found!');
+      return;
+    }
+
+    TrackPlayer.setupPlayer().then(async () => {
+      let artistsName = track.artists.map(artist => {
+        return artist.name;
+      });
+      let trackArtistsName = artistsName.join(', ');
+      let details = {
+        name: track.name,
+        imageUrl: track.imageUrl,
+        artists: trackArtistsName,
+      };
+      setTrackDetails(details);
       await TrackPlayer.add({
-        id: id,
-        url: songUrl,
+        id: track._id,
+        url: track.trackUrl,
       });
     });
   };
@@ -82,6 +102,7 @@ export const PlayerProvider = props => {
         duration: duration,
         position: position,
         playbackState: playbackState,
+        trackDetails: trackDetails,
         setIsPlaying: setIsPlaying,
         onAddTrack: onAddTrack,
         onPlay: onPlay,

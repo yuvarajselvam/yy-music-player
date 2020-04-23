@@ -7,14 +7,14 @@ export const styles = StyleSheet.create({
   drawer: {backgroundColor: Colors.grey900},
   drawerItems: {backgroundColor: 'transparent', padding: 0, margin: 0},
   drawerLabel: {
-    color: Colors.grey300,
+    color: Colors.grey200,
     fontSize: wp(3.6),
     width: wp(30),
     marginLeft: wp(2.8),
     padding: 0,
   },
   drawerHeaderLabel: {
-    color: Colors.grey300,
+    color: Colors.grey200,
     fontSize: wp(4),
     fontWeight: 'bold',
     width: wp(30),

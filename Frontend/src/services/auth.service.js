@@ -1,4 +1,4 @@
-const URL_LINK = 'http://46b6f6f8.ngrok.io/';
+const URL_LINK = 'http://192.168.0.4:5000/';
 
 export const authService = {
   userSSO: data => {
@@ -75,6 +75,10 @@ export const authService = {
     return fetch(URL_LINK + 'track/' + `${data.language}/` + `${data._id}/`);
   },
 
+  getAlbum: data => {
+    return fetch(URL_LINK + 'album/' + `${data.language}/` + `${data._id}/`);
+  },
+
   createPlaylist: data => {
     return fetch(URL_LINK + 'playlist/create/', {
       method: 'POST',
@@ -88,7 +92,7 @@ export const authService = {
   addToPlaylist: data => {
     data.operation = 'addTracks';
     return fetch(
-      URL_LINK + 'playlist/' + '5ea02357c776e189f701b922' + '/edit/',
+      URL_LINK + 'playlist/' + '5ea1c7c7b566f89fac9947a7' + '/edit/',
       {
         method: 'PUT',
         headers: {
@@ -101,7 +105,7 @@ export const authService = {
 
   editPlaylist: data => {
     return fetch(
-      URL_LINK + 'playlist/' + '5ea02357c776e189f701b922' + '/edit/',
+      URL_LINK + 'playlist/' + '5ea1c7c7b566f89fac9947a7' + '/edit/',
       {
         method: 'PUT',
         headers: {
@@ -115,7 +119,7 @@ export const authService = {
   removeFromPlaylist: data => {
     data.operation = 'removeTracks';
     return fetch(
-      URL_LINK + 'playlist/' + '5ea02357c776e189f701b922' + '/edit/',
+      URL_LINK + 'playlist/' + '5ea1c7c7b566f89fac9947a7' + '/edit/',
       {
         method: 'PUT',
         headers: {
@@ -144,7 +148,7 @@ export const authService = {
 
   deletePlaylist: data => {
     return fetch(
-      URL_LINK + 'playlist/' + '5ea02357c776e189f701b922' + '/delete/',
+      URL_LINK + 'playlist/' + '5ea1c7c7b566f89fac9947a7' + '/delete/',
       {
         method: 'DELETE',
         headers: {
