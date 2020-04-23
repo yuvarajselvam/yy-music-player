@@ -8,7 +8,7 @@ import {
   Overlay,
   Button,
 } from 'react-native-elements';
-import {IconButton, Colors, Appbar} from 'react-native-paper';
+import {IconButton, Colors, Appbar, Searchbar} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 import {
   heightPercentageToDP,
@@ -23,6 +23,7 @@ import {styles} from './search.styles';
 import {commonStyles} from '../common/styles';
 
 export function Search({navigation}) {
+  console.log('Search screen');
   const [keyword, setKeyword] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
@@ -31,13 +32,10 @@ export function Search({navigation}) {
   const [isSelectable, setIsSelectable] = useState(false);
 
   const searchRef = useRef();
-  const {onAddTrack, onPlay, onReset} = useContext(PlayerContext);
+  const {onAddTrack, onPlay} = useContext(PlayerContext);
 
-  const getUrl = (urlLink, id) => {
-    console.log('URL_LINK', urlLink);
-    // onRemove();
-    onAddTrack(id, urlLink).then(() => {
-      onReset();
+  const handleTrackSelect = track => {
+    onAddTrack(track).then(() => {
       onPlay();
     });
   };
@@ -45,7 +43,6 @@ export function Search({navigation}) {
   useFocusEffect(
     React.useCallback(() => {
       // Do something when the screen is focused
-      searchRef.current.focus();
       return () => {
         setSearchResults([]);
         setKeyword('');
@@ -96,14 +93,13 @@ export function Search({navigation}) {
       _id: item._id,
       language: item.language,
     };
-    console.log(data);
+    // console.log(data);
     if (item.type === 'track') {
       authService.getTrack(data).then(async response => {
         if (response.status === 200) {
           let responseObj = await response.json();
-          let trackUrl = responseObj.trackUrl;
-          let trackId = responseObj._id;
-          getUrl(trackUrl, trackId);
+          let track = responseObj;
+          handleTrackSelect(track);
         } else {
           Alert.alert('Song cannot be played at this moment');
         }
@@ -119,12 +115,20 @@ export function Search({navigation}) {
     setIsOverlayVisible(prevState => !prevState);
   };
 
+  const handleMultiTrackSelection = () => {
+    // TBD
+    console.log('All tracks to be selected at once');
+  };
+
   const trackVerticalButton = item => {
     setIsOverlayVisible(prevState => !prevState);
     setSelectedTrackItems([item]);
   };
 
   const handleLongPress = itemObj => {
+    if (itemObj.type === 'album') {
+      return;
+    }
     let itemId = itemObj._id;
     setIsSelectable(true);
     if (selectedItems.has(itemObj)) {
@@ -181,7 +185,11 @@ export function Search({navigation}) {
             color="#FFFFFF"
           />
           <View style={{flexDirection: 'row'}}>
-            <Appbar.Action icon="select-all" color="#FFFFFF" />
+            <Appbar.Action
+              icon="select-all"
+              color="#FFFFFF"
+              onPress={handleMultiTrackSelection}
+            />
             <Appbar.Action
               icon="dots-vertical"
               color="#FFFFFF"
@@ -190,12 +198,11 @@ export function Search({navigation}) {
           </View>
         </Appbar>
       ) : (
-        <SearchBar
+        <Searchbar
           placeholderTextColor="#FFFFFF"
           iconColor="#FFFFFF"
           ref={searchRef}
-          containerStyle={styles.searchContainer}
-          inputContainerStyle={styles.searchBar}
+          style={styles.searchBar}
           inputStyle={styles.searchInput}
           placeholder="Search Songs"
           value={keyword}
@@ -246,7 +253,7 @@ export function Search({navigation}) {
                   !isSelectable && (
                     <IconButton
                       style={styles.listVerticalButton}
-                      color={Colors.grey300}
+                      color={Colors.grey200}
                       size={heightPercentageToDP(2.8)}
                       icon="dots-vertical"
                       onPress={() => trackVerticalButton(item)}
@@ -283,7 +290,7 @@ function OverlayMenu(props) {
   const handlePlaylistTrackEdit = type => {
     // _id and owner need to updated dynamically from local DB
     let playlist = {
-      _id: '5ea02357c776e189f701b922',
+      _id: '5ea1c7c7b566f89fac9947a7',
       owner: '5e7baa1a88a82254f4f8daed',
       tracks: [],
     };
@@ -334,21 +341,21 @@ function OverlayMenu(props) {
       onBackdropPress={handleBackdropPress}>
       <View style={styles.overlayContent}>
         <Button
-          icon={<IconButton color={Colors.grey300} icon="heart-outline" />}
+          icon={<IconButton color={Colors.grey200} icon="heart-outline" />}
           buttonStyle={styles.overlayButtons}
           type="clear"
           title="Like"
           titleStyle={styles.overlayButtonTitle}
         />
         <Button
-          icon={<IconButton color={Colors.grey300} icon="share-variant" />}
+          icon={<IconButton color={Colors.grey200} icon="share-variant" />}
           buttonStyle={styles.overlayButtons}
           type="clear"
           title="Share"
           titleStyle={styles.overlayButtonTitle}
         />
         <Button
-          icon={<IconButton color={Colors.grey300} icon="playlist-plus" />}
+          icon={<IconButton color={Colors.grey200} icon="playlist-plus" />}
           buttonStyle={styles.overlayButtons}
           type="clear"
           title="Add to Playlist"
@@ -356,7 +363,7 @@ function OverlayMenu(props) {
           onPress={() => handlePlaylistTrackEdit('add')}
         />
         <Button
-          icon={<IconButton color={Colors.grey300} icon="playlist-remove" />}
+          icon={<IconButton color={Colors.grey200} icon="playlist-remove" />}
           buttonStyle={styles.overlayButtons}
           type="clear"
           title="Remove from Playlist"
@@ -364,7 +371,7 @@ function OverlayMenu(props) {
           onPress={() => handlePlaylistTrackEdit('remove')}
         />
         <Button
-          icon={<IconButton color={Colors.grey300} icon="playlist-plus" />}
+          icon={<IconButton color={Colors.grey200} icon="playlist-plus" />}
           buttonStyle={styles.overlayButtons}
           type="clear"
           title="Add to Queue"

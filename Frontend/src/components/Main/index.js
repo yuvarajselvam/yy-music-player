@@ -37,7 +37,12 @@ function CustomTabBar(props) {
   return (
     <View>
       <PlayerMain />
-      <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          backgroundColor: '#171717',
+        }}>
         <IconButton
           onPress={() => navigation.navigate('Home')}
           icon={'home'}
