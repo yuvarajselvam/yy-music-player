@@ -31,16 +31,22 @@ export function MyPlaylists({navigation}) {
   useFocusEffect(
     React.useCallback(() => {
       // Do something when the screen is focused
-      authService.getMyPlaylists().then(async response => {
-        if (response.status === 200) {
-          let responseData = await response.json();
-          console.log('Playlists ===', responseData);
-          setPlaylists(responseData);
-        }
-      });
+      getPlaylistService();
       return () => {};
     }, []),
   );
+
+  const getPlaylistService = () => {
+    authService.getMyPlaylists().then(async response => {
+      if (response.status === 200) {
+        let responseData = await response.json();
+        console.log('Playlists ===', responseData);
+        setPlaylists(responseData);
+      } else if (response.status === 204) {
+        setPlaylists([]);
+      }
+    });
+  };
 
   const createPlaylist = () => {
     console.log('Creating playlist');
@@ -90,11 +96,13 @@ export function MyPlaylists({navigation}) {
         setIsCreatePlaylistOverlayOpen={setIsCreatePlaylistOverlayOpen}
         playlistName={playlistName}
         setPlaylistName={setPlaylistName}
+        getPlaylistService={getPlaylistService}
       />
       <OverlayMenu
         playlistId={playlistId}
         isPlaylistMenuOverlayOpen={isPlaylistMenuOverlayOpen}
         setIsPlaylistMenuOverlayOpen={setIsPlaylistMenuOverlayOpen}
+        getPlaylistService={getPlaylistService}
       />
     </View>
   );
@@ -106,6 +114,7 @@ function CreatePlaylistOverlay(props) {
     setIsCreatePlaylistOverlayOpen,
     playlistName,
     setPlaylistName,
+    getPlaylistService,
   } = props;
 
   const [isPublic, setIsPublic] = useState(false);
@@ -135,8 +144,10 @@ function CreatePlaylistOverlay(props) {
         setIsCreatePlaylistOverlayOpen(false);
         setPlaylistName('');
         setIsPublic(false);
+        getPlaylistService();
+        Alert.alert('Created!', 'Playlist created successfully');
       } else {
-        Alert.alert('Playlist cannot be created');
+        Alert.alert('Failed!', 'Playlist cannot be created');
       }
     });
   };
@@ -183,6 +194,7 @@ function OverlayMenu(props) {
   const {
     isPlaylistMenuOverlayOpen,
     setIsPlaylistMenuOverlayOpen,
+    getPlaylistService,
     playlistId,
   } = props;
 
@@ -195,9 +207,10 @@ function OverlayMenu(props) {
     setIsPlaylistMenuOverlayOpen(false);
     authService.deletePlaylist(playlist).then(response => {
       if (response.status === 200) {
-        Alert.alert('Playlist deleted successfully');
+        getPlaylistService();
+        Alert.alert('Deleted!', 'Playlist deleted successfully');
       } else {
-        Alert.alert('Playlist cannot be deleted');
+        Alert.alert('Failed!', 'Playlist cannot be deleted');
       }
     });
   };

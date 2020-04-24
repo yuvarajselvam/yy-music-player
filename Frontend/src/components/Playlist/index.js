@@ -28,20 +28,25 @@ export function Playlist(props) {
 
   const {onAddTrack, onPlay} = useContext(PlayerContext);
 
+  const getPlaylistService = () => {
+    let data = {
+      _id: playlistId,
+    };
+    authService.getPlaylist(data).then(async response => {
+      if (response.status === 200) {
+        let responseData = await response.json();
+        console.log('Playlist ===', responseData);
+        setPlaylist(responseData);
+        setPlaylistTracks(responseData.tracks);
+      }
+    });
+  };
+
   useFocusEffect(
     React.useCallback(() => {
-      let data = {
-        _id: playlistId,
-      };
-      authService.getPlaylist(data).then(async response => {
-        if (response.status === 200) {
-          let responseData = await response.json();
-          console.log('Playlist ===', responseData);
-          setPlaylist(responseData);
-          setPlaylistTracks(responseData.tracks);
-        }
-      });
+      getPlaylistService();
       return () => {};
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playlistId]),
   );
 
@@ -108,17 +113,25 @@ export function Playlist(props) {
         setIsTrackMenuOverlayOpen={setIsTrackMenuOverlayOpen}
         isTrackMenuOverlayOpen={isTrackMenuOverlayOpen}
         trackObj={trackId}
+        playlistId={playlistId}
+        getPlaylistService={getPlaylistService}
       />
     </View>
   );
 }
 
 function TrackOverlayMenu(props) {
-  const {isTrackMenuOverlayOpen, setIsTrackMenuOverlayOpen, trackObj} = props;
+  const {
+    isTrackMenuOverlayOpen,
+    setIsTrackMenuOverlayOpen,
+    trackObj,
+    playlistId,
+    getPlaylistService,
+  } = props;
 
   const handleEditPlaylist = () => {
     let track = {
-      _id: '5ea1c7c7b566f89fac9947a7',
+      _id: playlistId,
       tracks: [trackObj],
       owner: '5e7baa1a88a82254f4f8daed',
     };
@@ -126,9 +139,10 @@ function TrackOverlayMenu(props) {
     setIsTrackMenuOverlayOpen(false);
     authService.removeFromPlaylist(track).then(response => {
       if (response.status === 200) {
-        Alert.alert('Track deleted successfully');
+        Alert.alert('Success!', 'Track deleted successfully');
+        getPlaylistService();
       } else {
-        Alert.alert('Track cannot be deleted');
+        Alert.alert('Failed!', 'Track cannot be deleted');
       }
     });
   };
