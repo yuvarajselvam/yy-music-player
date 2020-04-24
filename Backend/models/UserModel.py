@@ -1,7 +1,8 @@
 import re
 from datetime import datetime
+from models.PlaylistModel import Playlist
 from mongoengine import StringField, DateTimeField, EmailField, DynamicDocument, DynamicEmbeddedDocument, \
-    EmbeddedDocumentField, URLField, ValidationError
+    EmbeddedDocumentField, URLField, ValidationError, ListField, LazyReferenceField, PULL
 
 
 class Google(DynamicEmbeddedDocument):
@@ -24,6 +25,7 @@ class User(DynamicDocument):
     password = StringField(min_length=6)
     google = EmbeddedDocumentField(Google)
     facebook = EmbeddedDocumentField(Facebook)
+    playlists = ListField(LazyReferenceField(Playlist, reverse_delete_rule=PULL))
     createdAt = DateTimeField(default=datetime.now)
 
     def clean(self):
