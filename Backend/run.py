@@ -1,14 +1,15 @@
 import os
 
-from api.search.album import Album
-from api.search.artist import Artist
+from api.search.album import GetAlbum
+from api.search.artist import GetArtist
 from api.search.autocomplete import Autocomplete
 from api.auth.authenticate import Authenticate
 from api.auth.change_password import ChangePassword
 from api.auth.create_user import CreateUser
 from api.auth.forgot_password import ForgotPassword, ValidatePasswordChangeToken
 from api.auth.single_sign_on import SingleSignOn
-from api.search.track import Track
+from api.search.track import GetTrack
+from api.search.playlist import GetPlaylist, CreatePlaylist, DeletePlaylist, EditPlaylist, ListPlaylist
 
 from utils.secrets import Secrets
 from utils.db import DbUtils
@@ -40,10 +41,15 @@ api.add_resource(SingleSignOn, '/sso/')
 api.add_resource(ForgotPassword, '/forgot_password/')
 api.add_resource(ValidatePasswordChangeToken, '/forgot_password/validate/')
 api.add_resource(ChangePassword, '/change_password/')
-api.add_resource(Track, '/track/<_language>/<_id>')
-api.add_resource(Album, '/album/<_language>/<_id>')
-api.add_resource(Artist, '/artist/<_id>')
+api.add_resource(GetTrack, '/track/<_language>/<_id>/')
+api.add_resource(GetAlbum, '/album/<_language>/<_id>/')
+api.add_resource(GetArtist, '/artist/<_id>/')
 api.add_resource(Autocomplete, '/autocomplete/')
+api.add_resource(GetPlaylist, '/user/<_user_id>/playlist/<_id>/')
+api.add_resource(ListPlaylist, '/user/<_user_id>/playlists/')
+api.add_resource(CreatePlaylist, '/playlist/create/')
+api.add_resource(EditPlaylist, '/playlist/<_id>/edit/')
+api.add_resource(DeletePlaylist, '/playlist/<_id>/delete/')
 
 DbUtils().db_connect()
 
