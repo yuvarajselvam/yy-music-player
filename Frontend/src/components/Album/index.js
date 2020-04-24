@@ -46,7 +46,7 @@ export function Album(props) {
     console.log(album.artists[0].name);
     let data = {
       _id: track._id,
-      language: album.language,
+      language: albumlanguage,
     };
     // console.log(data);
     let trackObj = track;

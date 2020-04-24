@@ -1,13 +1,6 @@
 import React, {useState, useEffect, useRef, useContext} from 'react';
-import {View, ScrollView, Keyboard, Alert} from 'react-native';
-import {
-  Card,
-  ListItem,
-  Image,
-  SearchBar,
-  Overlay,
-  Button,
-} from 'react-native-elements';
+import {View, ScrollView, Keyboard, Alert, BackHandler} from 'react-native';
+import {Card, ListItem, Image, Overlay, Button} from 'react-native-elements';
 import {IconButton, Colors, Appbar, Searchbar} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 import {
@@ -28,7 +21,7 @@ export function Search({navigation}) {
   const [searchResults, setSearchResults] = useState([]);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const [selectedTrackItems, setSelectedTrackItems] = useState([]);
-  const [selectedItems, setSelectedItems] = useState(new Set());
+  const [selectedItems, setSelectedItems] = useState([]);
   const [isSelectable, setIsSelectable] = useState(false);
 
   const searchRef = useRef();
@@ -45,10 +38,43 @@ export function Search({navigation}) {
       // Do something when the screen is focused
       return () => {
         setSearchResults([]);
+        setSelectedTrackItems([]);
         setKeyword('');
+        setSelectedItems([]);
       };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []),
   );
+
+  useEffect(() => {
+    if (isSelectable) {
+      const backAction = () => {
+        Alert.alert(
+          'Hold on!',
+          'Are you sure you want to cancel the selection ?',
+          [
+            {
+              text: 'No',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {
+              text: 'YES',
+              onPress: () => {
+                setIsSelectable(false);
+              },
+            },
+          ],
+        );
+        return true;
+      };
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+      );
+      return () => backHandler.remove();
+    }
+  }, [isSelectable]);
 
   useEffect(() => {
     let currentKeyword = searchRef.current.props.value;
@@ -76,7 +102,6 @@ export function Search({navigation}) {
     return () => {
       console.log('Clear Interval');
       clearTimeout(timer);
-      setSearchResults([]);
     };
   }, [keyword]);
 
@@ -101,7 +126,7 @@ export function Search({navigation}) {
           let track = responseObj;
           handleTrackSelect(track);
         } else {
-          Alert.alert('Song cannot be played at this moment');
+          Alert.alert('Oops!', 'Song cannot be played at this moment');
         }
       });
     } else {
@@ -115,11 +140,6 @@ export function Search({navigation}) {
     setIsOverlayVisible(prevState => !prevState);
   };
 
-  const handleMultiTrackSelection = () => {
-    // TBD
-    console.log('All tracks to be selected at once');
-  };
-
   const trackVerticalButton = item => {
     setIsOverlayVisible(prevState => !prevState);
     setSelectedTrackItems([item]);
@@ -129,12 +149,16 @@ export function Search({navigation}) {
     if (itemObj.type === 'album') {
       return;
     }
+
     let itemId = itemObj._id;
     setIsSelectable(true);
-    if (selectedItems.has(itemObj)) {
-      selectedItems.delete(itemObj);
+    if (!selectedItems.includes(itemObj)) {
+      setSelectedItems(prevState => [...prevState, itemObj]);
     } else {
-      selectedItems.add(itemObj);
+      let filteredSelectedItems = selectedItems.filter(
+        item => itemId !== item._id,
+      );
+      setSelectedItems(filteredSelectedItems);
     }
     itemObj.isSelect = !itemObj.isSelect;
     let updatedSearchResults = [...searchResults];
@@ -157,7 +181,7 @@ export function Search({navigation}) {
     setSearchResults(revertItems);
     setIsSelectable(false);
     setSelectedTrackItems([]);
-    selectedItems.clear();
+    setSelectedItems([]);
   };
 
   let selectedItemStyle = {
@@ -165,16 +189,37 @@ export function Search({navigation}) {
     opacity: 0.9,
   };
 
+  const [isPlaylistsOverlayOpen, setIsPlaylistsOverlayOpen] = useState(false);
+  const [actionType, setActionType] = useState('');
+
+  const handlePlaylistTrackEdit = type => {
+    setActionType(type);
+    setIsOverlayVisible(false);
+    setIsPlaylistsOverlayOpen(true);
+  };
+
   return (
     <View style={commonStyles.screenStyle}>
+      {isPlaylistsOverlayOpen && (
+        <PlaylistsOverlay
+          isPlaylistsOverlayOpen={isPlaylistsOverlayOpen}
+          setIsPlaylistsOverlayOpen={setIsPlaylistsOverlayOpen}
+          actionType={actionType}
+          selectedTrackItems={selectedTrackItems}
+          setIsSelectable={setIsSelectable}
+          setSelectedTrackItems={setSelectedTrackItems}
+          setSelectedItems={setSelectedItems}
+        />
+      )}
       {isOverlayVisible && (
         <OverlayMenu
-          handleMultiTrackAction={handleMultiTrackAction}
+          handlePlaylistTrackEdit={handlePlaylistTrackEdit}
           isOverlayVisible={isOverlayVisible}
           setIsOverlayVisible={setIsOverlayVisible}
           selectedTrackItems={selectedTrackItems}
           setIsSelectable={setIsSelectable}
           setSelectedTrackItems={setSelectedTrackItems}
+          setSelectedItems={setSelectedItems}
         />
       )}
       {isSelectable ? (
@@ -184,12 +229,11 @@ export function Search({navigation}) {
             onPress={handleRemoveSelectedItems}
             color="#FFFFFF"
           />
-          <View style={{flexDirection: 'row'}}>
-            <Appbar.Action
-              icon="select-all"
-              color="#FFFFFF"
-              onPress={handleMultiTrackSelection}
-            />
+          <Appbar.Content
+            title={selectedItems.length}
+            titleStyle={{color: Colors.grey200}}
+          />
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Appbar.Action
               icon="dots-vertical"
               color="#FFFFFF"
@@ -276,56 +320,11 @@ function OverlayMenu(props) {
   const {
     isOverlayVisible,
     setIsOverlayVisible,
-    selectedTrackItems,
-    setIsSelectable,
-    setSelectedTrackItems,
+    handlePlaylistTrackEdit,
   } = props;
-
-  console.log('Overlay menu', selectedTrackItems);
 
   const handleBackdropPress = () => {
     setIsOverlayVisible(false);
-  };
-
-  const handlePlaylistTrackEdit = type => {
-    // _id and owner need to updated dynamically from local DB
-    let playlist = {
-      _id: '5ea1c7c7b566f89fac9947a7',
-      owner: '5e7baa1a88a82254f4f8daed',
-      tracks: [],
-    };
-    selectedTrackItems.forEach(track => {
-      let trackItem = {};
-      trackItem.name = track.name;
-      trackItem.id = track._id;
-      trackItem.type = 'library';
-      trackItem.artists = track.artists;
-      playlist.tracks.push(trackItem);
-    });
-
-    if (type === 'add') {
-      authService.addToPlaylist(playlist).then(response => {
-        if (response.status === 200) {
-          setIsSelectable(false);
-          setIsOverlayVisible(false);
-          setSelectedTrackItems([]);
-          Alert.alert('Tracks added to playlist successfully');
-        } else {
-          Alert.alert('Tracks cannot be added to Playlist');
-        }
-      });
-    } else if (type === 'remove') {
-      authService.removeFromPlaylist(playlist).then(response => {
-        if (response.status === 200) {
-          setIsSelectable(false);
-          setIsOverlayVisible(false);
-          setSelectedTrackItems([]);
-          Alert.alert('Tracks removed from playlist successfully');
-        } else {
-          Alert.alert('Tracks cannot be removed from Playlist');
-        }
-      });
-    }
   };
 
   return (
@@ -333,10 +332,10 @@ function OverlayMenu(props) {
       height={heightPercentageToDP('32%')}
       width={widthPercentageToDP('100%')}
       containerStyle={styles.overlayContainer}
-      transparent={true}
       overlayStyle={styles.overlay}
       animationType="fade"
       overlayBackgroundColor={Colors.grey900}
+      transparent={true}
       isVisible={isOverlayVisible}
       onBackdropPress={handleBackdropPress}>
       <View style={styles.overlayContent}>
@@ -377,6 +376,98 @@ function OverlayMenu(props) {
           title="Add to Queue"
           titleStyle={styles.overlayButtonTitle}
         />
+      </View>
+    </Overlay>
+  );
+}
+
+function PlaylistsOverlay(props) {
+  const {
+    isPlaylistsOverlayOpen,
+    setIsPlaylistsOverlayOpen,
+    setSelectedItems,
+    selectedTrackItems,
+    setSelectedTrackItems,
+    setIsSelectable,
+    actionType,
+  } = props;
+
+  console.log('Playlist overlay', selectedTrackItems);
+
+  const [playlists, setPlaylists] = useState([]);
+
+  useEffect(() => {
+    authService.getMyPlaylists().then(async response => {
+      let responseObj = await response.json();
+      console.log('Playlist overlay list ', responseObj);
+      setPlaylists(responseObj);
+    });
+  }, [isPlaylistsOverlayOpen]);
+
+  const handlePlaylistSelect = playlist => {
+    // owner need to updated dynamically from local DB
+    let playlistObj = {
+      _id: playlist._id,
+      owner: '5e7baa1a88a82254f4f8daed',
+      tracks: [],
+    };
+    selectedTrackItems.forEach(track => {
+      let trackItem = {};
+      trackItem.name = track.name;
+      trackItem.id = track._id;
+      trackItem.type = 'library';
+      trackItem.artists = track.artists;
+      playlistObj.tracks.push(trackItem);
+    });
+
+    if (actionType === 'add') {
+      authService.addToPlaylist(playlistObj).then(response => {
+        if (response.status === 200) {
+          setIsSelectable(false);
+          setIsPlaylistsOverlayOpen(false);
+          setSelectedTrackItems([]);
+          Alert.alert('Success!', 'Tracks added to playlist successfully');
+        } else {
+          Alert.alert('Failed!', 'Tracks cannot be added to Playlist');
+        }
+      });
+    } else if (actionType === 'remove') {
+      authService.removeFromPlaylist(playlist).then(response => {
+        if (response.status === 200) {
+          setIsSelectable(false);
+          setIsPlaylistsOverlayOpen(false);
+          setSelectedTrackItems([]);
+          Alert.alert('Success!', 'Tracks removed from playlist successfully');
+        } else {
+          Alert.alert('Failed!', 'Tracks cannot be removed from Playlist');
+        }
+      });
+    }
+    setSelectedItems([]);
+  };
+
+  return (
+    <Overlay
+      height={heightPercentageToDP('40%')}
+      width={widthPercentageToDP('80%')}
+      containerStyle={styles.overlayContainer}
+      transparent={true}
+      animationType="fade"
+      overlayBackgroundColor={Colors.grey900}
+      isVisible={isPlaylistsOverlayOpen}
+      onBackdropPress={() => setIsPlaylistsOverlayOpen(false)}>
+      <View>
+        {playlists.map((playlist, index) => {
+          return (
+            <ListItem
+              containerStyle={styles.listContainer}
+              title={playlist.name}
+              titleStyle={{color: Colors.grey200}}
+              key={index}
+              onPress={() => handlePlaylistSelect(playlist)}
+            />
+          );
+        })}
       </View>
     </Overlay>
   );
