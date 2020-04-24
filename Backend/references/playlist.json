@@ -1,0 +1,21 @@
+{
+  "_id": "123",
+  "name": "abc",
+  "scope": "public/private",
+  "type": "playlist",
+  "owner": "user_id",
+  "tracks": [
+    {
+      "name":  "track name",
+      "id": "xyz",
+      "type": "local/library",
+      "artists": "Anirudh, Ravichander",
+      "path": "/android/music/master.mp3 <only for local>",
+      "language": "tamil"
+    }
+  ],
+  "totalTracks": "2",
+  "imageUrl": "google.com",
+  "addedByCount": "5",
+  "createdAt": "2020-04-21 19:30:43IST"
+}
