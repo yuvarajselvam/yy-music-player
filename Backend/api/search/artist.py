@@ -6,7 +6,7 @@ from flask_restful import Resource
 from utils.db import artists
 
 
-class Artist(Resource):
+class GetArtist(Resource):
     @staticmethod
     def get(_id):
         if env["verbose"]:

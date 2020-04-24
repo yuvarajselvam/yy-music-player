@@ -20,43 +20,51 @@ class GetTracksUrlJob(object):
     def run(self):
         my_tracks = Saavn["tracks_" + self.language]
         tracks_list = my_tracks.find({"album.id": self.album_id})
+        print(f"Fetching {tracks_list[0]['album']['name']} songs...")
         for track in tracks_list:
             if "youtubeUrl" not in track:
-                track_name = track["name"]
+                track_name = re.sub("[\(,\)]", "", track["name"])
                 track_album = re.sub("[(\[].*[)\]]", "", track["album"]["name"]).strip()
-                track_artist = track["artists"][0]["name"]
+                track_artist = track["artists"][0]["name"] if len(track["artists"]) else ""
                 youtube_search_term = " ".join([track_name, track_album, track_artist])
-                url, youtube_url = youtube.getVideoURL(youtube_search_term)
-                my_tracks.update_one({"_id": track["_id"]}, {"$set": {"youtubeUrl": youtube_url,
-                                                                      "videoUrl": url}})
+                print("Searching YouTube for", youtube_search_term)
+                try:
+                    url, youtube_url = youtube.getVideoURL(youtube_search_term)
+                    my_tracks.update_one({"_id": track["_id"]}, {"$set": {"youtubeUrl": youtube_url,
+                                                                          "trackUrl": url}})
+                except FileNotFoundError:
+                    print("Song not found")
+                    pass
             else:
-                url, youtube_url = youtube.getVideoURL(track["youtubeUrl"])
-                my_tracks.update_one({"_id": track["_id"]}, {"$set": {"videoUrl": url}})
+                try:
+                    url, youtube_url = youtube.getVideoURL(track["youtubeUrl"])
+                    my_tracks.update_one({"_id": track["_id"]}, {"$set": {"trackUrl": url}})
+                except FileNotFoundError:
+                    print("Song not found")
 
 
-class Album(Resource):
+class GetAlbum(Resource):
     @staticmethod
     def get(_language, _id):
         if env["verbose"]:
             print(f"Getting album: {_id}")
 
-        my_albums = Saavn["albums_" + _language]
-        my_tracks = Saavn["tracks_" + _language]
+        my_albums = Saavn["albums_" + _language.lower()]
+        my_tracks = Saavn["tracks_" + _language.lower()]
 
         album = my_albums.find_one({"_id": _id})
 
         if not album:
-            response = jsonify(Error="Track not found!")
+            response = jsonify(Error="Album not found!")
             response.status_code = 404
             if env['verbose']:
                 print("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
 
-        # TODO: Add a logic here to trigger fetching videoUrl for all the album's tracks
+        album_tracks = my_tracks.find({"album.id": _id}, {"substrings": 0, "album": 0})
+        GetTracksUrlJob(_id, _language.lower())
+        album["tracks"] = sorted(album_tracks, key=lambda t: t["name"], reverse=True)
 
-        album_tracks = my_tracks.find({"album.id": _id})
-        GetTracksUrlJob(_id, _language)
-        album["tracks"] = sorted(album_tracks, key=lambda t: t["_id"], reverse=True)
         del album["substrings"]
         response = jsonify(album)
         response.status_code = 200
