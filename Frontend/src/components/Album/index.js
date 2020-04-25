@@ -22,7 +22,7 @@ export function Album(props) {
   const [album, setAlbum] = useState({artists: [{name: ''}]});
   const [albumTracks, setAlbumTracks] = useState([]);
 
-  const {onAddTrack, onPlay, onReset} = useContext(PlayerContext);
+  const {onAddTrack, onPlay} = useContext(PlayerContext);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -48,19 +48,20 @@ export function Album(props) {
       _id: track._id,
       language: albumlanguage,
     };
-    // console.log(data);
-    let trackObj = track;
     if (!track.trackUrl) {
       authService.getTrack(data).then(async response => {
         if (response.status === 200) {
           let responseObj = await response.json();
-          trackObj = responseObj;
+          onAddTrack(responseObj).then(() => {
+            onPlay();
+          });
         }
       });
+    } else {
+      onAddTrack(track).then(() => {
+        onPlay();
+      });
     }
-    onAddTrack(trackObj).then(() => {
-      onPlay();
-    });
   };
 
   return (
@@ -94,13 +95,7 @@ export function Album(props) {
             let trackArtistsName = artistsName.join(', ');
             return (
               <ListItem
-                containerStyle={{
-                  padding: 0,
-                  paddingLeft: 12,
-                  paddingRight: 4,
-                  backgroundColor: Colors.grey900,
-                  borderBottomWidth: 0,
-                }}
+                containerStyle={styles.listContainer}
                 contentContainerStyle={{padding: 10}}
                 // leftElement={
                 //   <View style={{paddingLeft: 10, alignItems: 'center'}}>
@@ -119,11 +114,7 @@ export function Album(props) {
                 title={track.name}
                 titleStyle={{color: Colors.grey200, paddingBottom: 4}}
                 subtitle={trackArtistsName}
-                subtitleStyle={{
-                  color: Colors.grey200,
-                  fontStyle: 'italic',
-                  fontSize: 14,
-                }}
+                subtitleStyle={styles.listSubtitle}
                 onPress={() => handleTrackSelect(track)}
               />
             );
