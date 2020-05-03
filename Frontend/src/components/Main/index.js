@@ -1,6 +1,6 @@
 import React from 'react';
 import {View} from 'react-native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createStackNavigator, TransitionSpecs} from '@react-navigation/stack';
 import {IconButton, Colors} from 'react-native-paper';
 
 import {MyMusic} from '../MyMusic';
@@ -14,20 +14,31 @@ import {Search} from '../Search';
 import {Album} from '../Album';
 import {Playlist} from '../Playlist';
 
-const Tab = createBottomTabNavigator();
+const stack = createStackNavigator();
 
 export function Main({navigation}) {
   return (
-    <Tab.Navigator
-      initialRouteName={'Home'}
-      tabBar={props => <CustomTabBar {...props} />}>
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="MyPlaylist" component={MyPlaylists} />
-      <Tab.Screen name="Playlist" component={Playlist} />
-      <Tab.Screen name="Search" component={Search} />
-      <Tab.Screen name="My Music" component={MyMusic} />
-      <Tab.Screen name="Album" component={Album} />
-    </Tab.Navigator>
+    <React.Fragment>
+      <stack.Navigator
+        screenOptions={{
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+          transitionSpec: {
+            open: TransitionSpecs.ScaleFromCenterAndroidSpec,
+            close: TransitionSpecs.ScaleFromCenterAndroidSpec,
+          },
+        }}
+        headerMode="none"
+        initialRouteName={'Home'}>
+        <stack.Screen name="Home" component={Home} />
+        <stack.Screen name="MyPlaylist" component={MyPlaylists} />
+        <stack.Screen name="Playlist" component={Playlist} />
+        <stack.Screen name="Search" component={Search} />
+        <stack.Screen name="My Music" component={MyMusic} />
+        <stack.Screen name="Album" component={Album} />
+      </stack.Navigator>
+      <CustomTabBar navigation={navigation} />
+    </React.Fragment>
   );
 }
 

@@ -8,8 +8,8 @@ import {Colors} from 'react-native-paper';
 
 export const styles = StyleSheet.create({
   albumImage: {
-    width: wp('80%'),
-    height: hp('40%'),
+    width: wp('50%'),
+    height: hp('25%'),
   },
   listImage: {
     width: wp(12),
