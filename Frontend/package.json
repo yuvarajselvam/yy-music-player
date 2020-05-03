@@ -30,7 +30,9 @@
     "react-native-screens": "^2.4.0",
     "react-native-swift": "^1.2.2",
     "react-native-track-player": "^1.2.2",
-    "react-native-vector-icons": "^6.6.0"
+    "react-native-vector-icons": "^6.6.0",
+    "realm": "^5.0.3",
+    "socket.io-client": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "7.9.0",
