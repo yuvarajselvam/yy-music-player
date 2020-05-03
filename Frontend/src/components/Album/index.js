@@ -67,7 +67,7 @@ export function Album(props) {
   return (
     <View style={commonStyles.screenStyle}>
       <Header navigation={navigation} />
-      <ScrollView>
+      <ScrollView overScrollMode="never">
         <View style={{alignItems: 'center', padding: 12}}>
           <Image source={{uri: album.imageUrl}} style={styles.albumImage} />
           <Text h4 style={{color: Colors.grey200}}>
