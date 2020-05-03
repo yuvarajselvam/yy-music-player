@@ -111,6 +111,7 @@ export function Search({navigation}) {
   };
 
   const handleListSelect = (item, evt) => {
+    Keyboard.dismiss();
     if (isSelectable) {
       return handleLongPress(item);
     }
