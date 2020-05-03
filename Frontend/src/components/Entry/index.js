@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -8,7 +8,6 @@ import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
 import {Colors, IconButton} from 'react-native-paper';
 import {Divider} from 'react-native-elements';
 import {View} from 'react-native';
-import {useNetInfo} from '@react-native-community/netinfo';
 
 import {Main} from '../Main';
 import {Settings} from '../Settings';
@@ -17,9 +16,6 @@ import {styles} from './entry.styles';
 const Drawer = createDrawerNavigator();
 
 function CustomDrawerContent({navigation}) {
-  const netInfo = useNetInfo();
-  console.log(netInfo);
-
   return (
     <DrawerContentScrollView>
       <DrawerItem
