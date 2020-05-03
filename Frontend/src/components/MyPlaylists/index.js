@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {View, Alert} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Alert, InteractionManager} from 'react-native';
 import {Card, ListItem, Button, Overlay, Text} from 'react-native-elements';
 import {Colors, Switch, IconButton} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
@@ -8,9 +8,16 @@ import {
   widthPercentageToDP,
 } from 'react-native-responsive-screen';
 
+const Realm = require('realm');
+
 import {Header} from '../../widgets/Header';
 import {InputBox} from '../../widgets/InputBox';
 import {authService} from '../../services/auth.service';
+import {
+  MyPlaylistSchema,
+  MyPlaylistsSchema,
+  PlaylistTrackSchema,
+} from '../../utils/schema';
 // import {mockMyPlaylists} from '../../mocks/my.playlists';
 
 import {commonStyles} from '../common/styles';
@@ -37,14 +44,12 @@ export function MyPlaylists({navigation}) {
   );
 
   const getPlaylistService = () => {
-    authService.getMyPlaylists().then(async response => {
-      if (response.status === 200) {
-        let responseData = await response.json();
-        console.log('Playlists ===', responseData);
-        setPlaylists(responseData);
-      } else if (response.status === 204) {
-        setPlaylists([]);
-      }
+    Realm.open({
+      schema: [MyPlaylistSchema, MyPlaylistsSchema, PlaylistTrackSchema],
+    }).then(realm => {
+      const myPlaylistsRealm = realm.objects('MyPlaylists');
+      // console.log('MyPlaylits.js === ', [...myPlaylistsRealm[0].myPlaylists]);
+      setPlaylists([...myPlaylistsRealm[0].myPlaylists]);
     });
   };
 

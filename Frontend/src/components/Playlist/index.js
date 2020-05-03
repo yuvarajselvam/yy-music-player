@@ -8,9 +8,16 @@ import {
   widthPercentageToDP,
 } from 'react-native-responsive-screen';
 
+const Realm = require('realm');
+
 import {Header} from '../../widgets/Header';
 import {authService} from '../../services/auth.service';
 import {PlayerContext} from '../../contexts/player.context';
+import {
+  MyPlaylistSchema,
+  MyPlaylistsSchema,
+  PlaylistTrackSchema,
+} from '../../utils/schema';
 
 // import {mockPlaylist} from '../../mocks/playlist';
 
@@ -20,25 +27,24 @@ import {styles} from './playlist.styles';
 export function Playlist(props) {
   console.log('Playlist screen');
   const {navigation, route} = props;
-  let playlistId = route.params.playlistId;
-  const [playlist, setPlaylist] = useState([]);
+  const playlistId = route.params.playlistId;
   const [trackId, setTrackId] = useState('');
+  const [playlist, setPlaylist] = useState({});
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [isTrackMenuOverlayOpen, setIsTrackMenuOverlayOpen] = useState(false);
 
   const {onAddTrack, onPlay} = useContext(PlayerContext);
 
   const getPlaylistService = () => {
-    let data = {
-      _id: playlistId,
-    };
-    authService.getPlaylist(data).then(async response => {
-      if (response.status === 200) {
-        let responseData = await response.json();
-        console.log('Playlist ===', responseData);
-        setPlaylist(responseData);
-        setPlaylistTracks(responseData.tracks);
-      }
+    Realm.open({
+      schema: [MyPlaylistSchema, MyPlaylistsSchema, PlaylistTrackSchema],
+    }).then(realm => {
+      const myPlaylist = realm.objects('MyPlaylist').filter(item => {
+        return item._id === playlistId;
+      });
+      console.log('MyPlaylit.js === ', myPlaylist[0]);
+      setPlaylist(myPlaylist[0]);
+      setPlaylistTracks([...myPlaylist[0].tracks]);
     });
   };
 
@@ -75,7 +81,7 @@ export function Playlist(props) {
       <ScrollView>
         <View style={{alignItems: 'center', padding: 12}}>
           <Image
-            source={{uri: playlist.imageUrl}}
+            // source={{uri: playlist.imageUrl}}
             style={{width: 100, height: 100}}
           />
           <Text h4 style={{color: Colors.grey200, padding: 8}}>

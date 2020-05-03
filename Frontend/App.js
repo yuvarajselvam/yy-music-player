@@ -1,15 +1,18 @@
 import 'react-native-gesture-handler';
-import React, {useReducer} from 'react';
+import React, {useReducer, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import {StatusBar} from 'react-native';
+import {Colors} from 'react-native-paper';
 
-import {Sso} from './src/components/Authorization/Sso';
-import {Login} from './src/components/Authorization/Login';
-import {Signup} from './src/components/Authorization/Signup';
-import {ForgotPassword} from './src/components/Authorization/ForgotPassword';
-import {ChangePassword} from './src/components/Authorization/ChangePassword';
-import {EnterOTP} from './src/components/Authorization/CheckOTP';
 import {Entry} from './src/components/Entry';
+// import {Sso} from './src/components/Authorization/Sso';
+// import {Login} from './src/components/Authorization/Login';
+// import {Signup} from './src/components/Authorization/Signup';
+// import {ForgotPassword} from './src/components/Authorization/ForgotPassword';
+// import {ChangePassword} from './src/components/Authorization/ChangePassword';
+// import {EnterOTP} from './src/components/Authorization/CheckOTP';
+// import {Load} from './src/utils/components/Load';
 
 import AuthContext from './src/contexts/auth.context';
 import {PlayerProvider} from './src/contexts/player.context';
@@ -49,6 +52,7 @@ export default function App() {
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const authContext = React.useMemo(
     () => ({
@@ -69,20 +73,29 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={authContext}>
+      <StatusBar backgroundColor={Colors.grey900} />
+
       <PlayerProvider>
         <NavigationContainer>
           <Stack.Navigator headerMode="none">
             {/* {state.userToken && state.loggedIn ? ( */}
+            {/* {!isLoaded ? (
+              <Stack.Screen name="Load">
+                {props => <Load {...props} setIsLoaded={setIsLoaded} />}
+              </Stack.Screen>
+            ) : (
+              <Stack.Screen name="Entry" component={Entry} />
+            )} */}
             <Stack.Screen name="Entry" component={Entry} />
             {/* ) : ( */}
-            <React.Fragment>
+            {/* <React.Fragment>
               <Stack.Screen name="Sso" component={Sso} />
               <Stack.Screen name="Login" component={Login} />
               <Stack.Screen name="Signup" component={Signup} />
               <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
               <Stack.Screen name="EnterOTP" component={EnterOTP} />
               <Stack.Screen name="ChangePassword" component={ChangePassword} />
-            </React.Fragment>
+            </React.Fragment> */}
             {/* )} */}
           </Stack.Navigator>
         </NavigationContainer>
