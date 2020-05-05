@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
-import {Text} from 'react-native-elements';
+import {Text, Input} from 'react-native-elements';
 import io from 'socket.io-client';
 
 import {Header} from '../../widgets/Header';
@@ -15,15 +15,25 @@ export function MyMusic({navigation}) {
   const [response, setResponse] = useState('');
   useEffect(() => {
     console.log('My Music socket useEffect');
+    socket.on('connect', data => {
+      setResponse(data);
+    });
     socket.on('chat message', data => {
+      console.log(data);
       setResponse(data);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleMessage = evt => {
+    console.log(evt.nativeEvent.text);
+    socket.emit('chat message', evt.nativeEvent.text);
+  };
   return (
     <View style={commonStyles.screenStyle}>
       <Header navigation={navigation} />
       <Text style={styles.text}>{response}</Text>
+      <Input placeholder="BASIC INPUT" onSubmitEditing={handleMessage} />
     </View>
   );
 }
