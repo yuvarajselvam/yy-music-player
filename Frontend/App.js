@@ -5,6 +5,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {StatusBar} from 'react-native';
 import {Colors} from 'react-native-paper';
 
+console.disableYellowBox = true;
+
 import {Entry} from './src/components/Entry';
 // import {Sso} from './src/components/Authorization/Sso';
 // import {Login} from './src/components/Authorization/Login';
