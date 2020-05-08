@@ -1,5 +1,7 @@
 import 'react-native-gesture-handler';
 import React, {useReducer} from 'react';
+import {StatusBar} from 'react-native';
+import {Colors} from 'react-native-paper';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
@@ -69,6 +71,7 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={authContext}>
+      <StatusBar backgroundColor={Colors.grey900} />
       <PlayerProvider>
         <NavigationContainer>
           <Stack.Navigator headerMode="none">
