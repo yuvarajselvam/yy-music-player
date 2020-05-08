@@ -1,8 +1,15 @@
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import {View, ScrollView, Keyboard, Alert, BackHandler} from 'react-native';
-import {Card, ListItem, Image, Overlay, Button} from 'react-native-elements';
-import {IconButton, Colors, Appbar, Searchbar} from 'react-native-paper';
-import {useFocusEffect} from '@react-navigation/native';
+import {
+  Card,
+  ListItem,
+  Image,
+  Overlay,
+  Button,
+  SearchBar,
+} from 'react-native-elements';
+import {IconButton, Colors, Appbar} from 'react-native-paper';
+// import {useFocusEffect} from '@react-navigation/native';
 import {
   heightPercentageToDP,
   widthPercentageToDP,
@@ -33,18 +40,18 @@ export function Search({navigation}) {
     });
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      // Do something when the screen is focused
-      return () => {
-        setSearchResults([]);
-        setSelectedTrackItems([]);
-        setKeyword('');
-        setSelectedItems([]);
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []),
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     // Do something when the screen is focused
+  //     return () => {
+  //       setSearchResults([]);
+  //       setSelectedTrackItems([]);
+  //       setKeyword('');
+  //       setSelectedItems([]);
+  //     };
+  //     // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   }, []),
+  // );
 
   useEffect(() => {
     if (isSelectable) {
@@ -77,13 +84,15 @@ export function Search({navigation}) {
   }, [isSelectable]);
 
   useEffect(() => {
-    let currentKeyword = searchRef.current.props.value;
     let timer;
-    if (currentKeyword.length > 0 && keyword === currentKeyword) {
+    if (
+      searchRef.current.props.value.length > 0 &&
+      keyword === searchRef.current.props.value
+    ) {
       timer = setTimeout(() => {
         console.log('SEARCH KEYWORD', keyword);
         let data = {
-          searchKey: currentKeyword,
+          searchKey: searchRef.current.props.value,
           languages: ['Tamil', 'Telugu'],
         };
         authService.getSearch(data).then(async response => {
@@ -94,10 +103,12 @@ export function Search({navigation}) {
               value.isSelect = false;
               return value;
             });
-            setSearchResults(edittedSearchList);
+            if (responseObj.searchKey === searchRef.current.props.value) {
+              setSearchResults(edittedSearchList);
+            }
           }
         });
-      }, 400);
+      }, 200);
     }
     return () => {
       console.log('Clear Interval');
@@ -243,7 +254,7 @@ export function Search({navigation}) {
           </View>
         </Appbar>
       ) : (
-        <Searchbar
+        <SearchBar
           placeholderTextColor="#FFFFFF"
           iconColor="#FFFFFF"
           ref={searchRef}
@@ -253,6 +264,14 @@ export function Search({navigation}) {
           value={keyword}
           onChangeText={handleSearch}
           blurOnSubmit={false}
+          clearIcon={
+            <IconButton
+              icon="close"
+              color={Colors.grey300}
+              size={20}
+              onPress={() => console.log('Pressed')}
+            />
+          }
         />
       )}
       <Card containerStyle={styles.card}>
