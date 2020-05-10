@@ -6,7 +6,7 @@ import {IconButton, Colors} from 'react-native-paper';
 import {MyMusic} from '../MyMusic';
 import {Home} from '../Home';
 
-import {PlayerMain} from '../Player';
+import {MiniPlayer} from '../Player/MiniPlayer';
 
 // import {styles} from './main.styles';
 import {MyPlaylists} from '../MyPlaylists';
@@ -22,11 +22,12 @@ export function Main({navigation}) {
       <stack.Navigator
         screenOptions={{
           gestureEnabled: true,
-          gestureDirection: 'horizontal',
-          transitionSpec: {
-            open: TransitionSpecs.ScaleFromCenterAndroidSpec,
-            close: TransitionSpecs.ScaleFromCenterAndroidSpec,
-          },
+          animationEnabled: false,
+          // gestureDirection: 'horizontal',
+          // transitionSpec: {
+          //   open: TransitionSpecs.ScaleFromCenterAndroidSpec,
+          //   close: TransitionSpecs.ScaleFromCenterAndroidSpec,
+          // },
         }}
         headerMode="none"
         initialRouteName={'Home'}>
@@ -47,12 +48,12 @@ function CustomTabBar(props) {
   const {navigation} = props;
   return (
     <View>
-      <PlayerMain />
+      <MiniPlayer navigation={navigation} />
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-around',
-          backgroundColor: '#171717',
+          backgroundColor: '#141414',
         }}>
         <IconButton
           onPress={() => navigation.navigate('Home')}

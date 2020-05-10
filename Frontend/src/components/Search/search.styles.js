@@ -41,6 +41,7 @@ export const styles = StyleSheet.create({
     borderRightWidth: 0,
     borderRadius: 0,
     elevation: 0,
+    height: hp(6.4),
   },
   searchContainer: {
     padding: 0,

@@ -1,13 +1,6 @@
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import {View, ScrollView, Keyboard, Alert, BackHandler} from 'react-native';
-import {
-  Card,
-  ListItem,
-  Image,
-  Overlay,
-  Button,
-  SearchBar,
-} from 'react-native-elements';
+import {Card, ListItem, Image, Button, SearchBar} from 'react-native-elements';
 import {IconButton, Colors, Appbar} from 'react-native-paper';
 // import {useFocusEffect} from '@react-navigation/native';
 import {
@@ -15,6 +8,7 @@ import {
   widthPercentageToDP,
 } from 'react-native-responsive-screen';
 
+import {OverlayModal} from '../../widgets/OverlayModal';
 import {authService} from '../../services/auth.service';
 import {PlayerContext} from '../../contexts/player.context';
 // import {searchResultsMock} from '../../mocks/search.list';
@@ -210,6 +204,11 @@ export function Search({navigation}) {
     setIsPlaylistsOverlayOpen(true);
   };
 
+  const clearSearch = () => {
+    setKeyword('');
+    setSearchResults([]);
+  };
+
   return (
     <View style={commonStyles.screenStyle}>
       {isPlaylistsOverlayOpen && (
@@ -258,7 +257,8 @@ export function Search({navigation}) {
           placeholderTextColor="#FFFFFF"
           iconColor="#FFFFFF"
           ref={searchRef}
-          style={styles.searchBar}
+          containerStyle={styles.searchBar}
+          inputContainerStyle={{padding: 0, margin: 0}}
           inputStyle={styles.searchInput}
           placeholder="Search Songs"
           value={keyword}
@@ -269,7 +269,16 @@ export function Search({navigation}) {
               icon="close"
               color={Colors.grey300}
               size={20}
-              onPress={() => console.log('Pressed')}
+              onPress={clearSearch}
+            />
+          }
+          searchIcon={
+            <IconButton
+              style={{padding: 0, margin: 0}}
+              icon="magnify"
+              color={Colors.grey300}
+              size={24}
+              onPress={clearSearch}
             />
           }
         />
@@ -348,56 +357,48 @@ function OverlayMenu(props) {
   };
 
   return (
-    <Overlay
-      height={heightPercentageToDP('32%')}
-      width={widthPercentageToDP('100%')}
-      containerStyle={styles.overlayContainer}
-      overlayStyle={styles.overlay}
-      animationType="fade"
-      overlayBackgroundColor={Colors.grey900}
-      transparent={true}
-      isVisible={isOverlayVisible}
+    <OverlayModal
+      position="bottom"
+      visible={isOverlayVisible}
       onBackdropPress={handleBackdropPress}>
-      <View style={styles.overlayContent}>
-        <Button
-          icon={<IconButton color={Colors.grey200} icon="heart-outline" />}
-          buttonStyle={styles.overlayButtons}
-          type="clear"
-          title="Like"
-          titleStyle={styles.overlayButtonTitle}
-        />
-        <Button
-          icon={<IconButton color={Colors.grey200} icon="share-variant" />}
-          buttonStyle={styles.overlayButtons}
-          type="clear"
-          title="Share"
-          titleStyle={styles.overlayButtonTitle}
-        />
-        <Button
-          icon={<IconButton color={Colors.grey200} icon="playlist-plus" />}
-          buttonStyle={styles.overlayButtons}
-          type="clear"
-          title="Add to Playlist"
-          titleStyle={styles.overlayButtonTitle}
-          onPress={() => handlePlaylistTrackEdit('add')}
-        />
-        <Button
-          icon={<IconButton color={Colors.grey200} icon="playlist-remove" />}
-          buttonStyle={styles.overlayButtons}
-          type="clear"
-          title="Remove from Playlist"
-          titleStyle={styles.overlayButtonTitle}
-          onPress={() => handlePlaylistTrackEdit('remove')}
-        />
-        <Button
-          icon={<IconButton color={Colors.grey200} icon="playlist-plus" />}
-          buttonStyle={styles.overlayButtons}
-          type="clear"
-          title="Add to Queue"
-          titleStyle={styles.overlayButtonTitle}
-        />
-      </View>
-    </Overlay>
+      <Button
+        icon={<IconButton color={Colors.grey200} icon="heart-outline" />}
+        buttonStyle={styles.overlayButtons}
+        type="clear"
+        title="Like"
+        titleStyle={styles.overlayButtonTitle}
+      />
+      <Button
+        icon={<IconButton color={Colors.grey200} icon="share-variant" />}
+        buttonStyle={styles.overlayButtons}
+        type="clear"
+        title="Share"
+        titleStyle={styles.overlayButtonTitle}
+      />
+      <Button
+        icon={<IconButton color={Colors.grey200} icon="playlist-plus" />}
+        buttonStyle={styles.overlayButtons}
+        type="clear"
+        title="Add to Playlist"
+        titleStyle={styles.overlayButtonTitle}
+        onPress={() => handlePlaylistTrackEdit('add')}
+      />
+      <Button
+        icon={<IconButton color={Colors.grey200} icon="playlist-remove" />}
+        buttonStyle={styles.overlayButtons}
+        type="clear"
+        title="Remove from Playlist"
+        titleStyle={styles.overlayButtonTitle}
+        onPress={() => handlePlaylistTrackEdit('remove')}
+      />
+      <Button
+        icon={<IconButton color={Colors.grey200} icon="playlist-plus" />}
+        buttonStyle={styles.overlayButtons}
+        type="clear"
+        title="Add to Queue"
+        titleStyle={styles.overlayButtonTitle}
+      />
+    </OverlayModal>
   );
 }
 
@@ -467,28 +468,20 @@ function PlaylistsOverlay(props) {
   };
 
   return (
-    <Overlay
-      height={heightPercentageToDP('40%')}
-      width={widthPercentageToDP('80%')}
-      containerStyle={styles.overlayContainer}
-      transparent={true}
-      animationType="fade"
-      overlayBackgroundColor={Colors.grey900}
-      isVisible={isPlaylistsOverlayOpen}
+    <OverlayModal
+      visible={isPlaylistsOverlayOpen}
       onBackdropPress={() => setIsPlaylistsOverlayOpen(false)}>
-      <View>
-        {playlists.map((playlist, index) => {
-          return (
-            <ListItem
-              containerStyle={styles.listContainer}
-              title={playlist.name}
-              titleStyle={{color: Colors.grey200}}
-              key={index}
-              onPress={() => handlePlaylistSelect(playlist)}
-            />
-          );
-        })}
-      </View>
-    </Overlay>
+      {playlists.map((playlist, index) => {
+        return (
+          <ListItem
+            containerStyle={styles.listContainer}
+            title={playlist.name}
+            titleStyle={{color: Colors.grey200}}
+            key={index}
+            onPress={() => handlePlaylistSelect(playlist)}
+          />
+        );
+      })}
+    </OverlayModal>
   );
 }
