@@ -12,6 +12,7 @@ import {View} from 'react-native';
 import {Main} from '../Main';
 import {Settings} from '../Settings';
 import {styles} from './entry.styles';
+import {MainPlayer} from '../Player/MainPlayer';
 
 const Drawer = createDrawerNavigator();
 
@@ -109,9 +110,10 @@ export function Entry() {
       sceneContainerStyle={styles.sceneContainer}
       drawerStyle={styles.drawer}
       drawerContent={props => <CustomDrawerContent {...props} />}
-      edgeWidth={wp(24)}
+      edgeWidth={wp(12)}
       initialRouteName="Main">
       <Drawer.Screen name="Main" component={Main} />
+      <Drawer.Screen name="Main Player" component={MainPlayer} />
       <Drawer.Screen name="Settings" component={Settings} />
     </Drawer.Navigator>
   );

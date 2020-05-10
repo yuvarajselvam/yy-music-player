@@ -11,6 +11,7 @@ import {
 import {Header} from '../../widgets/Header';
 import {InputBox} from '../../widgets/InputBox';
 import {authService} from '../../services/auth.service';
+import {OverlayModal} from '../../widgets/OverlayModal';
 // import {mockMyPlaylists} from '../../mocks/my.playlists';
 
 import {commonStyles} from '../common/styles';
@@ -65,10 +66,7 @@ export function MyPlaylists({navigation}) {
 
   return (
     <View style={commonStyles.screenStyle}>
-      <Header navigation={navigation} />
-      <View style={{alignItems: 'center', padding: 12}}>
-        <Button title="Create Playlist" onPress={createPlaylist} />
-      </View>
+      <Header navigation={navigation} title="My Playlists" />
       <Card containerStyle={styles.card}>
         {playlists.map((playlist, index) => {
           return (
@@ -85,11 +83,13 @@ export function MyPlaylists({navigation}) {
                 />
               }
               key={index}
-              titleStyle={{color: Colors.grey200}}
               onPress={() => handlePlaylistSelect(playlist)}
             />
           );
         })}
+        <View style={{alignItems: 'center', padding: 12}}>
+          <Button title="Create Playlist" onPress={createPlaylist} />
+        </View>
       </Card>
       <CreatePlaylistOverlay
         isCreatePlaylistOverlayOpen={isCreatePlaylistOverlayOpen}
@@ -216,33 +216,25 @@ function OverlayMenu(props) {
   };
 
   return (
-    <Overlay
-      height={heightPercentageToDP('20%')}
-      width={widthPercentageToDP('100%')}
-      containerStyle={styles.overlayContainer}
-      transparent={true}
-      overlayStyle={styles.overlay}
-      animationType="fade"
-      overlayBackgroundColor={Colors.grey900}
-      isVisible={isPlaylistMenuOverlayOpen}
+    <OverlayModal
+      position="bottom"
+      visible={isPlaylistMenuOverlayOpen}
       onBackdropPress={() => setIsPlaylistMenuOverlayOpen(false)}>
-      <View style={styles.overlayContent}>
-        <Button
-          icon={<IconButton color={Colors.grey200} icon="playlist-remove" />}
-          buttonStyle={styles.overlayButtons}
-          type="clear"
-          title="Delete Playlist"
-          titleStyle={styles.overlayButtonTitle}
-          onPress={handleDeletePlaylist}
-        />
-        <Button
-          icon={<IconButton color={Colors.grey200} icon="playlist-edit" />}
-          buttonStyle={styles.overlayButtons}
-          type="clear"
-          title="Change Playlist Name"
-          titleStyle={styles.overlayButtonTitle}
-        />
-      </View>
-    </Overlay>
+      <Button
+        icon={<IconButton color={Colors.grey200} icon="playlist-remove" />}
+        buttonStyle={styles.overlayButtons}
+        type="clear"
+        title="Delete Playlist"
+        titleStyle={styles.overlayButtonTitle}
+        onPress={handleDeletePlaylist}
+      />
+      <Button
+        icon={<IconButton color={Colors.grey200} icon="playlist-edit" />}
+        buttonStyle={styles.overlayButtons}
+        type="clear"
+        title="Change Playlist Name"
+        titleStyle={styles.overlayButtonTitle}
+      />
+    </OverlayModal>
   );
 }

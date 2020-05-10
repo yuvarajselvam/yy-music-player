@@ -1,4 +1,4 @@
-const URL_LINK = 'http://192.168.0.4:5000/';
+const URL_LINK = 'http://192.168.0.3:5000/';
 
 export const authService = {
   userSSO: data => {
