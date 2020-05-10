@@ -3,6 +3,7 @@ import json
 from json import JSONDecodeError
 from os import environ as env
 from time import time
+from time import sleep
 from fuzzywuzzy import fuzz
 from flask import request, jsonify
 from flask_restful import Resource
@@ -32,15 +33,13 @@ class Autocomplete(Resource):
         for language in request.args["languages"].split(','):
             my_albums = Saavn["albums_" + language.lower()]
             my_tracks = Saavn["tracks_" + language.lower()]
-            print(language)
             if len(search_key) < 3:
-                matching_albums = my_albums.find({"name": re.compile(f"^{search_key}.*", re.IGNORECASE),
-                                                  "albumType": {"$not": {"$eq": "Custom"}}})
-                matching_tracks = my_tracks.find({"name": re.compile(f"^{search_key}.*", re.IGNORECASE),
-                                                  "trackType": {"$not": {"$eq": "Custom"}}})
-                print(matching_tracks.count(), matching_albums.count())
-                matching_albums = list(matching_albums[:min(50, matching_albums.count())])
-                matching_tracks = list(matching_tracks[:min(50, matching_tracks.count())])
+                matching_albums = list(my_albums.find({"name": re.compile(f"^{search_key}.*", re.IGNORECASE),
+                                                       "albumType": {"$not": {"$eq": "Custom"}}}).sort("name"))
+                matching_tracks = list(my_tracks.find({"name": re.compile(f"^{search_key}.*", re.IGNORECASE),
+                                                       "trackType": {"$not": {"$eq": "Custom"}}}).sort("name"))
+                matching_albums = list(matching_albums[:min(50, len(matching_albums))])
+                matching_tracks = list(matching_tracks[:min(50, len(matching_tracks))])
             else:
                 matching_albums = my_albums.find({"$text": {"$search": search_key},
                                                   "albumType": {"$not": {"$eq": "Custom"}}},
@@ -49,9 +48,11 @@ class Autocomplete(Resource):
                                                   "trackType": {"$not": {"$eq": "Custom"}}},
                                                  {"score": {"$meta": "textScore"}})
 
-                matching_tracks = sorted(matching_tracks, key=lambda t: t["score"], reverse=True)
-                matching_albums = sorted(matching_albums, key=lambda t: t["score"], reverse=True)
-
+                matching_tracks = list(matching_tracks)
+                matching_albums = list(matching_albums)
+                # matching_tracks = sorted(matching_tracks, key=lambda t: t["score"], reverse=True)
+                # matching_albums = sorted(matching_albums, key=lambda t: t["score"], reverse=True)
+            print(language + ": ", len(matching_albums), "albums and", len(matching_tracks), "tracks")
             for alb in matching_albums:
                 album_name = re.sub("[(\[].*[)\]]", "", alb["name"]).strip()
                 alb["matchScore"] = get_score(search_key, album_name)
@@ -120,6 +121,7 @@ class Autocomplete(Resource):
             return response
 
         response = jsonify(searchResults=sorted(trimmed_albums + trimmed_tracks,
-                                                key=lambda t: t["matchScore"], reverse=True))
+                                                key=lambda t: t["matchScore"], reverse=True),
+                           searchKey=search_key)
         response.status_code = 200
         return response

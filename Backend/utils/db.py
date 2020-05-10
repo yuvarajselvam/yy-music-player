@@ -5,7 +5,7 @@ from utils.secrets import Secrets
 
 
 client = MongoClient()
-Saavn = client.YYMPSaavn
+Saavn = client.YYMPSaavn2
 tracks = Saavn.tracks_tamil
 albums = Saavn.albums_tamil
 artists = Saavn.artists

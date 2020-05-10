@@ -5,7 +5,7 @@ export const commonStyles = StyleSheet.create({
   screenStyle: {
     flex: 1,
     // justifyContent: 'flex-end',
-    backgroundColor: Colors.grey900,
+    backgroundColor: '#121212',
     // color: '#FFFFFF',
     color: '#E0E0E0',
   },

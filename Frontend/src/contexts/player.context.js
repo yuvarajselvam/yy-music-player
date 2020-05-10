@@ -1,9 +1,5 @@
 import React, {useState, createContext, useEffect} from 'react';
 import TrackPlayer from 'react-native-track-player';
-import {
-  usePlaybackState,
-  useTrackPlayerProgress,
-} from '../components/Player/player.hooks';
 import {Alert} from 'react-native';
 
 export const PlayerContext = createContext();
@@ -12,14 +8,19 @@ export const PlayerProvider = props => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [trackDetails, setTrackDetails] = useState({});
 
-  const {bufferedPosition, duration, position} = useTrackPlayerProgress();
-
-  const playbackState = usePlaybackState();
-
   useEffect(() => {
-    TrackPlayer.setupPlayer().then(() => {
+    TrackPlayer.setupPlayer().then(async () => {
       console.log('Setting up the player');
       onUpdateOptions();
+      // TO DO - removed and should contain actual last played track
+      await TrackPlayer.add({
+        id: 'track._id',
+        url: 'track.trackUrl',
+        title: 'track.name',
+        artist: 'trackArtistsName',
+        album: 'track.album.name',
+        artwork: 'track.imageUrl',
+      });
     });
     return () => onDestroy();
   }, []);
@@ -46,8 +47,18 @@ export const PlayerProvider = props => {
       await TrackPlayer.add({
         id: track._id,
         url: track.trackUrl,
+        title: track.name,
+        artist: trackArtistsName,
+        album: track.album.name,
+        artwork: track.imageUrl,
       });
     });
+  };
+
+  const getTrackDetails = async () => {
+    let trackId = await TrackPlayer.getCurrentTrack();
+    let trackObject = await TrackPlayer.getTrack(trackId);
+    return trackObject;
   };
 
   const onPlay = () => {
@@ -94,17 +105,26 @@ export const PlayerProvider = props => {
     });
   };
 
+  const updateSeekPosition = interval => {
+    console.log('Seek interval', interval);
+    TrackPlayer.seekTo(interval);
+  };
+
+  const getCurrentTrackId = async () => {
+    let trackId = await TrackPlayer.getCurrentTrack();
+    return trackId;
+  };
+
   return (
     <PlayerContext.Provider
       value={{
         isPlaying: isPlaying,
-        bufferedPosition: bufferedPosition,
-        duration: duration,
-        position: position,
-        playbackState: playbackState,
         trackDetails: trackDetails,
+        getCurrentTrackId: getCurrentTrackId,
+        getTrackDetails: getTrackDetails,
         setIsPlaying: setIsPlaying,
         onAddTrack: onAddTrack,
+        updateSeekPosition: updateSeekPosition,
         onPlay: onPlay,
         onPause: onPause,
         onPrevious: onPrevious,

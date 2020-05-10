@@ -77,7 +77,7 @@ export function Playlist(props) {
 
   return (
     <View style={commonStyles.screenStyle}>
-      <Header navigation={navigation} />
+      <Header navigation={navigation} title={playlist.name} />
       <ScrollView>
         <View style={{alignItems: 'center', padding: 12}}>
           <Image
@@ -98,7 +98,7 @@ export function Playlist(props) {
                 onPress={() => handleTrackSelect(track)}
                 key={index}
                 title={track.name}
-                titleStyle={{color: Colors.grey200}}
+                // titleStyle={{color: Colors.grey200}}
                 subtitle={track.artists}
                 subtitleStyle={{color: Colors.grey200}}
                 rightElement={

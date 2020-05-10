@@ -11,7 +11,7 @@ export function Home({navigation}) {
 
   return (
     <View style={commonStyles.screenStyle}>
-      <Header navigation={navigation} />
+      <Header navigation={navigation} title="Home" />
       <View />
     </View>
   );

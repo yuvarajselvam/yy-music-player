@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
     padding: 0,
     paddingLeft: 12,
     paddingRight: 4,
-    backgroundColor: Colors.grey900,
+    backgroundColor: '#121212',
     borderBottomWidth: 0,
   },
   overlayContainer: {flex: 1, opacity: 0.7, backgroundColor: Colors.black},

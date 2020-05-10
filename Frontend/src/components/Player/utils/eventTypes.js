@@ -21,7 +21,7 @@ const TrackPlayerEvents = {
   PLAYBACK_STATE: 'playback-state',
   PLAYBACK_TRACK_CHANGED: 'playback-track-changed',
   PLAYBACK_QUEUE_ENDED: 'playback-queue-ended',
-  PLAYBACK_ERROR: 'playback-error'
-}
+  PLAYBACK_ERROR: 'playback-error',
+};
 
-module.exports = TrackPlayerEvents
+module.exports = TrackPlayerEvents;
