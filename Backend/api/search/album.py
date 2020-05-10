@@ -52,7 +52,7 @@ class GetAlbum(Resource):
         my_albums = Saavn["albums_" + _language.lower()]
         my_tracks = Saavn["tracks_" + _language.lower()]
 
-        album = my_albums.find_one({"_id": _id})
+        album = my_albums.find_one({"_id": _id}, {"substrings": 0})
 
         if not album:
             response = jsonify(Error="Album not found!")
@@ -62,10 +62,9 @@ class GetAlbum(Resource):
             return response
 
         album_tracks = my_tracks.find({"album.id": _id}, {"substrings": 0, "album": 0})
-        GetTracksUrlJob(_id, _language.lower())
+        # GetTracksUrlJob(_id, _language.lower())
         album["tracks"] = sorted(album_tracks, key=lambda t: t["name"], reverse=True)
 
-        del album["substrings"]
         response = jsonify(album)
         response.status_code = 200
         if env['verbose']:
