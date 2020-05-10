@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
   searchAppBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    height: hp(6.4),
+    // height: hp(6.4),
     backgroundColor: 'transparent',
     borderWidth: 0,
     shadowOffset: {
@@ -18,17 +18,6 @@ export const styles = StyleSheet.create({
       height: 0,
     },
     elevation: 0,
-  },
-  searchBar: {
-    padding: 0,
-    margin: 0,
-    backgroundColor: Colors.grey700,
-    borderRadius: 0,
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
-    borderLeftWidth: 0,
-    elevation: 0,
-    height: hp(6.4),
   },
   searchInput: {
     margin: 0,
@@ -41,10 +30,20 @@ export const styles = StyleSheet.create({
     borderRightWidth: 0,
     borderRadius: 0,
     elevation: 0,
-    height: hp(6.4),
+    height: hp(7.2),
+    // flex: 1,
   },
   searchContainer: {
     padding: 0,
+    margin: 0,
+    backgroundColor: Colors.grey700,
+    borderRadius: 0,
+    borderTopWidth: 0,
+    borderBottomWidth: 0,
+    borderLeftWidth: 0,
+    elevation: 0,
+    // flex: 1,
+    height: hp(7.2),
   },
   card: {
     flex: 1,
