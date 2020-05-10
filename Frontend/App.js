@@ -4,10 +4,7 @@ import {StatusBar} from 'react-native';
 import {ThemeProvider} from 'react-native-elements';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import {StatusBar} from 'react-native';
 import {Colors} from 'react-native-paper';
-
-console.disableYellowBox = true;
 
 console.disableYellowBox = true;
 
@@ -22,7 +19,6 @@ import {Entry} from './src/components/Entry';
 
 import AuthContext from './src/contexts/auth.context';
 import {PlayerProvider} from './src/contexts/player.context';
-import {Colors} from 'react-native-paper';
 
 const Stack = createStackNavigator();
 
