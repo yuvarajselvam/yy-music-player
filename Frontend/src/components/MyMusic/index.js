@@ -8,11 +8,10 @@ import {Header} from '../../widgets/Header';
 export function MyMusic({navigation}) {
   return (
     <View style={commonStyles.screenStyle}>
-      <Header navigation={navigation} />
+      <Header navigation={navigation} title="My Music" />
       <Text
         style={{
           flex: 1,
-          color: '#FFFFFF',
           textAlign: 'center',
           textAlignVertical: 'center',
         }}>

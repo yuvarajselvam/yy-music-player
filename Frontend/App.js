@@ -1,7 +1,11 @@
 import 'react-native-gesture-handler';
 import React, {useReducer} from 'react';
+import {StatusBar} from 'react-native';
+import {ThemeProvider} from 'react-native-elements';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+
+console.disableYellowBox = true;
 
 import {Sso} from './src/components/Authorization/Sso';
 import {Login} from './src/components/Authorization/Login';
@@ -13,8 +17,17 @@ import {Entry} from './src/components/Entry';
 
 import AuthContext from './src/contexts/auth.context';
 import {PlayerProvider} from './src/contexts/player.context';
+import {Colors} from 'react-native-paper';
 
 const Stack = createStackNavigator();
+
+const theme = {
+  Text: {
+    style: {
+      color: Colors.grey200,
+    },
+  },
+};
 
 function reducer(state, action) {
   switch (action.type) {
@@ -69,23 +82,32 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={authContext}>
+      <StatusBar backgroundColor={'#121212'} />
       <PlayerProvider>
-        <NavigationContainer>
-          <Stack.Navigator headerMode="none">
-            {/* {state.userToken && state.loggedIn ? ( */}
-            <Stack.Screen name="Entry" component={Entry} />
-            {/* ) : ( */}
-            <React.Fragment>
-              <Stack.Screen name="Sso" component={Sso} />
-              <Stack.Screen name="Login" component={Login} />
-              <Stack.Screen name="Signup" component={Signup} />
-              <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-              <Stack.Screen name="EnterOTP" component={EnterOTP} />
-              <Stack.Screen name="ChangePassword" component={ChangePassword} />
-            </React.Fragment>
-            {/* )} */}
-          </Stack.Navigator>
-        </NavigationContainer>
+        <ThemeProvider theme={theme}>
+          <NavigationContainer>
+            <Stack.Navigator headerMode="none">
+              {/* {state.userToken && state.loggedIn ? ( */}
+              <Stack.Screen name="Entry" component={Entry} />
+              {/* ) : ( */}
+              <React.Fragment>
+                <Stack.Screen name="Sso" component={Sso} />
+                <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="Signup" component={Signup} />
+                <Stack.Screen
+                  name="ForgotPassword"
+                  component={ForgotPassword}
+                />
+                <Stack.Screen name="EnterOTP" component={EnterOTP} />
+                <Stack.Screen
+                  name="ChangePassword"
+                  component={ChangePassword}
+                />
+              </React.Fragment>
+              {/* )} */}
+            </Stack.Navigator>
+          </NavigationContainer>
+        </ThemeProvider>
       </PlayerProvider>
     </AuthContext.Provider>
   );
