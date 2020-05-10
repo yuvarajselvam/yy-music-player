@@ -20,10 +20,11 @@
     "@react-navigation/stack": "^5.2.5",
     "react": "16.9.0",
     "react-native": "0.61.5",
-    "react-native-elements": "^1.2.7",
+    "react-native-elements": "^2.0.0",
     "react-native-fbsdk": "^1.1.2",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-google-signin": "^2.1.1",
+    "react-native-linear-gradient": "^2.5.6",
     "react-native-paper": "^3.6.0",
     "react-native-reanimated": "^1.7.0",
     "react-native-responsive-screen": "^1.4.0",
@@ -33,7 +34,8 @@
     "react-native-track-player": "^1.2.2",
     "react-native-vector-icons": "^6.6.0",
     "realm": "^5.0.3",
-    "socket.io-client": "^2.3.0"
+    "socket.io-client": "^2.3.0",
+    "rn-dominant-color": "^1.4.3"
   },
   "devDependencies": {
     "@babel/core": "7.9.0",

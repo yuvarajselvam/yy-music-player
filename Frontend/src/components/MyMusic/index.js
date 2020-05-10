@@ -31,9 +31,17 @@ export function MyMusic({navigation}) {
   };
   return (
     <View style={commonStyles.screenStyle}>
-      <Header navigation={navigation} />
+      <Header navigation={navigation} title="My Music" />
       <Text style={styles.text}>{response}</Text>
       <Input placeholder="BASIC INPUT" onSubmitEditing={handleMessage} />
+      <Text
+        style={{
+          flex: 1,
+          textAlign: 'center',
+          textAlignVertical: 'center',
+        }}>
+        My Library
+      </Text>
     </View>
   );
 }

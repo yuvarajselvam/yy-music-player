@@ -8,10 +8,12 @@ import {Colors} from 'react-native-paper';
 export const styles = StyleSheet.create({
   miniPlayer: {
     height: hp(8.4),
-    backgroundColor: '#4d4d4d',
+    backgroundColor: '#141414',
     padding: 0,
     margin: 0,
     borderWidth: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.grey900,
   },
   // duration: {
   //   flex: 1,

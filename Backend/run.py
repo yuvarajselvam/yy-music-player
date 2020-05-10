@@ -8,7 +8,7 @@ from api.auth.change_password import ChangePassword
 from api.auth.create_user import CreateUser
 from api.auth.forgot_password import ForgotPassword, ValidatePasswordChangeToken
 from api.auth.single_sign_on import SingleSignOn
-from api.search.track import GetTrack
+from api.search.saavn_track import GetTrack
 from api.search.playlist import GetPlaylist, CreatePlaylist, DeletePlaylist, EditPlaylist, ListPlaylist
 
 from utils.secrets import Secrets

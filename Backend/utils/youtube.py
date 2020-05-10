@@ -17,7 +17,7 @@ ydl_opts = {
 def getVideoURL(keyword):
     ydl_opts["default_search"] = "ytsearch"
     with YoutubeDL(ydl_opts) as ydl:
-        ydl.cache.remove()
+        # ydl.cache.remove()
         res = ydl.extract_info(keyword + " song", download=False)
     if "entries" in res:
         video_url = res["entries"][0]['url']
