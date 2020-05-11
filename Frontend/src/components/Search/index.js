@@ -73,7 +73,7 @@ export function Search({navigation}) {
         console.log('SEARCH KEYWORD', keyword);
         let data = {
           searchKey: searchRef.current.props.value,
-          languages: ['Tamil', 'Telugu'],
+          languages: ['Tamil'],
         };
         authService.getSearch(data).then(async response => {
           if (response.status === 200) {
