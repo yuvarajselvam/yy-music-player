@@ -17,14 +17,18 @@ export const styles = StyleSheet.create({
   },
   listContainer: {
     padding: 0,
-    paddingLeft: 12,
-    paddingRight: 4,
-    backgroundColor: Colors.grey900,
+    backgroundColor: '#121212',
     borderBottomWidth: 0,
   },
-  listSubtitle: {
+  contentContainerStyle: {padding: hp(1.8)},
+  titleStyle: {
     color: Colors.grey200,
-    fontStyle: 'italic',
-    fontSize: 14,
+    paddingBottom: hp(0.4),
+    fontWeight: 'bold',
+    fontSize: wp(4),
+  },
+  listSubtitle: {
+    color: Colors.grey500,
+    fontSize: wp(3.2),
   },
 });
