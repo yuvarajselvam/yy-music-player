@@ -1,8 +1,7 @@
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import {View, ScrollView, Keyboard, Alert, BackHandler} from 'react-native';
-import {Card, ListItem, Image, Button, SearchBar} from 'react-native-elements';
+import {ListItem, Image, Button, SearchBar} from 'react-native-elements';
 import {IconButton, Colors, Appbar} from 'react-native-paper';
-// import {useFocusEffect} from '@react-navigation/native';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -33,19 +32,6 @@ export function Search({navigation}) {
       onPlay();
     });
   };
-
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     // Do something when the screen is focused
-  //     return () => {
-  //       setSearchResults([]);
-  //       setSelectedTrackItems([]);
-  //       setKeyword('');
-  //       setSelectedItems([]);
-  //     };
-  //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   }, []),
-  // );
 
   useEffect(() => {
     if (isSelectable) {
@@ -105,13 +91,12 @@ export function Search({navigation}) {
       }, 200);
     }
     return () => {
-      console.log('Clear Interval');
+      // console.log('Clear Interval');
       clearTimeout(timer);
     };
   }, [keyword]);
 
   const handleSearch = value => {
-    console.log(value);
     setKeyword(value);
   };
 
@@ -290,7 +275,7 @@ export function Search({navigation}) {
           }}
         />
       )}
-      <Card containerStyle={styles.card}>
+      <View style={styles.card}>
         <ScrollView
           onScrollBeginDrag={Keyboard.dismiss}
           keyboardShouldPersistTaps="always"
@@ -347,7 +332,7 @@ export function Search({navigation}) {
             );
           })}
         </ScrollView>
-      </Card>
+      </View>
     </View>
   );
 }
