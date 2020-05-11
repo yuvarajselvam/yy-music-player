@@ -92,7 +92,7 @@ export const authService = {
   addToPlaylist: data => {
     data.operation = 'addTracks';
     return fetch(
-      URL_LINK + 'playlist/' + '5ea1c7c7b566f89fac9947a7' + '/edit/',
+      URL_LINK + 'playlist/' + '5eb98e89e7d1c209066a8315' + '/edit/',
       {
         method: 'PUT',
         headers: {
@@ -105,7 +105,7 @@ export const authService = {
 
   editPlaylist: data => {
     return fetch(
-      URL_LINK + 'playlist/' + '5ea1c7c7b566f89fac9947a7' + '/edit/',
+      URL_LINK + 'playlist/' + '5eb98e89e7d1c209066a8315' + '/edit/',
       {
         method: 'PUT',
         headers: {
@@ -119,7 +119,7 @@ export const authService = {
   removeFromPlaylist: data => {
     data.operation = 'removeTracks';
     return fetch(
-      URL_LINK + 'playlist/' + '5ea1c7c7b566f89fac9947a7' + '/edit/',
+      URL_LINK + 'playlist/' + '5eb98e89e7d1c209066a8315' + '/edit/',
       {
         method: 'PUT',
         headers: {
@@ -132,7 +132,7 @@ export const authService = {
 
   getMyPlaylists: data => {
     return fetch(
-      URL_LINK + 'user/' + '5e7baa1a88a82254f4f8daed/' + 'playlists/',
+      URL_LINK + 'user/' + '5eb98e89e7d1c209066a8315/' + 'playlists/',
     );
   },
 
@@ -140,7 +140,7 @@ export const authService = {
     return fetch(
       URL_LINK +
         'user/' +
-        '5e7baa1a88a82254f4f8daed/' +
+        '5eb98e89e7d1c209066a8315/' +
         'playlist/' +
         `${data._id}/`,
     );
@@ -148,7 +148,7 @@ export const authService = {
 
   deletePlaylist: data => {
     return fetch(
-      URL_LINK + 'playlist/' + '5ea1c7c7b566f89fac9947a7' + '/delete/',
+      URL_LINK + 'playlist/' + '5eb98e89e7d1c209066a8315' + '/delete/',
       {
         method: 'DELETE',
         headers: {
