@@ -21,10 +21,10 @@ class CreateUser(Resource):
                 user_json = json.dumps(user)
                 new_user = User.from_json(json_data=user_json)
                 new_user.save()
-                response = new_user
+                response = new_user.to_json()
                 if env['verbose']:
-                    print("Response:", json.dumps(json.loads(response.to_json()), indent=2, sort_keys=True))
-                return response.to_json(), 201
+                    print("Response:", json.dumps(response, indent=2, sort_keys=True))
+                return response, 201
             else:
                 raise ValidationError("Password field must be at least 6 characters long!")
         except ValidationError as e:
