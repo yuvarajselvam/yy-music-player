@@ -1,13 +1,14 @@
 import re
 import json
-from json import JSONDecodeError
-from os import environ as env
-from time import time
-from time import sleep
+import time
 from fuzzywuzzy import fuzz
 from flask import request, jsonify
 from flask_restful import Resource
 from utils.db import Saavn
+from utils.logging import Logger
+
+
+logger = Logger("autocomplete").logger
 
 
 def get_score(search_term, lookup_term):
@@ -23,36 +24,26 @@ def get_score(search_term, lookup_term):
 class Autocomplete(Resource):
     @staticmethod
     def get():
-        if env["verbose"]:
-            print(json.dumps(request.args, indent=2, sort_keys=True))
-
+        logger.debug(json.dumps(request.args, indent=2, sort_keys=True))
         search_key = request.args["searchKey"]
-        start_time = time()
+        start_time = time.time()
         trimmed_tracks = []
         trimmed_albums = trimmed_artists = []
         for language in request.args["languages"].split(','):
             my_albums = Saavn["albums_" + language.lower()]
             my_tracks = Saavn["tracks_" + language.lower()]
-            if len(search_key) < 3:
-                matching_albums = list(my_albums.find({"name": re.compile(f"^{search_key}.*", re.IGNORECASE),
-                                                       "albumType": {"$not": {"$eq": "Custom"}}}).sort("name"))
-                matching_tracks = list(my_tracks.find({"name": re.compile(f"^{search_key}.*", re.IGNORECASE),
-                                                       "trackType": {"$not": {"$eq": "Custom"}}}).sort("name"))
-                matching_albums = list(matching_albums[:min(50, len(matching_albums))])
-                matching_tracks = list(matching_tracks[:min(50, len(matching_tracks))])
-            else:
-                matching_albums = my_albums.find({"$text": {"$search": search_key},
-                                                  "albumType": {"$not": {"$eq": "Custom"}}},
-                                                 {"score": {"$meta": "textScore"}})
-                matching_tracks = my_tracks.find({"$text": {"$search": search_key},
-                                                  "trackType": {"$not": {"$eq": "Custom"}}},
-                                                 {"score": {"$meta": "textScore"}})
 
-                matching_tracks = list(matching_tracks)
-                matching_albums = list(matching_albums)
-                # matching_tracks = sorted(matching_tracks, key=lambda t: t["score"], reverse=True)
-                # matching_albums = sorted(matching_albums, key=lambda t: t["score"], reverse=True)
-            print(language + ": ", len(matching_albums), "albums and", len(matching_tracks), "tracks")
+            no_custom_filter = {"$not": {"$eq": "Custom"}}
+            project_fields = {"name": 1, "_id": 1, "type": 1, "imageUrl": 1, "artists": 1}
+            if len(search_key) < 3:
+                matching_albums = list(my_albums.find({"name": re.compile(f"^{search_key}.*", re.IGNORECASE), "albumType": no_custom_filter},
+                                                      project_fields).sort("name").limit(50))
+                matching_tracks = list(my_tracks.find({"name": re.compile(f"^{search_key}.*", re.IGNORECASE), "trackType": no_custom_filter},
+                                                      project_fields).sort("name").limit(50))
+            else:
+                matching_albums = list(my_albums.find({"$text": {"$search": search_key}, "albumType": no_custom_filter}, project_fields))
+                matching_tracks = list(my_tracks.find({"$text": {"$search": search_key}, "trackType": no_custom_filter}, project_fields))
+
             for alb in matching_albums:
                 album_name = re.sub("[(\[].*[)\]]", "", alb["name"]).strip()
                 alb["matchScore"] = get_score(search_key, album_name)
@@ -68,46 +59,26 @@ class Autocomplete(Resource):
             #     .find({"name": re.compile(f".*{search_key}.*", re.IGNORECASE)})
             # matching_artists = sorted(matching_artists, key=lambda t: t["popularity"], reverse=True)
 
-            if env["verbose"]:
-                print(f"Time taken for searching in {language}: ", time() - start_time)
-
             if len(matching_albums):
-                for album in matching_albums[: 10 if 10 <= len(matching_albums) else len(matching_albums)]:
-                    # if env["verbose"]:
-                    #     print("Album: ", album["name"], "MatchScore:", album["matchScore"])
-                    trimmed_album = {
-                        "name": album["name"],
-                        "_id": album["_id"],
-                        "imageUrl": album["imageUrl"] if "imageUrl" in album else None,
-                        "type": album["type"],
-                        "matchScore": album["matchScore"],
-                        "language": language
-                    }
+                for album in matching_albums:
+                    # logger.debug(f'Album: {album["name"]}, MatchScore: {album["matchScore"]}')
                     if len(album["artists"]):
-                        trimmed_album["artists"] = album["artists"][0]["name"]
-                    trimmed_albums.append(trimmed_album)
+                        album["artists"] = album["artists"][0]["name"]
+                    album["language"] = language
+                    trimmed_albums.append(album)
 
             if len(matching_tracks):
-                for track in matching_tracks[: 10 if 10 <= len(matching_tracks) else len(matching_tracks)]:
-                    # if env["verbose"]:
-                    #     print("Track: ", track["name"], "MatchScore:", track["matchScore"])
-                    track_dict = {
-                        "name": track["name"],
-                        "_id": track["_id"],
-                        "imageUrl": track["imageUrl"] if "imageUrl" in track else None,
-                        "type": track["type"],
-                        "matchScore": track["matchScore"],
-                        "language": language
-                    }
+                for track in matching_tracks:
+                    # logger.debug(f'Track: {track["name"]}, MatchScore: {track["matchScore"]}')
                     track_artists = [artist["name"] for artist in track["artists"]]
                     if len(track["artists"]):
-                        track_dict["artists"] = ', '.join(track_artists)
-                    trimmed_tracks.append(track_dict)
+                        track["artists"] = ', '.join(track_artists)
+                    track["language"] = language
+                    trimmed_tracks.append(track)
 
             # if len(matching_artists):
             #     for artist in matching_artists[: 2 if 2 <= len(matching_artists) else len(matching_artists)]:
-            #         if env["verbose"]:
-            #             print("Artist: ", artist["name"], "Popularity:", artist["popularity"])
+            #         logger.debug(f'Artist: {artist["name"]}, MatchScore: {artist["matchScore"]}')
             #         trimmed_artists.append({
             #             "name": artist["name"],
             #             "_id": artist["_id"],
@@ -120,8 +91,9 @@ class Autocomplete(Resource):
             response.status_code = 204
             return response
 
-        response = jsonify(searchResults=sorted(trimmed_albums + trimmed_tracks,
-                                                key=lambda t: t["matchScore"], reverse=True),
-                           searchKey=search_key)
+        search_results = sorted(trimmed_albums + trimmed_tracks, key=lambda t: t["matchScore"], reverse=True)
+        search_results = search_results[:20]
+        logger.info(f"Found {len(trimmed_albums)} albums & {len(trimmed_tracks)} tracks in {round(time.time()-start_time, 3)}s")
+        response = jsonify(searchResults=search_results, searchKey=search_key)
         response.status_code = 200
         return response

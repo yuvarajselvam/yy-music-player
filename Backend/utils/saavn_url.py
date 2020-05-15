@@ -1,10 +1,10 @@
 import json
 import time
-
+import logging
 from selenium.common.exceptions import TimeoutException
 from seleniumwire import webdriver
 from selenium.webdriver.chrome.options import Options
-
+logging.basicConfig(level=logging.DEBUG)
 website_URL = "https://www.jiosaavn.com/album/aadu-puli/rl-mYe9,u6g_"
 
 chrome_options = Options()
@@ -52,9 +52,9 @@ def get_track_url(const_url):
         title: "Thaarame Thaarame",
         url: "{const_url}",
         year: "2019"}};
-        State.addSong(song, "queue", 1);
+        Player.playSong(song, 128);
             '''
-    print(js)
+    # State.addSong(song, "queue", 1);
     browser.execute_script(js)
     try:
         browser.wait_for_request("https://aa.cf.saavncdn.com", 15)

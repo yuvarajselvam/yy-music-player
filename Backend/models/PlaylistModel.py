@@ -1,6 +1,7 @@
+import json
 from datetime import datetime
 from mongoengine import DynamicDocument, DynamicEmbeddedDocument, EmbeddedDocumentListField, \
-    StringField, DateTimeField, LongField, URLField, IntField, LazyReferenceField, ValidationError
+    StringField, DateTimeField, LongField, URLField, IntField, LazyReferenceField, ValidationError, CASCADE
 
 
 class PlaylistTrack(DynamicEmbeddedDocument):
@@ -23,7 +24,7 @@ class Playlist(DynamicDocument):
     name = StringField(required=True, min_length=1)
     type = StringField(required=True, default="playlist")
     scope = StringField(default="private", choices=["public", "private", "system"])
-    owner = StringField()
+    owner = LazyReferenceField('User')
     tracks = EmbeddedDocumentListField(PlaylistTrack)
     totalTracks = IntField(default=0, min_value=0)
     imageUrl = URLField()
@@ -35,3 +36,9 @@ class Playlist(DynamicDocument):
             raise ValidationError("Owner is required for user created playlists.")
 
         # TODO: Verify unique Track ID
+
+    def to_json(self):
+        obj = json.loads(super(Playlist, self).to_json())
+        obj["_id"] = str(self.pk)
+        obj["owner"] = str(self.owner.pk)
+        return obj
