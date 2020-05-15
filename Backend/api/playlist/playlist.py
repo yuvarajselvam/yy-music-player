@@ -3,33 +3,24 @@ from flask import jsonify, request
 from flask_restful import Resource
 from os import environ as env
 from mongoengine import ValidationError, NotUniqueError
+
 from models.PlaylistModel import Playlist, PlaylistTrack
 from models.UserModel import User
+
 from utils.db import Saavn
+from utils.retrieve import list_api
+from utils.response import error_response, resource_not_found
+from utils.logging import Logger
 
 
-def resource_not_found(resource):
-    response = jsonify(Error=f"{resource} not found!")
-    response.status_code = 404
-    if env['verbose']:
-        print("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
-    return response
-
-
-def error_response(message, status_code):
-    response = jsonify(Error=message)
-    response.status_code = status_code
-    if env['verbose']:
-        print("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
-    return response
+logger = Logger("playlist").logger
 
 
 class CreatePlaylist(Resource):
     @staticmethod
     def post():
         playlist = request.get_json()
-        if env['verbose']:
-            print("\nCreate playlist:", json.dumps(playlist, indent=2, sort_keys=True))
+        logger.info("\nCreate playlist:", json.dumps(playlist, indent=2, sort_keys=True))
 
         try:
             user = User.objects(pk=playlist["owner"]).first()
@@ -46,13 +37,9 @@ class CreatePlaylist(Resource):
             if "playlists" in user:
                 user["playlists"].append(new_playlist)
             new_playlist.save(validate=False)
-            _id = str(new_playlist.pk)
-            new_playlist = json.loads(new_playlist.to_json())
             user.save()
-            new_playlist["_id"] = _id
-            response = new_playlist
-            if env['verbose']:
-                print("Response:", json.dumps(response, indent=2, sort_keys=True))
+            response = new_playlist.to_json()
+            logger.debug("Response:", json.dumps(response, indent=2, sort_keys=True))
             return response, 201
         except ValidationError as e:
             return error_response(str(e), 400)
@@ -65,8 +52,7 @@ class CreatePlaylist(Resource):
 class GetPlaylist(Resource):
     @staticmethod
     def get(_user_id, _id):
-        if env["verbose"]:
-            print(f"Getting playlist: {_id} from user: {_user_id}")
+        logger.info(f"Getting playlist: {_id} from user: {_user_id}")
         try:
             playlist = Playlist.objects(pk=_id).first()
             user = User.objects(pk=_user_id).first()
@@ -80,12 +66,9 @@ class GetPlaylist(Resource):
             return resource_not_found("Playlist")
 
         if "playlists" in user and playlist in user["playlists"]:
-            playlist = json.loads(playlist.to_json())
-            playlist["_id"] = _id
-            response = jsonify(playlist)
+            response = jsonify(playlist.to_json())
             response.status_code = 200
-            if env['verbose']:
-                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
+            logger.debug(json.dumps(response.get_json(), indent=2, sort_keys=True))
             return response
 
         else:
@@ -95,44 +78,16 @@ class GetPlaylist(Resource):
 class ListPlaylist(Resource):
     @staticmethod
     def get(_user_id):
-        if env["verbose"]:
-            print(f"Listing playlists of user: {_user_id}")
-
-        try:
-            user = User.objects(pk=_user_id).first()
-        except:
-            return error_response("Invalid ID", 400)
-
-        if not user:
-            return resource_not_found("User")
-
-        if "playlists" in user and len(user["playlists"]):
-            playlists = []
-            for playlist in user["playlists"]:
-                _id = str(playlist.pk)
-                try:
-                    playlist = json.loads(Playlist.objects(pk=str(playlist.pk)).first().to_json())
-                    playlist["_id"] = _id
-                    playlists.append(playlist)
-                except:
-                    return error_response(f"Playlist not found: {_id}", 404)
-            response = jsonify(playlists)
-            response.status_code = 200
-            if env['verbose']:
-                print(json.dumps(response.get_json(), indent=2, sort_keys=True))
-            return response
-        else:
-            response = jsonify([])
-            response.status_code = 204
-            return response
+        logger.info(f"Listing playlists of user: {_user_id}")
+        return list_api(User, Playlist, _user_id, "playlists")
 
 
 class EditPlaylist(Resource):
     @staticmethod
     def put(_id):
         req_playlist = request.get_json()
-        if env['verbose']:
-            print("\nEdit playlist:", json.dumps(req_playlist, indent=2, sort_keys=True))
+        logger.info("Edit playlist:", req_playlist["_id"])
+        logger.debug("Playlist object before edit:\n", json.dumps(req_playlist, indent=2, sort_keys=True))
 
         playlist = Playlist.objects(pk=req_playlist["_id"]).first()
 
@@ -156,11 +111,8 @@ class EditPlaylist(Resource):
                 playlist.reload()
                 playlist["totalTracks"] = str(len(playlist["tracks"]))
                 edited_playlist = playlist.save()
-                edited_playlist = json.loads(edited_playlist.to_json())
-                edited_playlist["_id"] = str(playlist.pk)
-                response = edited_playlist
-                if env['verbose']:
-                    print("Response:", json.dumps(response, indent=2, sort_keys=True))
+                response = edited_playlist.to_json()
+                logger.debug("Edited playlist (response):\n", json.dumps(response, indent=2, sort_keys=True))
                 return response, 200
             except ValidationError as e:
                 return error_response(str(e), 400)
@@ -171,11 +123,8 @@ class EditPlaylist(Resource):
                 del req_playlist["_id"]
                 playlist.update(**req_playlist)
                 edited_playlist = playlist.save()
-                edited_playlist = json.loads(edited_playlist.to_json())
-                edited_playlist["_id"] = str(playlist.pk)
-                response = edited_playlist
-                if env['verbose']:
-                    print("Response:", json.dumps(response, indent=2, sort_keys=True))
+                response = edited_playlist.to_json()
+                logger.debug("Edited playlist (response):\n", json.dumps(response, indent=2, sort_keys=True))
                 return response, 200
             except ValidationError as e:
                 return error_response(str(e), 400)
@@ -187,8 +136,7 @@ class DeletePlaylist(Resource):
     @staticmethod
     def delete(_id):
         req_playlist = request.get_json()
-        if env['verbose']:
-            print("\nDelete playlist:", json.dumps(req_playlist, indent=2, sort_keys=True))
+        logger.info(f"Delete playlist: {req_playlist['_id']}")
 
         playlist = Playlist.objects(pk=req_playlist["_id"]).first()
         if playlist["owner"] == req_playlist["owner"]:
@@ -197,6 +145,5 @@ class DeletePlaylist(Resource):
             response.status_code = 200
         else:
             return error_response("User does not have access to delete the playlist.", 401)
-        if env['verbose']:
-            print("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
+        logger.debug("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
         return response

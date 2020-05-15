@@ -25,7 +25,6 @@ class GetTrack(Resource):
         st = time.time()
         my_tracks = Saavn["tracks_" + _language.lower()]
         track = my_tracks.find_one({"_id": _id}, {"substrings": 0})
-        print(time.time() - st)
         if not track:
             return resource_not_found("Track")
         try:
