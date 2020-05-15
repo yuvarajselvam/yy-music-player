@@ -4,8 +4,8 @@ import {Card, ListItem, Image, Button, SearchBar} from 'react-native-elements';
 import {IconButton, Colors, Appbar} from 'react-native-paper';
 // import {useFocusEffect} from '@react-navigation/native';
 import {
-  heightPercentageToDP,
-  widthPercentageToDP,
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 
 import {OverlayModal} from '../../widgets/OverlayModal';
@@ -257,18 +257,19 @@ export function Search({navigation}) {
           placeholderTextColor="#FFFFFF"
           iconColor="#FFFFFF"
           ref={searchRef}
-          containerStyle={styles.searchBar}
+          containerStyle={styles.searchContainer}
           inputContainerStyle={{padding: 0, margin: 0}}
           inputStyle={styles.searchInput}
           placeholder="Search Songs"
           value={keyword}
           onChangeText={handleSearch}
-          blurOnSubmit={false}
+          round={false}
           clearIcon={
             <IconButton
+              // style={{alignSelf: 'center'}}
               icon="close"
               color={Colors.grey300}
-              size={20}
+              size={hp(2.4)}
               onPress={clearSearch}
             />
           }
@@ -277,10 +278,16 @@ export function Search({navigation}) {
               style={{padding: 0, margin: 0}}
               icon="magnify"
               color={Colors.grey300}
-              size={24}
+              size={hp(3.2)}
               onPress={clearSearch}
             />
           }
+          leftIconContainerStyle={{padding: 0, margin: 0, alignItems: 'center'}}
+          rightIconContainerStyle={{
+            padding: 0,
+            margin: 0,
+            alignItems: 'center',
+          }}
         />
       )}
       <Card containerStyle={styles.card}>
@@ -327,14 +334,14 @@ export function Search({navigation}) {
                     <IconButton
                       style={styles.listVerticalButton}
                       color={Colors.grey200}
-                      size={heightPercentageToDP(2.8)}
+                      size={hp(2.8)}
                       icon="dots-vertical"
                       onPress={() => trackVerticalButton(item)}
                     />
                   )
                 }
                 contentContainerStyle={{
-                  width: widthPercentageToDP(58),
+                  width: wp(58),
                 }}
               />
             );
