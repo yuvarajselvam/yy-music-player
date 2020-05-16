@@ -1,4 +1,5 @@
 import os
+import re
 import time
 
 from api.search.album import GetAlbum
@@ -20,9 +21,9 @@ from utils.secrets import Secrets
 from utils.db import DbUtils
 from utils.logging import Logger
 
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, decode_token
 from flask_restful import Api
 
 os.environ.__setitem__('verbose', 'abs')
@@ -35,6 +36,37 @@ CORS(app)
 api = Api(app)
 jwt = JWTManager(app)
 NotificationUtil().init_firebase()
+
+
+@app.before_request
+def before_request():
+    request_path = request.path.split("/")
+    logger.debug(request_path)
+    if request_path and request_path[1] not in ['signup', 'signin', 'sso', 'forgot-password', 'change-password']:
+        header_name = "Authorization"
+        header_type = "Bearer"
+        header_pattern = re.compile(f"{header_type} (.*)")
+        auth_header = request.headers.get(header_name, None)
+        if not auth_header:
+            response = jsonify(Error=f"Missing {header_name} Header.")
+            logger.debug(f"Missing {header_name} Header.")
+            response.status_code = 400
+            return response
+        auth_token = header_pattern.search(auth_header)
+        if auth_token:
+            try:
+                jwt_data = decode_token(auth_token.group(1))
+            except Exception as e:
+                jwt_data = decode_token(auth_token.group(1), allow_expired=True)
+                response = jsonify(Error=f"Token expired for user: {jwt_data['identity']}")
+                response.status_code = 400
+                logger.debug(f"Token expired for user: {jwt_data['identity']}")
+                return response
+        else:
+            response = jsonify(Error=f"Bad header format.")
+            logger.debug("Bad header format")
+            response.status_code = 400
+            return response
 
 
 @app.route('/')
