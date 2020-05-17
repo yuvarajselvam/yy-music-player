@@ -1,7 +1,6 @@
 import json
 from flask import jsonify, request
 from flask_restful import Resource
-from os import environ as env
 from mongoengine import ValidationError, NotUniqueError
 
 from models.PlaylistModel import Playlist, PlaylistTrack
@@ -20,7 +19,7 @@ class CreatePlaylist(Resource):
     @staticmethod
     def post():
         playlist = request.get_json()
-        logger.info("\nCreate playlist:", json.dumps(playlist, indent=2, sort_keys=True))
+        logger.info(f"\nCreate playlist: {json.dumps(playlist, indent=2, sort_keys=True)}")
 
         try:
             user = User.objects(pk=playlist["owner"]).first()
@@ -39,7 +38,7 @@ class CreatePlaylist(Resource):
             new_playlist.save(validate=False)
             user.save()
             response = new_playlist.to_json()
-            logger.debug("Response:", json.dumps(response, indent=2, sort_keys=True))
+            logger.debug(json.dumps(response, indent=2, sort_keys=True))
             return response, 201
         except ValidationError as e:
             return error_response(str(e), 400)
@@ -86,14 +85,14 @@ class EditPlaylist(Resource):
     @staticmethod
     def put(_id):
         req_playlist = request.get_json()
-        logger.info("Edit playlist:", req_playlist["_id"])
-        logger.debug("Playlist object before edit:\n", json.dumps(req_playlist, indent=2, sort_keys=True))
+        logger.info(f"Edit playlist: {req_playlist['_id']}")
+        logger.debug(f"Playlist object before edit:\n {json.dumps(req_playlist, indent=2, sort_keys=True)}")
 
         playlist = Playlist.objects(pk=req_playlist["_id"]).first()
 
         if not playlist:
             return resource_not_found("Playlist")
-        elif playlist["owner"] != req_playlist["owner"]:
+        elif str(playlist["owner"].pk) != req_playlist["owner"]:
             return error_response("User does not have access to edit the playlist.", 401)
         elif "operation" in req_playlist:
             op = req_playlist["operation"]
@@ -112,7 +111,7 @@ class EditPlaylist(Resource):
                 playlist["totalTracks"] = str(len(playlist["tracks"]))
                 edited_playlist = playlist.save()
                 response = edited_playlist.to_json()
-                logger.debug("Edited playlist (response):\n", json.dumps(response, indent=2, sort_keys=True))
+                logger.debug(f"Edited playlist (response):\n {json.dumps(response, indent=2, sort_keys=True)}")
                 return response, 200
             except ValidationError as e:
                 return error_response(str(e), 400)
@@ -124,7 +123,7 @@ class EditPlaylist(Resource):
                 playlist.update(**req_playlist)
                 edited_playlist = playlist.save()
                 response = edited_playlist.to_json()
-                logger.debug("Edited playlist (response):\n", json.dumps(response, indent=2, sort_keys=True))
+                logger.debug(f"Edited playlist (response):\n {json.dumps(response, indent=2, sort_keys=True)}")
                 return response, 200
             except ValidationError as e:
                 return error_response(str(e), 400)
@@ -145,5 +144,5 @@ class DeletePlaylist(Resource):
             response.status_code = 200
         else:
             return error_response("User does not have access to delete the playlist.", 401)
-        logger.debug("Response:", json.dumps(response.get_json(), indent=2, sort_keys=True))
+        logger.debug(json.dumps(response.get_json(), indent=2, sort_keys=True))
         return response
