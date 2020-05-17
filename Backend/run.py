@@ -13,7 +13,7 @@ from api.auth.forgot_password import ForgotPassword, ValidatePasswordChangeToken
 from api.auth.single_sign_on import SingleSignOn
 from api.auth.register_device import RegisterDevice
 from api.playlist.playlist import GetPlaylist, CreatePlaylist, DeletePlaylist, EditPlaylist, ListPlaylist
-from api.social.follow import ListFollowers, ListFollowing, FollowUser, RespondToFollowRequest
+from api.social.follow import ListFollowers, ListFollowing, FollowUser, RespondToFollowRequest, ListPendingRequests
 from api.social.user_search import UserSearch, GetUser, GetUserByEmail
 
 from utils.notifications import NotificationUtil
@@ -41,7 +41,6 @@ NotificationUtil().init_firebase()
 @app.before_request
 def before_request():
     request_path = request.path.split("/")
-    logger.debug(request_path)
     if request_path and request_path[1] not in ['signup', 'signin', 'sso', 'forgot-password', 'change-password']:
         header_name = "Authorization"
         header_type = "Bearer"
@@ -96,6 +95,7 @@ api.add_resource(GetUser, '/user/<_user_id>/')
 api.add_resource(GetUserByEmail, '/user/email/<_user_email>/')
 api.add_resource(FollowUser, '/follow-request/')
 api.add_resource(RespondToFollowRequest, '/follow-request/<_op>/')
+api.add_resource(ListPendingRequests, '/user/<_user_id>/pending-requests/')
 api.add_resource(RegisterDevice, '/register-device/')
 
 DbUtils().setup_schema()

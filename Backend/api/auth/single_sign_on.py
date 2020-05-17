@@ -65,7 +65,7 @@ def update_social(user, credentials):
 
 def create_new_user(credentials):
     user_dict = {
-        "fullName": credentials["fullName"],
+        "name": credentials["name"],
         "email": credentials["email"]
     }
     user = User.from_json(json_data=json.dumps(user_dict))
