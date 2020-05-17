@@ -5,7 +5,7 @@ from mongoengine import DynamicDocument, DynamicEmbeddedDocument, EmbeddedDocume
 
 
 class PlaylistTrack(DynamicEmbeddedDocument):
-    id = StringField()
+    id = StringField(primary_key=True)
     name = StringField(required=True)
     type = StringField(required=True, choices=["local", "library"])
     path = URLField()
