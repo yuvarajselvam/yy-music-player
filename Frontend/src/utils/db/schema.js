@@ -12,13 +12,13 @@ export const PlaylistTrackSchema = {
 
 export const MyPlaylistSchema = {
   name: 'MyPlaylist',
-  primaryKey: '_id',
+  // primaryKey: '_id',
   properties: {
     _id: 'string',
     name: 'string',
     type: 'string',
     owner: 'string',
-    tracks: 'PlaylistTrack[]',
+    // tracks: 'PlaylistTrack[]?',
     totalTracks: 'int',
     addedByCount: 'int',
   },
@@ -30,3 +30,17 @@ export const MyPlaylistsSchema = {
     myPlaylists: 'MyPlaylist[]',
   },
 };
+
+export const UserSchema = {
+  name: 'User',
+  primaryKey: '_id',
+  properties: {
+    _id: 'string',
+    email: 'string',
+    fullName: 'string',
+    authToken: 'string',
+    createdAt: 'date',
+  },
+};
+
+// Todo - watermelon db need to be checked and added

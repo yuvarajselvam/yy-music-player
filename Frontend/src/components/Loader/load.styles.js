@@ -3,20 +3,17 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import {Colors} from 'react-native-paper';
 
 export const styles = StyleSheet.create({
-  overlayContainer: {
+  indicator: {
     flex: 1,
-    padding: wp(1),
-  },
-  modelBackdrop: {
-    width: wp('100%'),
-    height: hp('100%'),
-    position: 'absolute',
-    opacity: 0.8,
-    backgroundColor: '#000000',
-  },
-  overlayContent: {
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
     backgroundColor: '#121212',
+  },
+  logoImage: {
+    width: wp('60%'),
+    height: hp('30%'),
   },
 });
