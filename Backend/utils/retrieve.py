@@ -27,7 +27,9 @@ def get_token_by_user(user):
         return
 
 
-def list_api(source_model, target_model, source_id, source_key):
+def list_api(source_model, target_model, source_id, source_key, target_fields=None):
+    if target_fields is None:
+        target_fields = ["name"]
     try:
         source_object = source_model.objects(pk=source_id).first()
     except:
@@ -40,8 +42,11 @@ def list_api(source_model, target_model, source_id, source_key):
         target_list = []
         for target in source_object[source_key]:
             try:
-                target = target_model.objects(pk=target.pk).first().to_json()
-                target_list.append(target)
+                target = target_model.objects(pk=target.pk).first()
+                if target:
+                    target_dict = {k: target[k] for k in target_fields}
+                    target_dict["_id"] = str(target.pk)
+                    target_list.append(target_dict)
             except:
                 return resource_not_found(f"{source_key[:-1].title()} [{str(target.pk)}]")
         response = jsonify(target_list)

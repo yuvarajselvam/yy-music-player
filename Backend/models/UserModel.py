@@ -29,7 +29,7 @@ class PendingRequest(DynamicEmbeddedDocument):
 
 class User(DynamicDocument):
     meta = {'collection': 'users'}
-    fullName = StringField(required=True)
+    name = StringField(required=True)
     # username = StringField(required=True, regex=re.compile("^[a-zA-Z0-9_]+$"), unique=True)
     email = EmailField(required=True, unique=True)
     dob = DateField()

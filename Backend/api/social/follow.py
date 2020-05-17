@@ -27,6 +27,20 @@ class ListFollowing(Resource):
         return list_api(User, User, _user_id, "following")
 
 
+class ListPendingRequests(Resource):
+    @staticmethod
+    def get(_user_id):
+        logger.info(f"Listing pending requests of user: {_user_id}")
+        user = User.objects(pk=_user_id).first()
+        if not user:
+            return ResponseUtil.resource_not_found(f"User [{_user_id}]")
+        if "pendingRequests" in user and len(user["pendingRequests"]):
+            response = [{"userId": str(req["userId"].pk), "isRequester": req["isRequester"]} for req in user["pendingRequests"]]
+            return response, 200
+        else:
+            return None, 204
+
+
 class FollowUser(Resource):
     @staticmethod
     def post():
@@ -40,9 +54,9 @@ class FollowUser(Resource):
             if not (followee and follower):
                 ResponseUtil.resource_not_found("User")
 
-            data_payload = {"Message": f"{follower['fullName']} has requested to follow you.",
+            data_payload = {"Message": f"{follower['name']} has requested to follow you.",
                             "follower": str(follower.pk)}
-            notify_payload = {"title": f"{follower['fullName']} has requested to follow you.",
+            notify_payload = {"title": f"{follower['name']} has requested to follow you.",
                               "body": "Tap to accept/reject"}
 
             try:
@@ -84,8 +98,8 @@ class RespondToFollowRequest(Resource):
         if not (followee and follower):
             ResponseUtil.resource_not_found("User")
 
-        data_payload = {"Message": f"{followee['fullName']} has {_op.lower()}ed your follow request."}
-        notify_payload = {"title": f"{followee['fullName']} has {_op.lower()}ed your follow request.", "body": ""}
+        data_payload = {"Message": f"{followee['name']} has {_op.lower()}ed your follow request."}
+        notify_payload = {"title": f"{followee['name']} has {_op.lower()}ed your follow request.", "body": ""}
         try:
             for deviceToken in follower["deviceTokens"]:
                 Notify.send(token=deviceToken, data=data_payload, notification=notify_payload)
