@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useContext} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {View, ScrollView, Keyboard, Alert, BackHandler} from 'react-native';
 import {ListItem, Image, Button, SearchBar} from 'react-native-elements';
 import {IconButton, Colors, Appbar} from 'react-native-paper';
@@ -8,12 +8,13 @@ import {
 } from 'react-native-responsive-screen';
 
 import {OverlayModal} from '../../widgets/OverlayModal';
-import {authService} from '../../services/auth.service';
-import {PlayerContext} from '../../contexts/player.context';
+import {trackService} from '../../services/track.service';
+import {usePlayerContext} from '../../contexts/player.context';
 // import {searchResultsMock} from '../../mocks/search.list';
 
 import {styles} from './search.styles';
 import {commonStyles} from '../common/styles';
+import {useAuthContext} from '../../contexts/auth.context';
 
 export function Search({navigation}) {
   console.log('Search screen');
@@ -25,7 +26,7 @@ export function Search({navigation}) {
   const [isSelectable, setIsSelectable] = useState(false);
 
   const searchRef = useRef();
-  const {onAddTrack, onPlay} = useContext(PlayerContext);
+  const {onAddTrack, onPlay} = usePlayerContext();
 
   const handleTrackSelect = track => {
     onAddTrack(track).then(() => {
@@ -75,7 +76,7 @@ export function Search({navigation}) {
           searchKey: searchRef.current.props.value,
           languages: ['Tamil'],
         };
-        authService.getSearch(data).then(async response => {
+        trackService.getSearch(data).then(async response => {
           if (response.status === 200) {
             let responseObj = await response.json();
             let responseSearchList = responseObj.searchResults;
@@ -111,7 +112,7 @@ export function Search({navigation}) {
     };
     // console.log(data);
     if (item.type === 'track') {
-      authService.getTrack(data).then(async response => {
+      trackService.getTrack(data).then(async response => {
         if (response.status === 200) {
           let responseObj = await response.json();
           let track = responseObj;
@@ -275,64 +276,62 @@ export function Search({navigation}) {
           }}
         />
       )}
-      <View style={styles.card}>
-        <ScrollView
-          onScrollBeginDrag={Keyboard.dismiss}
-          keyboardShouldPersistTaps="always"
-          keyboardDismissMode="on-drag">
-          {searchResults.map((item, index) => {
-            return (
-              <ListItem
-                disabledStyle={{opacity: 0.4}}
-                disabled={isSelectable && item.type === 'album'}
-                onLongPress={() => handleLongPress(item)}
-                onPress={evt => handleListSelect(item, evt)}
-                leftElement={
-                  <View>
-                    <Image
-                      // containerStyle={{opacity: 0.5}}
-                      style={styles.listImage}
-                      source={{
-                        uri: item.imageUrl,
-                      }}
-                    />
-                  </View>
-                }
-                key={index}
-                subtitle={
-                  item.artists +
-                  ' - ' +
-                  item.type.charAt(0).toUpperCase() +
-                  item.type.slice(1)
-                }
-                subtitleStyle={styles.listSubtitle}
-                title={item.name}
-                titleStyle={styles.listTitle}
-                titleProps={{numberOfLines: 1}}
-                bottomDivider
-                containerStyle={[
-                  styles.listContainer,
-                  isSelectable && item.isSelect && selectedItemStyle,
-                ]}
-                rightElement={
-                  !isSelectable && (
-                    <IconButton
-                      style={styles.listVerticalButton}
-                      color={Colors.grey200}
-                      size={hp(2.8)}
-                      icon="dots-vertical"
-                      onPress={() => trackVerticalButton(item)}
-                    />
-                  )
-                }
-                contentContainerStyle={{
-                  width: wp(58),
-                }}
-              />
-            );
-          })}
-        </ScrollView>
-      </View>
+      <ScrollView
+        onScrollBeginDrag={Keyboard.dismiss}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="on-drag">
+        {searchResults.map((item, index) => {
+          return (
+            <ListItem
+              disabledStyle={{opacity: 0.4}}
+              disabled={isSelectable && item.type === 'album'}
+              onLongPress={() => handleLongPress(item)}
+              onPress={evt => handleListSelect(item, evt)}
+              leftElement={
+                <View>
+                  <Image
+                    // containerStyle={{opacity: 0.5}}
+                    style={styles.listImage}
+                    source={{
+                      uri: item.imageUrl,
+                    }}
+                  />
+                </View>
+              }
+              key={index}
+              subtitle={
+                item.artists +
+                ' - ' +
+                item.type.charAt(0).toUpperCase() +
+                item.type.slice(1)
+              }
+              subtitleStyle={styles.listSubtitle}
+              title={item.name}
+              titleStyle={styles.listTitle}
+              titleProps={{numberOfLines: 1}}
+              bottomDivider
+              containerStyle={[
+                styles.listContainer,
+                isSelectable && item.isSelect && selectedItemStyle,
+              ]}
+              rightElement={
+                !isSelectable && (
+                  <IconButton
+                    style={styles.listVerticalButton}
+                    color={Colors.grey200}
+                    size={hp(2.8)}
+                    icon="dots-vertical"
+                    onPress={() => trackVerticalButton(item)}
+                  />
+                )
+              }
+              contentContainerStyle={{
+                width: wp(58),
+              }}
+            />
+          );
+        })}
+      </ScrollView>
     </View>
   );
 }
@@ -409,8 +408,10 @@ function PlaylistsOverlay(props) {
 
   const [playlists, setPlaylists] = useState([]);
 
+  const {userInfo} = useAuthContext();
+
   useEffect(() => {
-    authService.getMyPlaylists().then(async response => {
+    trackService.getMyPlaylists().then(async response => {
       let responseObj = await response.json();
       console.log('Playlist overlay list ', responseObj);
       setPlaylists(responseObj);
@@ -421,7 +422,7 @@ function PlaylistsOverlay(props) {
     // owner need to updated dynamically from local DB
     let playlistObj = {
       _id: playlist._id,
-      owner: '5e7baa1a88a82254f4f8daed',
+      owner: userInfo._id,
       tracks: [],
     };
     selectedTrackItems.forEach(track => {
@@ -434,7 +435,7 @@ function PlaylistsOverlay(props) {
     });
 
     if (actionType === 'add') {
-      authService.addToPlaylist(playlistObj).then(response => {
+      trackService.addToPlaylist(playlistObj).then(response => {
         if (response.status === 200) {
           setIsSelectable(false);
           setIsPlaylistsOverlayOpen(false);
@@ -445,7 +446,7 @@ function PlaylistsOverlay(props) {
         }
       });
     } else if (actionType === 'remove') {
-      authService.removeFromPlaylist(playlist).then(response => {
+      trackService.removeFromPlaylist(playlist).then(response => {
         if (response.status === 200) {
           setIsSelectable(false);
           setIsPlaylistsOverlayOpen(false);

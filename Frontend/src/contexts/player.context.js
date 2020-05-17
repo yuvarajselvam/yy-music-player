@@ -1,4 +1,4 @@
-import React, {useState, createContext, useEffect} from 'react';
+import React, {useState, createContext, useEffect, useContext} from 'react';
 import TrackPlayer from 'react-native-track-player';
 import {Alert} from 'react-native';
 
@@ -137,3 +137,7 @@ export const PlayerProvider = props => {
     </PlayerContext.Provider>
   );
 };
+
+export function usePlayerContext() {
+  return useContext(PlayerContext);
+}
