@@ -7,11 +7,10 @@ from flask import request, jsonify
 from flask_restful import Resource
 from mongoengine import ValidationError
 
-from utils import retrieve, email as emailUtil
+from utils import retrieve
+from utils.email import EmailUtil
 from models.PasswordChangeTokenModel import PasswordChangeToken
 from hmac import compare_digest
-
-email_service = emailUtil.get_service()
 
 
 class ForgotPassword(Resource):
@@ -28,7 +27,7 @@ class ForgotPassword(Resource):
             if "password" in user:
                 try:
                     password_change_token = PasswordChangeToken(user=user, token=token)
-                    is_mail_sent = emailUtil.send_message(email_service, email, subject, msg)
+                    is_mail_sent = EmailUtil().send_message(email, subject, msg)
                     if env['verbose']:
                         print("Mail sent:", is_mail_sent)
                     password_change_token.save()

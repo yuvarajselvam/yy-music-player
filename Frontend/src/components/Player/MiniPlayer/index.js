@@ -2,7 +2,10 @@ import React, {useContext} from 'react';
 import {View, TouchableWithoutFeedback} from 'react-native';
 import {Slider, ListItem, Image} from 'react-native-elements';
 import {IconButton, Colors} from 'react-native-paper';
-import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 
 import {useTrackPlayerProgress} from '../utils/player.hooks';
 import {PlayerContext} from '../../../contexts/player.context';
@@ -80,14 +83,14 @@ export function MiniPlayer(props) {
           containerStyle={styles.miniPlayer}
           title={trackDetails.name}
           titleStyle={{
-            fontSize: 13.2,
+            fontSize: wp(3.4),
             paddingBottom: 2,
             fontWeight: 'bold',
             color: Colors.grey200,
           }}
           subtitle={trackDetails.artists}
           subtitleStyle={{
-            fontSize: 12,
+            fontSize: wp(2.8),
             color: Colors.grey200,
           }}
           leftElement={

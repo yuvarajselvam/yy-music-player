@@ -17,8 +17,8 @@ import {styles} from './album.style';
 export function Album(props) {
   const {navigation, route} = props;
   let albumId = route.params._id;
-  console.log('Album screen');
   let albumlanguage = route.params.language;
+  console.log('Album screen', albumlanguage);
   const [album, setAlbum] = useState({artists: [{name: ''}]});
   const [albumTracks, setAlbumTracks] = useState([]);
 
@@ -96,7 +96,7 @@ export function Album(props) {
             return (
               <ListItem
                 containerStyle={styles.listContainer}
-                contentContainerStyle={{padding: 10}}
+                contentContainerStyle={styles.contentContainerStyle}
                 // leftElement={
                 //   <View style={{paddingLeft: 10, alignItems: 'center'}}>
                 //     <Text style={{color: Colors.grey200}}>{trackNumber}</Text>
@@ -112,7 +112,7 @@ export function Album(props) {
                 }
                 key={track._id}
                 title={track.name}
-                titleStyle={{color: Colors.grey200, paddingBottom: 4}}
+                titleStyle={styles.titleStyle}
                 subtitle={trackArtistsName}
                 subtitleStyle={styles.listSubtitle}
                 onPress={() => handleTrackSelect(track)}
