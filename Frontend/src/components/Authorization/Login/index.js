@@ -25,7 +25,7 @@ export function Login({navigation}) {
     };
     authService
       .userSignIn(data)
-      .then(async (response) => {
+      .then(async response => {
         let responseObj = await response.json();
         if (response.status === 200) {
           signIn(email, responseObj.token);
@@ -35,7 +35,7 @@ export function Login({navigation}) {
         let message = responseObj.message;
         ToastAndroid.show(message, ToastAndroid.LONG);
       })
-      .catch((err) => {
+      .catch(err => {
         console.log(err);
       });
   };

@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState} from 'react';
 import {View, ScrollView} from 'react-native';
 import {Image, Text, ListItem, Icon} from 'react-native-elements';
 import {Colors, IconButton} from 'react-native-paper';
@@ -6,8 +6,8 @@ import {useFocusEffect} from '@react-navigation/native';
 import {heightPercentageToDP} from 'react-native-responsive-screen';
 
 import {Header} from '../../widgets/Header';
-import {authService} from '../../services/auth.service';
-import {PlayerContext} from '../../contexts/player.context';
+import {trackService} from '../../services/track.service';
+import {usePlayerContext} from '../../contexts/player.context';
 
 // import {mockAlbum} from '../../mocks/album';
 
@@ -22,7 +22,7 @@ export function Album(props) {
   const [album, setAlbum] = useState({artists: [{name: ''}]});
   const [albumTracks, setAlbumTracks] = useState([]);
 
-  const {onAddTrack, onPlay} = useContext(PlayerContext);
+  const {onAddTrack, onPlay} = usePlayerContext();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -30,7 +30,7 @@ export function Album(props) {
         _id: albumId,
         language: albumlanguage,
       };
-      authService.getAlbum(data).then(async response => {
+      trackService.getAlbum(data).then(async response => {
         if (response.status === 200) {
           let responseData = await response.json();
           // console.log('Album ===', responseData.artists);
@@ -49,7 +49,7 @@ export function Album(props) {
       language: albumlanguage,
     };
     if (!track.trackUrl) {
-      authService.getTrack(data).then(async response => {
+      trackService.getTrack(data).then(async response => {
         if (response.status === 200) {
           let responseObj = await response.json();
           onAddTrack(responseObj).then(() => {

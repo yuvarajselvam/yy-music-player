@@ -14,6 +14,8 @@
     "@react-native-community/cli": "^4.3.0",
     "@react-native-community/masked-view": "^0.1.7",
     "@react-native-community/netinfo": "^5.8.0",
+    "@react-native-firebase/app": "^6.7.1",
+    "@react-native-firebase/messaging": "^6.7.1",
     "@react-navigation/bottom-tabs": "^5.2.7",
     "@react-navigation/drawer": "^5.4.0",
     "@react-navigation/native": "^5.1.2",
