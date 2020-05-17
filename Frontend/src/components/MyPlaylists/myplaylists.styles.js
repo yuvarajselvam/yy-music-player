@@ -30,6 +30,7 @@ export const styles = StyleSheet.create({
   },
   overlayButtonTitle: {
     color: Colors.grey200,
+    fontWeight: 'normal',
     fontSize: wp(4),
   },
   playlistScope: {
