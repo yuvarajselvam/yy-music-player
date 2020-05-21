@@ -51,7 +51,7 @@ const facebookService = (type, fbServiceCallback) => {
           (error, userData) => {
             let obj = {
               type: type,
-              accessToken: token,
+              token: token,
               id: userData.id,
               name: userData.name,
               email: userData.email,
@@ -87,7 +87,7 @@ const googleService = async type => {
   let data = {
     type: type,
     accessToken: accessToken,
-    idToken: idToken,
+    token: idToken,
     id: id,
     name: name,
     email: email,

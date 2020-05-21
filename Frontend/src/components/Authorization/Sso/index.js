@@ -28,48 +28,6 @@ export function Sso({navigation}) {
   };
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // const initialUserAuthentication = async loginType => {
-  //   console.log('First authentication check');
-  //   let localDataObj = await getLocalStore();
-  //   return new Promise(async (resolve, reject) => {
-  //     if (localDataObj && localDataObj.accessToken) {
-  //       let email = localDataObj.email;
-  //       let type = localDataObj.signInType;
-  //       if (type !== loginType) {
-  //         console.log('Clearing unMatched LoginType localstore');
-  //         await AsyncStorage.removeItem('localStore');
-  //         resolve(false);
-  //       } else {
-  //         let data = {
-  //           email: email,
-  //           accessToken: localDataObj.accessToken,
-  //           idToken: localDataObj.idToken,
-  //           type: type,
-  //           os: 'Android',
-  //         };
-  //         authService
-  //           .userSSO(data)
-  //           .then(async response => {
-  //             console.log(await response.json());
-  //             if (response.status === 200) {
-  //               console.log('Intial User Authentication Response');
-  //               dispatch({type: loginType, value: false});
-  //               signIn(email, localDataObj.accessToken);
-  //               resolve(true);
-  //             } else {
-  //               resolve(false);
-  //             }
-  //           })
-  //           .catch(err => {
-  //             console.log(err.message);
-  //           });
-  //       }
-  //     } else {
-  //       resolve(false);
-  //     }
-  //   });
-  // };
-
   const handleSSO = async type => {
     dispatch({type: type, value: true});
     try {

@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   ToastAndroid,
@@ -9,14 +9,15 @@ import {Button, Image, Text} from 'react-native-elements';
 
 import {InputBox} from '../../../widgets/InputBox';
 import {authService} from '../../../services/auth.service';
-import AuthContext from '../../../contexts/auth.context';
+import {useAuthContext} from '../../../contexts/auth.context';
+import {setLocalStore} from '../../../utils/funtions';
 import {styles} from '../auth.styles';
 
 export function Login({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const {signIn} = useContext(AuthContext);
+  const {signIn} = useAuthContext();
 
   const signInWithEmail = () => {
     let data = {
@@ -28,7 +29,12 @@ export function Login({navigation}) {
       .then(async response => {
         let responseObj = await response.json();
         if (response.status === 200) {
-          signIn(email, responseObj.token);
+          let localData = {
+            userId: responseObj.userId,
+            authToken: responseObj.authToken,
+          };
+          await setLocalStore(localData);
+          signIn(responseObj.authToken);
           setEmail('');
           setPassword('');
         }
