@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {StatusBar} from 'react-native';
 import {ThemeProvider} from 'react-native-elements';
 import {NavigationContainer} from '@react-navigation/native';
@@ -18,8 +18,6 @@ import {EnterOTP} from './src/components/Authorization/CheckOTP';
 import {Loader} from './src/components/Loader';
 
 import {AuthProvider, useAuthContext} from './src/contexts/auth.context';
-
-// import {getLocalStore} from './src/utils/funtions';
 
 const Stack = createStackNavigator();
 
