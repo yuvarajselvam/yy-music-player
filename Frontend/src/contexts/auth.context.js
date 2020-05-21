@@ -1,4 +1,5 @@
 import React, {createContext, useState, useContext, useReducer} from 'react';
+import {removeLocalStore} from '../utils/funtions';
 
 const AuthContext = createContext();
 
@@ -42,7 +43,11 @@ function AuthProvider(props) {
     dispatch({type: 'SIGN_IN', authToken: authToken});
   };
 
-  const signOut = () => dispatch({type: 'SIGN_OUT'});
+  const signOut = async () => {
+    await removeLocalStore();
+    console.log('User signed out !');
+    dispatch({type: 'SIGN_OUT'});
+  };
 
   return (
     <AuthContext.Provider
