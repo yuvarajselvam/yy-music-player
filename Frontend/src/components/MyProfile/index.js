@@ -26,7 +26,7 @@ export function MyProfile(props) {
           }}
         />
         <Text h4>{userInfo.name}</Text>
-        <Text>@ {userInfo._id}</Text>
+        <Text>@ {userInfo.id}</Text>
       </Card>
       <ListItem
         containerStyle={styles.listContainer}
@@ -45,25 +45,25 @@ export function MyProfile(props) {
       <ListItem
         containerStyle={styles.listContainer}
         title="Followers"
-        rightElement={() => (
-          <RightIcon badgeValue={userInfo.followers.length} />
-        )}
+        // rightElement={() => (
+        //   <RightIcon badgeValue={userInfo.followers.length} />
+        // )}
         onPress={() => navigation.navigate('Followers')}
       />
       <ListItem
         containerStyle={styles.listContainer}
         title="Following"
-        rightElement={() => (
-          <RightIcon badgeValue={userInfo.following.length} />
-        )}
+        // rightElement={() => (
+        //   <RightIcon badgeValue={userInfo.following.length} />
+        // )}
         onPress={() => navigation.navigate('Following')}
       />
       <ListItem
         containerStyle={styles.listContainer}
         title="Pending Requests"
-        rightElement={() => (
-          <RightIcon badgeValue={userInfo.pendingRequests.length} />
-        )}
+        // rightElement={() => (
+        //   <RightIcon badgeValue={userInfo.pendingRequests.length} />
+        // )}
         onPress={() => navigation.navigate('Requests')}
       />
     </View>

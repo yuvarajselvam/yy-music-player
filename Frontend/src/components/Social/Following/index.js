@@ -17,7 +17,7 @@ export function Following(props) {
         if (response.status === 200) {
           let responseObj = await response.json();
           // console.log('followings list', responseObj);
-          setFollowings(responseObj);
+          setFollowings(responseObj.following);
         } else {
           setFollowings([{name: 'No Following'}]);
         }
