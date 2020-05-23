@@ -422,7 +422,7 @@ function PlaylistsOverlay(props) {
     // owner need to updated dynamically from local DB
     let playlistObj = {
       _id: playlist._id,
-      owner: userInfo._id,
+      owner: userInfo.id,
       tracks: [],
     };
     selectedTrackItems.forEach(track => {

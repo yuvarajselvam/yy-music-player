@@ -134,7 +134,7 @@ function CreatePlaylistOverlay(props) {
     let data = {
       name: playlistName,
       type: 'playlist',
-      owner: userInfo._id,
+      owner: userInfo.id,
     };
     if (isPublic) {
       data.scope = 'public';
@@ -197,7 +197,7 @@ function OverlayMenu(props) {
   const handleDeletePlaylist = () => {
     let playlist = {
       _id: playlistId,
-      owner: userInfo._id,
+      owner: userInfo.id,
     };
 
     setIsPlaylistMenuOverlayOpen(false);

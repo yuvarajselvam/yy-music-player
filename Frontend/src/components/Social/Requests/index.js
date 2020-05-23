@@ -13,7 +13,7 @@ import {styles} from './requests.styles';
 
 export function Requests(props) {
   const {navigation} = props;
-  const [pendingRequest, setPendingRequest] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState([]);
 
   const {userInfo} = useAuthContext();
 
@@ -21,7 +21,7 @@ export function Requests(props) {
     React.useCallback(() => {
       getPendingRequestService();
       return () => {
-        setPendingRequest([]);
+        setPendingRequests([]);
       };
     }, []),
   );
@@ -31,17 +31,17 @@ export function Requests(props) {
       if (response.status === 200) {
         let responseObj = await response.json();
         // console.log('Pending list', responseObj);
-        setPendingRequest(responseObj);
+        setPendingRequests(responseObj.pendingRequests);
       } else {
-        setPendingRequest([]);
+        setPendingRequests([]);
       }
     });
   };
 
-  const handleAcceptRequest = requester => {
+  const handleAcceptRequest = request => {
     let data = {
-      followee: userInfo._id,
-      follower: requester.userId,
+      followee: userInfo.id,
+      follower: request.id,
     };
     userService.acceptRequest(data).then(response => {
       if (response.status === 200) {
@@ -51,10 +51,10 @@ export function Requests(props) {
     });
   };
 
-  const handleRejectRequest = requester => {
+  const handleRejectRequest = request => {
     let data = {
-      followee: userInfo._id,
-      follower: requester.userId,
+      followee: userInfo.id,
+      follower: request.id,
     };
     userService.rejectRequest(data).then(response => {
       if (response.status === 200) {
@@ -73,31 +73,33 @@ export function Requests(props) {
         onLeftIconPress={() => navigation.goBack()}
       />
 
-      {pendingRequest.length > 0 ? (
-        pendingRequest.map(requester => {
+      {pendingRequests.length > 0 ? (
+        pendingRequests.map(request => {
+          let approver = false;
+          let subtitleText = 'Request Pending';
+          if (request.type === 'received') {
+            approver = true;
+            subtitleText = 'Approve or ignore request';
+          }
           return (
             <ListItem
               containerStyle={styles.listContainer}
-              title={requester.userId}
+              title={request.name}
               titleStyle={{marginBottom: 4}}
-              subtitle={
-                requester.isRequester
-                  ? 'Request Pending'
-                  : 'Approve or ignore request'
-              }
+              subtitle={subtitleText}
               subtitleStyle={{color: Colors.grey200}}
               rightElement={
-                !requester.isRequester && (
+                approver && (
                   <View style={{flexDirection: 'row'}}>
                     <Button
                       containerStyle={{marginRight: widthPercentageToDP(3.2)}}
                       title="accept"
-                      onPress={() => handleAcceptRequest(requester)}
+                      onPress={() => handleAcceptRequest(request)}
                     />
                     <Button
                       type="outline"
                       title="reject"
-                      onPress={() => handleRejectRequest(requester)}
+                      onPress={() => handleRejectRequest(request)}
                     />
                   </View>
                 )

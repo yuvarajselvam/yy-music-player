@@ -18,8 +18,8 @@ export function Users(props) {
     React.useCallback(() => {
       userService.getUsers().then(async response => {
         let responseObj = await response.json();
-        console.log('users list', responseObj);
-        setUsers(responseObj.searchResults);
+        // console.log('users list', responseObj.users);
+        setUsers(responseObj.users);
       });
       return () => {
         setUsers([]);
@@ -27,11 +27,11 @@ export function Users(props) {
     }, []),
   );
 
-  const handleRequest = id => {
-    let userId = userInfo._id;
+  const handleRequest = user => {
+    let userId = userInfo.id;
     let data = {
       follower: userId,
-      followee: id,
+      followee: user.id,
     };
     userService.followRequest(data).then(response => {
       if (response.status === 200) {
@@ -45,20 +45,21 @@ export function Users(props) {
   return (
     <View style={{flex: 1}}>
       <Header navigation={navigation} />
-      {users.map((user, index) => {
-        return (
-          <ListItem
-            containerStyle={{
-              backgroundColor: '#121212',
-              borderWidth: 0,
-              margin: 0,
-            }}
-            title={user.name}
-            titleStyle={{color: Colors.grey200}}
-            onPress={() => handleRequest(user._id)}
-          />
-        );
-      })}
+      {users.length > 0 &&
+        users.map((user, index) => {
+          return (
+            <ListItem
+              containerStyle={{
+                backgroundColor: '#121212',
+                borderWidth: 0,
+                margin: 0,
+              }}
+              title={user.name}
+              titleStyle={{color: Colors.grey200}}
+              onPress={() => handleRequest(user)}
+            />
+          );
+        })}
     </View>
   );
 }
