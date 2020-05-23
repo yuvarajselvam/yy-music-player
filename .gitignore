@@ -1,0 +1,6 @@
+/Backend/migration/
+/Backend/scripts/
+/Backend/json_data/
+/Backend/executables/
+/node_modules/
+/package-lock.json
