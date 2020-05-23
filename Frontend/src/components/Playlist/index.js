@@ -136,7 +136,7 @@ function TrackOverlayMenu(props) {
     let track = {
       _id: playlistId,
       tracks: [trackObj],
-      owner: userInfo._id,
+      owner: userInfo.id,
     };
 
     setIsTrackMenuOverlayOpen(false);

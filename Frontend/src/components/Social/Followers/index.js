@@ -17,7 +17,7 @@ export function Followers(props) {
         if (response.status === 200) {
           let responseObj = await response.json();
           // console.log('followers list', responseObj);
-          setFollowers(responseObj.searchResults);
+          setFollowers(responseObj.followers);
         } else {
           setFollowers([{name: 'No Followers'}]);
         }
