@@ -1,11 +1,8 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {View, ScrollView, Keyboard, Alert, BackHandler} from 'react-native';
-import {ListItem, Image, Button, SearchBar} from 'react-native-elements';
+import {Button, SearchBar} from 'react-native-elements';
 import {IconButton, Colors, Appbar} from 'react-native-paper';
-import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
-} from 'react-native-responsive-screen';
+import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
 
 import {OverlayModal} from '../../widgets/OverlayModal';
 import {trackService} from '../../services/track.service';
@@ -15,6 +12,7 @@ import {usePlayerContext} from '../../contexts/player.context';
 import {styles} from './search.styles';
 import {commonStyles} from '../common/styles';
 import {useAuthContext} from '../../contexts/auth.context';
+import {ListItems} from '../../widgets/ListItems';
 
 export function Search({navigation}) {
   console.log('Search screen');
@@ -101,7 +99,7 @@ export function Search({navigation}) {
     setKeyword(value);
   };
 
-  const handleListSelect = (item, evt) => {
+  const handleListSelect = item => {
     Keyboard.dismiss();
     if (isSelectable) {
       return handleLongPress(item);
@@ -161,7 +159,7 @@ export function Search({navigation}) {
 
   const handleRemoveSelectedItems = () => {
     let revertItems = [...searchResults];
-    console.log(selectedItems);
+    // console.log(selectedItems);
     selectedItems.forEach(itemObj => {
       let itemToBeRemoved = searchResults.find(item => {
         return item._id === itemObj._id;
@@ -252,10 +250,9 @@ export function Search({navigation}) {
           round={false}
           clearIcon={
             <IconButton
-              // style={{alignSelf: 'center'}}
               icon="close"
               color={Colors.grey300}
-              size={hp(2.4)}
+              size={wp(4.8)}
               onPress={clearSearch}
             />
           }
@@ -264,7 +261,7 @@ export function Search({navigation}) {
               style={{padding: 0, margin: 0}}
               icon="magnify"
               color={Colors.grey300}
-              size={hp(3.2)}
+              size={wp(5.6)}
               onPress={clearSearch}
             />
           }
@@ -280,57 +277,19 @@ export function Search({navigation}) {
         onScrollBeginDrag={Keyboard.dismiss}
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="on-drag">
-        {searchResults.map((item, index) => {
-          return (
-            <ListItem
-              disabledStyle={{opacity: 0.4}}
-              disabled={isSelectable && item.type === 'album'}
-              onLongPress={() => handleLongPress(item)}
-              onPress={evt => handleListSelect(item, evt)}
-              leftElement={
-                <View>
-                  <Image
-                    // containerStyle={{opacity: 0.5}}
-                    style={styles.listImage}
-                    source={{
-                      uri: item.imageUrl,
-                    }}
-                  />
-                </View>
-              }
-              key={index}
-              subtitle={
-                item.artists +
-                ' - ' +
-                item.type.charAt(0).toUpperCase() +
-                item.type.slice(1)
-              }
-              subtitleStyle={styles.listSubtitle}
-              title={item.name}
-              titleStyle={styles.listTitle}
-              titleProps={{numberOfLines: 1}}
-              bottomDivider
-              containerStyle={[
-                styles.listContainer,
-                isSelectable && item.isSelect && selectedItemStyle,
-              ]}
-              rightElement={
-                !isSelectable && (
-                  <IconButton
-                    style={styles.listVerticalButton}
-                    color={Colors.grey200}
-                    size={hp(2.8)}
-                    icon="dots-vertical"
-                    onPress={() => trackVerticalButton(item)}
-                  />
-                )
-              }
-              contentContainerStyle={{
-                width: wp(58),
-              }}
-            />
-          );
-        })}
+        <ListItems
+          options={searchResults}
+          titleKeys={['name']}
+          subtitleKeys={['artists', 'type']}
+          rightIconName={!isSelectable && 'more-vert'}
+          onRightIconPress={trackVerticalButton}
+          onLongPress={handleLongPress}
+          onPress={handleListSelect}
+          listSelectedStyle={isSelectable && selectedItemStyle}
+          leftAvatarKey="imageUrl"
+          disabledKey={isSelectable && 'type'}
+          disabledValue={'album'}
+        />
       </ScrollView>
     </View>
   );
@@ -464,17 +423,11 @@ function PlaylistsOverlay(props) {
     <OverlayModal
       visible={isPlaylistsOverlayOpen}
       onBackdropPress={() => setIsPlaylistsOverlayOpen(false)}>
-      {playlists.map((playlist, index) => {
-        return (
-          <ListItem
-            containerStyle={styles.listContainer}
-            title={playlist.name}
-            titleStyle={{color: Colors.grey200}}
-            key={index}
-            onPress={() => handlePlaylistSelect(playlist)}
-          />
-        );
-      })}
+      <ListItems
+        options={playlists}
+        titleKeys={['name']}
+        onPress={handlePlaylistSelect}
+      />
     </OverlayModal>
   );
 }

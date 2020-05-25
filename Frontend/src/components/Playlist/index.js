@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, ScrollView, Alert} from 'react-native';
-import {ListItem, Image, Text, Overlay, Button} from 'react-native-elements';
+import {Image, Text, Overlay, Button} from 'react-native-elements';
 import {Colors, IconButton} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 import {
@@ -17,6 +17,7 @@ import {usePlayerContext} from '../../contexts/player.context';
 import {commonStyles} from '../common/styles';
 import {styles} from './playlist.styles';
 import {useAuthContext} from '../../contexts/auth.context';
+import {ListItems} from '../../widgets/ListItems';
 
 export function Playlist(props) {
   console.log('Playlist screen');
@@ -85,29 +86,14 @@ export function Playlist(props) {
           <Text style={{color: Colors.grey200}}>Various Artists</Text>
         </View>
         <View style={{flex: 1}}>
-          {playlistTracks.map((track, index) => {
-            return (
-              <ListItem
-                containerStyle={styles.listContainer}
-                contentContainerStyle={{padding: 10}}
-                onPress={() => handleTrackSelect(track)}
-                key={index}
-                title={track.name}
-                // titleStyle={{color: Colors.grey200}}
-                subtitle={track.artists}
-                subtitleStyle={{color: Colors.grey200}}
-                rightElement={
-                  <IconButton
-                    style={styles.listVerticalButton}
-                    color={Colors.grey200}
-                    size={heightPercentageToDP(2.8)}
-                    icon="dots-vertical"
-                    onPress={() => handleTrackMenu(track)}
-                  />
-                }
-              />
-            );
-          })}
+          <ListItems
+            options={playlistTracks}
+            titleKeys={['name']}
+            subtitleKeys={['artists']}
+            rightIconName="more-vert"
+            onRightIconPress={handleTrackMenu}
+            onPress={handleTrackSelect}
+          />
         </View>
       </ScrollView>
       <TrackOverlayMenu

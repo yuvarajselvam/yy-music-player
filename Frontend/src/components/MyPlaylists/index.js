@@ -1,9 +1,8 @@
-import React, {useState, useEffect} from 'react';
-import {View, Alert, InteractionManager} from 'react-native';
-import {Card, ListItem, Button, Overlay, Text} from 'react-native-elements';
+import React, {useState} from 'react';
+import {View, Alert, InteractionManager, ScrollView} from 'react-native';
+import {Button, Text} from 'react-native-elements';
 import {Colors, Switch, IconButton} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
-import {heightPercentageToDP} from 'react-native-responsive-screen';
 
 import {Header} from '../../widgets/Header';
 import {InputBox} from '../../widgets/InputBox';
@@ -14,6 +13,7 @@ import {OverlayModal} from '../../widgets/OverlayModal';
 import {commonStyles} from '../common/styles';
 import {styles} from './myplaylists.styles';
 import {useAuthContext} from '../../contexts/auth.context';
+import {ListItems} from '../../widgets/ListItems';
 
 export function MyPlaylists({navigation}) {
   const [
@@ -64,30 +64,18 @@ export function MyPlaylists({navigation}) {
   return (
     <View style={commonStyles.screenStyle}>
       <Header navigation={navigation} title="My Playlists" />
-      <Card containerStyle={styles.card}>
-        {playlists.map((playlist, index) => {
-          return (
-            <ListItem
-              title={playlist.name}
-              containerStyle={styles.listContainer}
-              rightElement={
-                <IconButton
-                  style={{alignItems: 'flex-end', margin: 0}}
-                  color={Colors.grey200}
-                  size={heightPercentageToDP(2.8)}
-                  icon="dots-vertical"
-                  onPress={() => handleVerticalDotButton(playlist._id)}
-                />
-              }
-              key={index}
-              onPress={() => handlePlaylistSelect(playlist)}
-            />
-          );
-        })}
-        <View style={{alignItems: 'center', padding: 12}}>
-          <Button title="Create Playlist" onPress={createPlaylist} />
-        </View>
-      </Card>
+      <View style={{alignItems: 'center', padding: 12}}>
+        <Button title="Create Playlist" onPress={createPlaylist} />
+      </View>
+      <ScrollView>
+        <ListItems
+          options={playlists}
+          titleKeys={['name']}
+          onPress={handlePlaylistSelect}
+          rightIconName="more-vert"
+          onRightIconPress={handleVerticalDotButton}
+        />
+      </ScrollView>
       <CreatePlaylistOverlay
         isCreatePlaylistOverlayOpen={isCreatePlaylistOverlayOpen}
         setIsCreatePlaylistOverlayOpen={setIsCreatePlaylistOverlayOpen}
