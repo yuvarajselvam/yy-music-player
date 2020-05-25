@@ -1,15 +1,14 @@
 import React, {useState} from 'react';
 import {View, ToastAndroid} from 'react-native';
-import {ListItem, Button} from 'react-native-elements';
+import {Button} from 'react-native-elements';
 import {useFocusEffect} from '@react-navigation/native';
-import {Colors} from 'react-native-paper';
 import {widthPercentageToDP} from 'react-native-responsive-screen';
 
 import {Header} from '../../../widgets/Header';
 
 import {userService} from '../../../services/user.service';
 import {useAuthContext} from '../../../contexts/auth.context';
-import {styles} from './requests.styles';
+import {ListItems} from '../../../widgets/ListItems';
 
 export function Requests(props) {
   const {navigation} = props;
@@ -67,52 +66,41 @@ export function Requests(props) {
   return (
     <View style={{flex: 1}}>
       <Header
-        title="Notification"
+        title="Requests"
         navigation={navigation}
         leftIconName="arrow-back"
         onLeftIconPress={() => navigation.goBack()}
       />
-
-      {pendingRequests.length > 0 ? (
-        pendingRequests.map(request => {
-          let approver = false;
+      <ListItems
+        options={pendingRequests}
+        titleKeys={['name']}
+        subtitleElement={request => {
           let subtitleText = 'Request Pending';
           if (request.type === 'received') {
-            approver = true;
             subtitleText = 'Approve or ignore request';
           }
+          return subtitleText;
+        }}
+        rightElement={request => {
           return (
-            <ListItem
-              containerStyle={styles.listContainer}
-              title={request.name}
-              titleStyle={{marginBottom: 4}}
-              subtitle={subtitleText}
-              subtitleStyle={{color: Colors.grey200}}
-              rightElement={
-                approver && (
-                  <View style={{flexDirection: 'row'}}>
-                    <Button
-                      containerStyle={{marginRight: widthPercentageToDP(3.2)}}
-                      title="accept"
-                      onPress={() => handleAcceptRequest(request)}
-                    />
-                    <Button
-                      type="outline"
-                      title="reject"
-                      onPress={() => handleRejectRequest(request)}
-                    />
-                  </View>
-                )
-              }
-            />
+            request.type === 'received' && (
+              <View style={{flexDirection: 'row'}}>
+                <Button
+                  containerStyle={{marginRight: widthPercentageToDP(3.2)}}
+                  title="accept"
+                  onPress={() => handleAcceptRequest(request)}
+                />
+                <Button
+                  type="outline"
+                  title="reject"
+                  onPress={() => handleRejectRequest(request)}
+                />
+              </View>
+            )
           );
-        })
-      ) : (
-        <ListItem
-          containerStyle={styles.listContainer}
-          title="No pending Request"
-        />
-      )}
+        }}
+        emptyTitle="No pending requests"
+      />
     </View>
   );
 }
