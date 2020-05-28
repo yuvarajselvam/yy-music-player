@@ -12,11 +12,11 @@ import {usePlayerContext} from '../../contexts/player.context';
 
 import {commonStyles} from '../common/styles';
 import {styles} from './album.style';
-import {ListItems} from '../../widgets/ListItems';
+import ListItems from '../../widgets/ListItems';
 
 export function Album(props) {
   const {navigation, route} = props;
-  let albumId = route.params._id;
+  let albumId = route.params.id;
   let albumlanguage = route.params.language;
   console.log('Album screen', albumlanguage);
   const [album, setAlbum] = useState({artists: [{name: ''}]});
@@ -27,7 +27,7 @@ export function Album(props) {
   useFocusEffect(
     React.useCallback(() => {
       let data = {
-        _id: albumId,
+        id: albumId,
         language: albumlanguage,
       };
       trackService.getAlbum(data).then(async response => {
@@ -42,26 +42,30 @@ export function Album(props) {
     }, [albumId, albumlanguage]),
   );
 
-  const handleTrackSelect = track => {
-    let data = {
-      _id: track._id,
-      language: albumlanguage,
-    };
-    if (!track.trackUrl) {
-      trackService.getTrack(data).then(async response => {
-        if (response.status === 200) {
-          let responseObj = await response.json();
-          onAddTrack(responseObj).then(() => {
-            onPlay();
-          });
-        }
-      });
-    } else {
-      onAddTrack(track).then(() => {
-        onPlay();
-      });
-    }
-  };
+  const handleTrackSelect = React.useCallback(
+    track => {
+      let data = {
+        id: track.id,
+        language: albumlanguage,
+      };
+      if (!track.trackUrl) {
+        trackService.getTrack(data).then(async response => {
+          if (response.status === 200) {
+            let responseObj = await response.json();
+            onAddTrack(responseObj).then(() => {
+              onPlay();
+            });
+          }
+        });
+      } else {
+        onAddTrack(track).then(() => {
+          onPlay();
+        });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [albumlanguage],
+  );
 
   return (
     <View style={commonStyles.screenStyle}>
@@ -93,7 +97,6 @@ export function Album(props) {
             subtitleKeys={['name']}
             onPress={handleTrackSelect}
             rightIconName="more-vert"
-            onRightIconPress={() => {}}
           />
         </View>
       </ScrollView>

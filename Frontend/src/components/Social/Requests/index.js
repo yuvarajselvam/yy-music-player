@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, ToastAndroid} from 'react-native';
-import {Button} from 'react-native-elements';
+import {Button, Text} from 'react-native-elements';
 import {useFocusEffect} from '@react-navigation/native';
 import {widthPercentageToDP} from 'react-native-responsive-screen';
 
@@ -8,7 +8,7 @@ import {Header} from '../../../widgets/Header';
 
 import {userService} from '../../../services/user.service';
 import {useAuthContext} from '../../../contexts/auth.context';
-import {ListItems} from '../../../widgets/ListItems';
+import ListItems from '../../../widgets/ListItems';
 
 export function Requests(props) {
   const {navigation} = props;
@@ -37,7 +37,7 @@ export function Requests(props) {
     });
   };
 
-  const handleAcceptRequest = request => {
+  const handleAcceptRequest = React.useCallback(request => {
     let data = {
       followee: userInfo.id,
       follower: request.id,
@@ -48,9 +48,10 @@ export function Requests(props) {
         ToastAndroid.show('Request accepted successfully', ToastAndroid.SHORT);
       }
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const handleRejectRequest = request => {
+  const handleRejectRequest = React.useCallback(request => {
     let data = {
       followee: userInfo.id,
       follower: request.id,
@@ -61,7 +62,8 @@ export function Requests(props) {
         ToastAndroid.show('Request rejected successfully', ToastAndroid.SHORT);
       }
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <View style={{flex: 1}}>
@@ -79,7 +81,7 @@ export function Requests(props) {
           if (request.type === 'received') {
             subtitleText = 'Approve or ignore request';
           }
-          return subtitleText;
+          return <Text>{subtitleText}</Text>;
         }}
         rightElement={request => {
           return (

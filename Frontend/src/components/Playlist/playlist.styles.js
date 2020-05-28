@@ -19,7 +19,6 @@ export const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
   },
-  overlayContent: {flex: 1, justifyContent: 'space-around'},
   overlayButtons: {
     justifyContent: 'flex-start',
     alignItems: 'center',
