@@ -24,7 +24,9 @@ import {Requests} from '../Social/Requests';
 
 const Drawer = createDrawerNavigator();
 
-function CustomDrawerContent({navigation}) {
+const CustomDrawerContent = React.memo(function CustomDrawerContent({
+  navigation,
+}) {
   return (
     <DrawerContentScrollView>
       <DrawerItem
@@ -102,7 +104,7 @@ function CustomDrawerContent({navigation}) {
       </View>
     </DrawerContentScrollView>
   );
-}
+});
 
 export function Entry() {
   useEffect(() => {
