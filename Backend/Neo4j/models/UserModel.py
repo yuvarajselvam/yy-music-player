@@ -134,8 +134,7 @@ class User:
         else:
             raise DatabaseError("Follower/Followee node does not exist.")
 
-    def respond_to_follow_request(self, follower, operation):
-        follower_node = follower.get_node()
+    def respond_to_follow_request(self, follower_node, operation):
         if self._node and follower_node:
             rel_match = RelationshipMatcher(graph)
             rel = rel_match.match((follower_node, self._node), r_type='REQUESTED_TO_FOLLOW')
@@ -163,6 +162,9 @@ class User:
             follower["type"] = "received"
             received.append(follower)
         return sent + received
+
+    def get_playlists(self):
+        return get_related_nodes((None, self._node), 'OWNED_BY')
 
     def get_linked_accounts(self, **kwargs):
         return get_related_nodes((None, self._node), 'LINKED_TO', **kwargs)

@@ -70,7 +70,7 @@ class FollowRequestResponder(Resource):
             return make_response((f"User[{request_json['followee']}] not found.", 404))
 
         try:
-            followee.respond_to_follow_request(follower, _op)
+            followee.respond_to_follow_request(follower.get_node(), _op)
         except DatabaseError as e:
             return make_response((str(e), 400))
 

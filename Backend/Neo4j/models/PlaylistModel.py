@@ -3,10 +3,11 @@ import inspect
 import neotime
 import datetime
 
-from py2neo import Node
+from py2neo import Node, Relationship, RelationshipMatcher
 
 from utils.extensions import neo4j
 from utils import validation
+from utils.querying import get_relationships, get_related_nodes
 
 
 graph = neo4j.get_db()
@@ -58,6 +59,45 @@ class Playlist:
         playlist = graph.nodes.match('Playlist', **kwargs).first()
         return cls(dict(playlist), _node=playlist)
 
+    # Create/Delete Relationships
+
+    def link_owner(self, owner_node):
+        if self._node and owner_node:
+            playlist_owner = Relationship(self._node, "OWNED_BY", owner_node)
+            graph.create(playlist_owner)
+        else:
+            raise Exception("Playlist/Owner node does not exist.")
+
+    def check_visibility(self, user_node):
+        if self._node and user_node:
+            relationships = get_relationships((self._node, user_node))
+            return "OWNED_BY" in relationships
+        else:
+            raise Exception("Playlist/User node does not exist.")
+
+    def add_track(self, track_node):
+        if self._node and track_node:
+            if "ADDED_TO" not in get_relationships((track_node, self._node)):
+                track_playlist = Relationship(track_node, "ADDED_TO", self._node)
+                graph.create(track_playlist)
+        else:
+            raise Exception("Playlist/Track node does not exist.")
+
+    def remove_track(self, track_node):
+        if self._node and track_node:
+            rel_match = RelationshipMatcher(graph)
+            rel = rel_match.match((track_node, self._node), r_type='ADDED_TO')
+            if rel.exists():
+                graph.separate(rel.first())
+        else:
+            raise Exception("Playlist/Track node does not exist.")
+
+    def delete(self):
+        if self._node:
+            graph.delete(self._node)
+        else:
+            raise Exception("Playlist does not exist.")
+
     def get_node(self):
         return self._node
 
@@ -94,6 +134,10 @@ class Playlist:
     def scope(self, value):
         validation.check_choices("scope", value, self._allowed_scopes)
         self._scope = value.upper()
+
+    @property
+    def tracks(self):
+        return get_related_nodes((None, self._node), 'ADDED_TO')
 
     @property
     def createdAt(self):
