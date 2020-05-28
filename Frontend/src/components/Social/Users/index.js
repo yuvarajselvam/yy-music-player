@@ -5,9 +5,9 @@ import {useFocusEffect} from '@react-navigation/native';
 import {Header} from '../../../widgets/Header';
 import {userService} from '../../../services/user.service';
 import {useAuthContext} from '../../../contexts/auth.context';
-import {ListItems} from '../../../widgets/ListItems';
+import ListItems from '../../../widgets/ListItems';
 
-export function Users(props) {
+function UsersComponent(props) {
   const {navigation} = props;
   const [users, setUsers] = useState([]);
 
@@ -26,7 +26,7 @@ export function Users(props) {
     }, []),
   );
 
-  const handleRequest = user => {
+  const handleRequest = React.useCallback(user => {
     let userId = userInfo.id;
     let data = {
       follower: userId,
@@ -39,12 +39,17 @@ export function Users(props) {
         ToastAndroid.show('Request failed', ToastAndroid.SHORT);
       }
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <View style={{flex: 1}}>
-      <Header navigation={navigation} />
+      <Header navigation={navigation} title="People" />
       <ListItems options={users} titleKeys={['name']} onPress={handleRequest} />
     </View>
   );
 }
+
+const Users = React.memo(UsersComponent);
+
+export {Users};

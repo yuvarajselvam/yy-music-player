@@ -6,7 +6,7 @@ import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
 
 import {styles} from './list.styles';
 
-ListItems.propTypes = {
+ListItemsComponent.propTypes = {
   options: PropTypes.array,
   single: PropTypes.bool,
   titleText: PropTypes.string,
@@ -27,7 +27,7 @@ ListItems.propTypes = {
   emptySubtitle: PropTypes.string,
 };
 
-export function ListItems(props) {
+function ListItemsComponent(props) {
   const {
     options,
     single,
@@ -133,3 +133,8 @@ export function ListItems(props) {
     />
   );
 }
+
+// const ListItems = React.memo(ListItemsComponent);
+// export ListItems;
+
+export default React.memo(ListItemsComponent);

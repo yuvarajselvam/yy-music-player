@@ -14,7 +14,7 @@ export const PlayerProvider = props => {
       onUpdateOptions();
       // TO DO - removed and should contain actual last played track
       await TrackPlayer.add({
-        id: 'track._id',
+        id: 'track.id',
         url: 'track.trackUrl',
         title: 'track.name',
         artist: 'trackArtistsName',
@@ -34,21 +34,17 @@ export const PlayerProvider = props => {
     }
 
     TrackPlayer.setupPlayer().then(async () => {
-      let artistsName = track.artists.map(artist => {
-        return artist.name;
-      });
-      let trackArtistsName = artistsName.join(', ');
       let details = {
         name: track.name,
         imageUrl: track.imageUrl,
-        artists: trackArtistsName,
+        artists: track.artists,
       };
       setTrackDetails(details);
       await TrackPlayer.add({
-        id: track._id,
+        id: track.id,
         url: track.trackUrl,
         title: track.name,
-        artist: trackArtistsName,
+        artist: track.artists,
         album: track.album.name,
         artwork: track.imageUrl,
       });

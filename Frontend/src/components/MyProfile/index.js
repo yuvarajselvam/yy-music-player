@@ -4,9 +4,9 @@ import {Text, Avatar, Card, Badge} from 'react-native-elements';
 import {Header} from '../../widgets/Header';
 import {useAuthContext} from '../../contexts/auth.context';
 import {styles} from './myprofile.styles';
-import {ListItems} from '../../widgets/ListItems';
+import ListItems from '../../widgets/ListItems';
 
-export function MyProfile(props) {
+function MyProfileComponent(props) {
   const {navigation} = props;
 
   const {userInfo} = useAuthContext();
@@ -35,17 +35,23 @@ export function MyProfile(props) {
       <ListItems
         single={true}
         titleText="Followers"
-        onPress={() => navigation.navigate('Followers')}
+        onPress={React.useCallback(() => navigation.navigate('Followers'), [
+          navigation,
+        ])}
       />
       <ListItems
         single={true}
         titleText="Following"
-        onPress={() => navigation.navigate('Following')}
+        onPress={React.useCallback(() => navigation.navigate('Following'), [
+          navigation,
+        ])}
       />
       <ListItems
         single={true}
         titleText="Pending Requests"
-        onPress={() => navigation.navigate('Requests')}
+        onPress={React.useCallback(() => navigation.navigate('Requests'), [
+          navigation,
+        ])}
       />
     </View>
   );
@@ -69,3 +75,7 @@ export function MyProfile(props) {
 //     </View>
 //   );
 // }
+
+const MyProfile = React.memo(MyProfileComponent);
+
+export {MyProfile};

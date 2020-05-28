@@ -13,7 +13,12 @@ import {OverlayModal} from '../../widgets/OverlayModal';
 import {commonStyles} from '../common/styles';
 import {styles} from './myplaylists.styles';
 import {useAuthContext} from '../../contexts/auth.context';
-import {ListItems} from '../../widgets/ListItems';
+import ListItems from '../../widgets/ListItems';
+
+const SCOPES = {
+  PUBLIC: 'public',
+  PRIVATE: 'private',
+};
 
 export function MyPlaylists({navigation}) {
   const [
@@ -39,7 +44,7 @@ export function MyPlaylists({navigation}) {
       if (response.status === 200) {
         let responseData = await response.json();
         // console.log('Playlists ===', responseData);
-        setPlaylists(responseData);
+        setPlaylists(responseData.playlists);
       } else if (response.status === 204) {
         setPlaylists([]);
       }
@@ -51,15 +56,18 @@ export function MyPlaylists({navigation}) {
     setIsCreatePlaylistOverlayOpen(true);
   };
 
-  const handlePlaylistSelect = playlist => {
-    console.log(playlist);
-    navigation.navigate('Playlist', {playlistId: playlist._id});
-  };
+  const handlePlaylistSelect = React.useCallback(
+    playlist => {
+      console.log(playlist);
+      navigation.navigate('Playlist', {playlistId: playlist.id});
+    },
+    [navigation],
+  );
 
-  const handleVerticalDotButton = id => {
+  const handleVerticalDotButton = React.useCallback(playlistObj => {
     setIsPlaylistMenuOverlayOpen(true);
-    setPlaylistId(id);
-  };
+    setPlaylistId(playlistObj.id);
+  }, []);
 
   return (
     <View style={commonStyles.screenStyle}>
@@ -118,15 +126,15 @@ function CreatePlaylistOverlay(props) {
       setErrorMessage('Playlist name cannot be empty');
       return;
     }
-    console.log('creating playlist', userInfo);
     let data = {
       name: playlistName,
-      type: 'playlist',
       owner: userInfo.id,
+      scope: SCOPES.PRIVATE,
     };
     if (isPublic) {
-      data.scope = 'public';
+      data.scope = SCOPES.PUBLIC;
     }
+    // console.log('creating playlist', data);
     trackService.createPlaylist(data).then(response => {
       if (response.status === 201) {
         setIsCreatePlaylistOverlayOpen(false);
@@ -184,8 +192,8 @@ function OverlayMenu(props) {
 
   const handleDeletePlaylist = () => {
     let playlist = {
-      _id: playlistId,
-      owner: userInfo.id,
+      id: playlistId,
+      userId: userInfo.id,
     };
 
     setIsPlaylistMenuOverlayOpen(false);

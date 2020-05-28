@@ -12,7 +12,7 @@ import {usePlayerContext} from '../../contexts/player.context';
 import {styles} from './search.styles';
 import {commonStyles} from '../common/styles';
 import {useAuthContext} from '../../contexts/auth.context';
-import {ListItems} from '../../widgets/ListItems';
+import ListItems from '../../widgets/ListItems';
 
 export function Search({navigation}) {
   console.log('Search screen');
@@ -26,11 +26,12 @@ export function Search({navigation}) {
   const searchRef = useRef();
   const {onAddTrack, onPlay} = usePlayerContext();
 
-  const handleTrackSelect = track => {
+  const handleTrackSelect = React.useCallback(track => {
     onAddTrack(track).then(() => {
       onPlay();
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (isSelectable) {
@@ -77,6 +78,7 @@ export function Search({navigation}) {
         trackService.getSearch(data).then(async response => {
           if (response.status === 200) {
             let responseObj = await response.json();
+            // console.log('search', responseObj);
             let responseSearchList = responseObj.searchResults;
             let edittedSearchList = responseSearchList.map(value => {
               value.isSelect = false;
@@ -99,72 +101,78 @@ export function Search({navigation}) {
     setKeyword(value);
   };
 
-  const handleListSelect = item => {
-    Keyboard.dismiss();
-    if (isSelectable) {
-      return handleLongPress(item);
-    }
-    let data = {
-      _id: item._id,
-      language: item.language,
-    };
-    // console.log(data);
-    if (item.type === 'track') {
-      trackService.getTrack(data).then(async response => {
-        if (response.status === 200) {
-          let responseObj = await response.json();
-          let track = responseObj;
-          handleTrackSelect(track);
-        } else {
-          Alert.alert('Oops!', 'Song cannot be played at this moment');
-        }
-      });
-    } else {
-      navigation.navigate('Album', data);
-    }
-  };
+  const handleListSelect = React.useCallback(
+    item => {
+      Keyboard.dismiss();
+      if (isSelectable) {
+        return handleLongPress(item);
+      }
+      let data = {
+        id: item.id,
+        language: item.language,
+      };
+      // console.log(data);
+      if (item.type === 'Track') {
+        trackService.getTrack(data).then(async response => {
+          if (response.status === 200) {
+            let responseObj = await response.json();
+            let track = responseObj;
+            handleTrackSelect(track);
+          } else {
+            Alert.alert('Oops!', 'Song cannot be played at this moment');
+          }
+        });
+      } else {
+        navigation.navigate('Album', data);
+      }
+    },
+    [handleLongPress, handleTrackSelect, isSelectable, navigation],
+  );
 
   const handleMultiTrackAction = () => {
     console.log(selectedItems);
-    setSelectedTrackItems([...selectedItems]);
+    setSelectedTrackItems(selectedItems);
     setIsOverlayVisible(prevState => !prevState);
   };
 
-  const trackVerticalButton = item => {
+  const trackVerticalButton = React.useCallback(item => {
     setIsOverlayVisible(prevState => !prevState);
     setSelectedTrackItems([item]);
-  };
+  }, []);
 
-  const handleLongPress = itemObj => {
-    if (itemObj.type === 'album') {
-      return;
-    }
-
-    let itemId = itemObj._id;
-    setIsSelectable(true);
-    if (!selectedItems.includes(itemObj)) {
-      setSelectedItems(prevState => [...prevState, itemObj]);
-    } else {
-      let filteredSelectedItems = selectedItems.filter(
-        item => itemId !== item._id,
-      );
-      setSelectedItems(filteredSelectedItems);
-    }
-    itemObj.isSelect = !itemObj.isSelect;
-    let updatedSearchResults = [...searchResults];
-    const index = updatedSearchResults.findIndex(item => itemId === item._id);
-    updatedSearchResults[index] = itemObj;
-    setSearchResults(updatedSearchResults);
-  };
+  const handleLongPress = React.useCallback(
+    itemObj => {
+      if (itemObj.type === 'Album') {
+        return;
+      }
+      let itemId = itemObj.id;
+      setIsSelectable(true);
+      if (!selectedItems.includes(itemObj)) {
+        console.log('selected Items', selectedItems);
+        setSelectedItems(prevState => [...prevState, itemObj]);
+      } else {
+        let filteredSelectedItems = selectedItems.filter(
+          item => itemId !== item.id,
+        );
+        setSelectedItems(filteredSelectedItems);
+      }
+      itemObj.isSelect = !itemObj.isSelect;
+      let updatedSearchResults = [...searchResults];
+      const index = updatedSearchResults.findIndex(item => itemId === item.id);
+      updatedSearchResults[index] = itemObj;
+      setSearchResults(updatedSearchResults);
+    },
+    [searchResults, selectedItems],
+  );
 
   const handleRemoveSelectedItems = () => {
     let revertItems = [...searchResults];
     // console.log(selectedItems);
     selectedItems.forEach(itemObj => {
       let itemToBeRemoved = searchResults.find(item => {
-        return item._id === itemObj._id;
+        return item.id === itemObj.id;
       });
-      let itemIndex = searchResults.find(item => item._id === itemObj._id);
+      let itemIndex = searchResults.find(item => item.id === itemObj.id);
       itemToBeRemoved.isSelect = !itemToBeRemoved.isSelect;
       revertItems[itemIndex] = itemToBeRemoved;
     });
@@ -288,7 +296,7 @@ export function Search({navigation}) {
           listSelectedStyle={isSelectable && selectedItemStyle}
           leftAvatarKey="imageUrl"
           disabledKey={isSelectable && 'type'}
-          disabledValue={'album'}
+          disabledValue={'Album'}
         />
       </ScrollView>
     </View>
@@ -372,52 +380,54 @@ function PlaylistsOverlay(props) {
   useEffect(() => {
     trackService.getMyPlaylists().then(async response => {
       let responseObj = await response.json();
-      console.log('Playlist overlay list ', responseObj);
-      setPlaylists(responseObj);
+      // console.log('Playlist overlay list ', responseObj);
+      setPlaylists(responseObj.playlists);
     });
   }, [isPlaylistsOverlayOpen]);
 
-  const handlePlaylistSelect = playlist => {
-    // owner need to updated dynamically from local DB
-    let playlistObj = {
-      _id: playlist._id,
-      owner: userInfo.id,
-      tracks: [],
-    };
-    selectedTrackItems.forEach(track => {
-      let trackItem = {};
-      trackItem.name = track.name;
-      trackItem.id = track._id;
-      trackItem.type = 'library';
-      trackItem.artists = track.artists;
-      playlistObj.tracks.push(trackItem);
-    });
+  const handlePlaylistSelect = React.useCallback(
+    playlist => {
+      // owner need to updated dynamically from local DB
+      let playlistObj = {
+        id: playlist.id,
+        userId: userInfo.id,
+        tracks: [],
+      };
+      selectedTrackItems.forEach(track => {
+        playlistObj.tracks.push(track.id);
+      });
 
-    if (actionType === 'add') {
-      trackService.addToPlaylist(playlistObj).then(response => {
-        if (response.status === 200) {
-          setIsSelectable(false);
-          setIsPlaylistsOverlayOpen(false);
-          setSelectedTrackItems([]);
-          Alert.alert('Success!', 'Tracks added to playlist successfully');
-        } else {
-          Alert.alert('Failed!', 'Tracks cannot be added to Playlist');
-        }
-      });
-    } else if (actionType === 'remove') {
-      trackService.removeFromPlaylist(playlist).then(response => {
-        if (response.status === 200) {
-          setIsSelectable(false);
-          setIsPlaylistsOverlayOpen(false);
-          setSelectedTrackItems([]);
-          Alert.alert('Success!', 'Tracks removed from playlist successfully');
-        } else {
-          Alert.alert('Failed!', 'Tracks cannot be removed from Playlist');
-        }
-      });
-    }
-    setSelectedItems([]);
-  };
+      if (actionType === 'add') {
+        trackService.addToPlaylist(playlistObj).then(response => {
+          if (response.status === 200) {
+            setIsSelectable(false);
+            setIsPlaylistsOverlayOpen(false);
+            setSelectedTrackItems([]);
+            Alert.alert('Success!', 'Tracks added to playlist successfully');
+          } else {
+            Alert.alert('Failed!', 'Tracks cannot be added to Playlist');
+          }
+        });
+      } else if (actionType === 'remove') {
+        trackService.removeFromPlaylist(playlist).then(response => {
+          if (response.status === 200) {
+            setIsSelectable(false);
+            setIsPlaylistsOverlayOpen(false);
+            setSelectedTrackItems([]);
+            Alert.alert(
+              'Success!',
+              'Tracks removed from playlist successfully',
+            );
+          } else {
+            Alert.alert('Failed!', 'Tracks cannot be removed from Playlist');
+          }
+        });
+      }
+      setSelectedItems([]);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [actionType, selectedTrackItems],
+  );
 
   return (
     <OverlayModal

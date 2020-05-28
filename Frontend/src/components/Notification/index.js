@@ -2,9 +2,9 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {Header} from '../../widgets/Header';
-import {ListItems} from '../../widgets/ListItems';
+import ListItems from '../../widgets/ListItems';
 
-export function Notification(props) {
+function NotificationComponent(props) {
   const {navigation} = props;
 
   return (
@@ -19,3 +19,7 @@ export function Notification(props) {
     </View>
   );
 }
+
+const Notification = React.memo(NotificationComponent);
+
+export {Notification};
