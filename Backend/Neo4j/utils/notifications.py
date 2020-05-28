@@ -18,4 +18,4 @@ class NotificationUtil:
         notification_obj = messaging.Notification(title=notification["title"], body=notification["body"]) if notification else None
         message = messaging.Message(data=data, notification=notification_obj, token=token)
         response = messaging.send(message)
-        logger.debug(f"send method response: {response}")
+        # logger.debug(f"send method response: {response}")

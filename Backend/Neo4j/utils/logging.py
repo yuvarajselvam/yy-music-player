@@ -23,7 +23,10 @@ class Logger:
                 req = request.args
 
             for k, v in req.items():
-                s += f"{k:<14s} : {v:<81.81s}\n"
+                if isinstance(v, str):
+                    s += f"{k:<14s} : {v:<81.81s}\n"
+                elif isinstance(v, list):
+                    s += f"{k:<14s} : {str(len(v)) + ' item(s) received.':<81.81s}\n"
             self.log(12, s)
         except Exception as e:
             print(str(e))
