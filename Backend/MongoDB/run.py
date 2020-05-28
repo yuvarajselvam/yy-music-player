@@ -6,12 +6,12 @@ from api.search.album import GetAlbum
 from api.search.artist import GetArtist
 from api.search.autocomplete import Autocomplete
 from api.search.saavn_track import GetTrack
-from api.auth.authenticate import Authenticate
-from api.auth.change_password import ChangePassword
-from api.auth.create_user import CreateUser
-from api.auth.forgot_password import ForgotPassword, ValidatePasswordChangeToken
-from api.auth.single_sign_on import SingleSignOn
-from api.auth.register_device import RegisterDevice
+from api.auth.auth import Authenticate
+from api.auth.auth import ChangePassword
+from api.auth.auth import CreateUser
+from api.auth.auth import ForgotPassword, ValidatePasswordChangeToken
+from api.auth.auth import SingleSignOn
+from api.auth.auth import RegisterDevice
 from api.playlist.playlist import GetPlaylist, CreatePlaylist, DeletePlaylist, EditPlaylist, ListPlaylist
 from api.social.follow import ListFollowers, ListFollowing, FollowUser, RespondToFollowRequest, ListPendingRequests
 from api.social.user_search import UserSearch, GetUser, GetUserByEmail
