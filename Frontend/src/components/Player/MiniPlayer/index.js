@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {View, TouchableWithoutFeedback} from 'react-native';
 import {Slider, ListItem, Image} from 'react-native-elements';
 import {IconButton, Colors} from 'react-native-paper';
@@ -8,7 +8,7 @@ import {
 } from 'react-native-responsive-screen';
 
 import {useTrackPlayerProgress} from '../utils/player.hooks';
-import {PlayerContext} from '../../../contexts/player.context';
+import {usePlayerContext} from '../../../contexts/player.context';
 
 import {styles} from './player.styles';
 
@@ -21,7 +21,7 @@ export function MiniPlayer(props) {
     onPlay,
     onPause,
     trackDetails,
-  } = useContext(PlayerContext);
+  } = usePlayerContext();
 
   const {bufferedPosition, duration, position} = useTrackPlayerProgress();
 

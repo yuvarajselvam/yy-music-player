@@ -15,7 +15,11 @@ export function OverlayModal(props) {
       animationType="slide"
       transparent={true}
       visible={visible}>
-      <View style={{flex: 1, justifyContent: `${overlayPosition}`}}>
+      <View
+        style={[
+          styles.overlayContainer,
+          {justifyContent: `${overlayPosition}`},
+        ]}>
         <TouchableWithoutFeedback onPress={onBackdropPress}>
           <View style={styles.modelBackdrop} />
         </TouchableWithoutFeedback>
