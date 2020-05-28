@@ -24,7 +24,6 @@ export const styles = StyleSheet.create({
   titleStyle: {
     color: Colors.grey200,
     paddingBottom: hp(0.4),
-    fontWeight: 'bold',
     fontSize: wp(4),
   },
   listSubtitle: {
