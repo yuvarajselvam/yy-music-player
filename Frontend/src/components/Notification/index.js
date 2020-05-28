@@ -1,11 +1,10 @@
 import React from 'react';
 import {View} from 'react-native';
-import {ListItem} from 'react-native-elements';
-import {Colors} from 'react-native-paper';
 
 import {Header} from '../../widgets/Header';
+import ListItems from '../../widgets/ListItems';
 
-export function Notification(props) {
+function NotificationComponent(props) {
   const {navigation} = props;
 
   return (
@@ -16,13 +15,11 @@ export function Notification(props) {
         leftIconName="arrow-back"
         onLeftIconPress={() => navigation.goBack()}
       />
-      <ListItem
-        containerStyle={{margin: 0, backgroundColor: '#121212'}}
-        title={'Notifications'}
-        titleStyle={{marginBottom: 4}}
-        subtitle={'Coming soon !'}
-        subtitleStyle={{color: Colors.grey200}}
-      />
+      <ListItems titleText="Notification" subtitleText="Coming soon !" />
     </View>
   );
 }
+
+const Notification = React.memo(NotificationComponent);
+
+export {Notification};

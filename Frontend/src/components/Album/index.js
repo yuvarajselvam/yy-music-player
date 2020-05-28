@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
 import {View, ScrollView} from 'react-native';
-import {Image, Text, ListItem, Icon} from 'react-native-elements';
-import {Colors, IconButton} from 'react-native-paper';
+import {Image, Text, Icon} from 'react-native-elements';
+import {Colors} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
-import {heightPercentageToDP} from 'react-native-responsive-screen';
 
 import {Header} from '../../widgets/Header';
 import {trackService} from '../../services/track.service';
@@ -13,10 +12,11 @@ import {usePlayerContext} from '../../contexts/player.context';
 
 import {commonStyles} from '../common/styles';
 import {styles} from './album.style';
+import ListItems from '../../widgets/ListItems';
 
 export function Album(props) {
   const {navigation, route} = props;
-  let albumId = route.params._id;
+  let albumId = route.params.id;
   let albumlanguage = route.params.language;
   console.log('Album screen', albumlanguage);
   const [album, setAlbum] = useState({artists: [{name: ''}]});
@@ -27,7 +27,7 @@ export function Album(props) {
   useFocusEffect(
     React.useCallback(() => {
       let data = {
-        _id: albumId,
+        id: albumId,
         language: albumlanguage,
       };
       trackService.getAlbum(data).then(async response => {
@@ -42,27 +42,30 @@ export function Album(props) {
     }, [albumId, albumlanguage]),
   );
 
-  const handleTrackSelect = track => {
-    console.log(album.artists[0].name);
-    let data = {
-      _id: track._id,
-      language: albumlanguage,
-    };
-    if (!track.trackUrl) {
-      trackService.getTrack(data).then(async response => {
-        if (response.status === 200) {
-          let responseObj = await response.json();
-          onAddTrack(responseObj).then(() => {
-            onPlay();
-          });
-        }
-      });
-    } else {
-      onAddTrack(track).then(() => {
-        onPlay();
-      });
-    }
-  };
+  const handleTrackSelect = React.useCallback(
+    track => {
+      let data = {
+        id: track.id,
+        language: albumlanguage,
+      };
+      if (!track.trackUrl) {
+        trackService.getTrack(data).then(async response => {
+          if (response.status === 200) {
+            let responseObj = await response.json();
+            onAddTrack(responseObj).then(() => {
+              onPlay();
+            });
+          }
+        });
+      } else {
+        onAddTrack(track).then(() => {
+          onPlay();
+        });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [albumlanguage],
+  );
 
   return (
     <View style={commonStyles.screenStyle}>
@@ -87,38 +90,14 @@ export function Album(props) {
             onPress={() => console.log('hello')}
           />
         </View>
-        <View style={{flex: 1, paddingBottom: 24}}>
-          {albumTracks.map((track, index) => {
-            let artistsName = track.artists.map(artist => {
-              return artist.name;
-            });
-            let trackArtistsName = artistsName.join(', ');
-            return (
-              <ListItem
-                containerStyle={styles.listContainer}
-                contentContainerStyle={styles.contentContainerStyle}
-                // leftElement={
-                //   <View style={{paddingLeft: 10, alignItems: 'center'}}>
-                //     <Text style={{color: Colors.grey200}}>{trackNumber}</Text>
-                //   </View>
-                // }
-                rightElement={
-                  <IconButton
-                    style={styles.listVerticalButton}
-                    color={Colors.grey200}
-                    size={heightPercentageToDP(2.8)}
-                    icon="dots-vertical"
-                  />
-                }
-                key={track._id}
-                title={track.name}
-                titleStyle={styles.titleStyle}
-                subtitle={trackArtistsName}
-                subtitleStyle={styles.listSubtitle}
-                onPress={() => handleTrackSelect(track)}
-              />
-            );
-          })}
+        <View style={{flex: 1}}>
+          <ListItems
+            options={albumTracks}
+            titleKeys={['name']}
+            subtitleKeys={['name']}
+            onPress={handleTrackSelect}
+            rightIconName="more-vert"
+          />
         </View>
       </ScrollView>
     </View>

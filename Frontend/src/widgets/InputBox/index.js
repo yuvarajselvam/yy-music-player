@@ -1,7 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Input} from 'react-native-elements';
 
 import {styles} from './input.styles';
+
+InputBox.propTypes = {
+  label: PropTypes.string,
+  type: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  onChangeText: PropTypes.func,
+};
 
 export function InputBox(props) {
   let inputConfigObj = {};
@@ -75,7 +83,9 @@ export function InputBox(props) {
       blurOnSubmit={inputConfigObj.blurOnSubmit}
       maxLength={inputConfigObj.maxLength}
       secureTextEntry={inputConfigObj.secureTextEntry}
-      {...props}
+      value={props.value}
+      label={props.label}
+      onChangeText={props.onChangeText}
     />
   );
 }

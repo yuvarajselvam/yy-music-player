@@ -43,32 +43,6 @@ export const styles = StyleSheet.create({
     elevation: 0,
     // height: hp('6.4%'),
   },
-  listImage: {
-    width: wp(12),
-    height: hp(6),
-  },
-  listTitle: {
-    width: wp('64%'),
-    flex: 1,
-    fontSize: wp(4),
-    color: Colors.grey200,
-  },
-  listContainer: {
-    backgroundColor: '#121212',
-    borderWidth: 0,
-    borderBottomWidth: 0,
-    borderTopWidth: 0,
-  },
-  listSubtitle: {
-    width: wp(58),
-    flex: 1,
-    color: Colors.grey200,
-    fontSize: wp(3),
-  },
-  listVerticalButton: {
-    alignItems: 'flex-end',
-    margin: 0,
-  },
   overlayContainer: {flex: 1, opacity: 0.7, backgroundColor: Colors.black},
   overlay: {
     position: 'absolute',

@@ -1,12 +1,8 @@
 import React, {useState} from 'react';
 import {View, ScrollView, Alert} from 'react-native';
-import {ListItem, Image, Text, Overlay, Button} from 'react-native-elements';
+import {Image, Text, Button} from 'react-native-elements';
 import {Colors, IconButton} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
-import {
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from 'react-native-responsive-screen';
 
 import {Header} from '../../widgets/Header';
 import {trackService} from '../../services/track.service';
@@ -17,12 +13,14 @@ import {usePlayerContext} from '../../contexts/player.context';
 import {commonStyles} from '../common/styles';
 import {styles} from './playlist.styles';
 import {useAuthContext} from '../../contexts/auth.context';
+import ListItems from '../../widgets/ListItems';
+import {OverlayModal} from '../../widgets/OverlayModal';
 
 export function Playlist(props) {
   console.log('Playlist screen');
   const {navigation, route} = props;
   const playlistId = route.params.playlistId;
-  const [trackId, setTrackId] = useState('');
+  const [track, setTrack] = useState('');
   const [playlist, setPlaylist] = useState({});
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [isTrackMenuOverlayOpen, setIsTrackMenuOverlayOpen] = useState(false);
@@ -31,7 +29,7 @@ export function Playlist(props) {
 
   const getPlaylistService = () => {
     let data = {
-      _id: playlistId,
+      id: playlistId,
     };
     trackService.getPlaylist(data).then(async response => {
       if (response.status === 200) {
@@ -51,24 +49,25 @@ export function Playlist(props) {
     }, [playlistId]),
   );
 
-  const handleTrackSelect = track => {
-    console.log(track);
+  const handleTrackSelect = React.useCallback(trackObj => {
+    // console.log(trackObj);
     let data = {
-      _id: track.id,
+      id: trackObj.id,
       language: 'Tamil',
     };
     trackService.getTrack(data).then(async response => {
-      let trackObj = await response.json();
-      onAddTrack(trackObj).then(() => {
+      let responseObj = await response.json();
+      onAddTrack(responseObj).then(() => {
         onPlay();
       });
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const handleTrackMenu = track => {
+  const handleTrackMenu = React.useCallback(trackObj => {
     setIsTrackMenuOverlayOpen(true);
-    setTrackId(track);
-  };
+    setTrack(trackObj);
+  }, []);
 
   return (
     <View style={commonStyles.screenStyle}>
@@ -85,37 +84,22 @@ export function Playlist(props) {
           <Text style={{color: Colors.grey200}}>Various Artists</Text>
         </View>
         <View style={{flex: 1}}>
-          {playlistTracks.map((track, index) => {
-            return (
-              <ListItem
-                containerStyle={styles.listContainer}
-                contentContainerStyle={{padding: 10}}
-                onPress={() => handleTrackSelect(track)}
-                key={index}
-                title={track.name}
-                // titleStyle={{color: Colors.grey200}}
-                subtitle={track.artists}
-                subtitleStyle={{color: Colors.grey200}}
-                rightElement={
-                  <IconButton
-                    style={styles.listVerticalButton}
-                    color={Colors.grey200}
-                    size={heightPercentageToDP(2.8)}
-                    icon="dots-vertical"
-                    onPress={() => handleTrackMenu(track)}
-                  />
-                }
-              />
-            );
-          })}
+          <ListItems
+            options={playlistTracks}
+            titleKeys={['name']}
+            subtitleKeys={['artists']}
+            rightIconName="more-vert"
+            onRightIconPress={handleTrackMenu}
+            onPress={handleTrackSelect}
+          />
         </View>
       </ScrollView>
       <TrackOverlayMenu
         setIsTrackMenuOverlayOpen={setIsTrackMenuOverlayOpen}
         isTrackMenuOverlayOpen={isTrackMenuOverlayOpen}
-        trackObj={trackId}
-        playlistId={playlistId}
+        trackObj={track}
         getPlaylistService={getPlaylistService}
+        playlist={playlist}
       />
     </View>
   );
@@ -126,17 +110,17 @@ function TrackOverlayMenu(props) {
     isTrackMenuOverlayOpen,
     setIsTrackMenuOverlayOpen,
     trackObj,
-    playlistId,
     getPlaylistService,
+    playlist,
   } = props;
 
   const {userInfo} = useAuthContext();
 
   const handleEditPlaylist = () => {
     let track = {
-      _id: playlistId,
-      tracks: [trackObj],
-      owner: userInfo.id,
+      id: playlist.id,
+      tracks: [trackObj.id],
+      userId: userInfo.id,
     };
 
     setIsTrackMenuOverlayOpen(false);
@@ -151,17 +135,11 @@ function TrackOverlayMenu(props) {
   };
 
   return (
-    <Overlay
-      height={heightPercentageToDP('20%')}
-      width={widthPercentageToDP('100%')}
-      containerStyle={styles.overlayContainer}
-      transparent={true}
-      overlayStyle={styles.overlay}
-      animationType="fade"
-      overlayBackgroundColor={Colors.grey900}
-      isVisible={isTrackMenuOverlayOpen}
+    <OverlayModal
+      position="bottom"
+      visible={isTrackMenuOverlayOpen}
       onBackdropPress={() => setIsTrackMenuOverlayOpen(false)}>
-      <View style={styles.overlayContent}>
+      <View>
         <Button
           icon={<IconButton color={Colors.grey200} icon="playlist-remove" />}
           buttonStyle={styles.overlayButtons}
@@ -178,6 +156,6 @@ function TrackOverlayMenu(props) {
           titleStyle={styles.overlayButtonTitle}
         />
       </View>
-    </Overlay>
+    </OverlayModal>
   );
 }
