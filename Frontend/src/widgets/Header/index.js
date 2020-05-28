@@ -1,9 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Appbar, Colors} from 'react-native-paper';
 
 import {styles} from './header.styles';
 import {Icon} from 'react-native-elements';
 import {View, TouchableWithoutFeedback} from 'react-native';
+
+Header.propTypes = {
+  navigation: PropTypes.object,
+  title: PropTypes.string,
+  leftIconName: PropTypes.string,
+  onLeftIconPress: PropTypes.func,
+  rightIconName: PropTypes.string,
+  onRightIconPress: PropTypes.func,
+};
 
 export function Header(props) {
   const {
