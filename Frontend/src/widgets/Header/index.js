@@ -2,6 +2,8 @@ import React from 'react';
 import {Appbar, Colors} from 'react-native-paper';
 
 import {styles} from './header.styles';
+import {Icon} from 'react-native-elements';
+import {View, TouchableWithoutFeedback} from 'react-native';
 
 export function Header(props) {
   const {
@@ -16,32 +18,29 @@ export function Header(props) {
   return (
     <Appbar style={styles.appHeader}>
       {leftIconName ? (
-        <Appbar.Action
-          icon={leftIconName}
-          color="#E0E0E0"
-          onPress={onLeftIconPress}
-        />
+        <TouchableWithoutFeedback onPress={onLeftIconPress}>
+          <View>
+            <Icon name={leftIconName} color="#E0E0E0" />
+          </View>
+        </TouchableWithoutFeedback>
       ) : (
-        <Appbar.Action
-          icon="menu"
-          color="#E0E0E0"
-          onPress={() => navigation.toggleDrawer()}
-        />
+        <TouchableWithoutFeedback onPress={() => navigation.toggleDrawer()}>
+          <View>
+            <Icon name="menu" color="#E0E0E0" />
+          </View>
+        </TouchableWithoutFeedback>
       )}
       <Appbar.Content title={title} titleStyle={{color: Colors.grey200}} />
-      {rightIconName ? (
-        <Appbar.Action
-          icon={rightIconName}
-          color="#E0E0E0"
-          onPress={onRightIconPress}
-        />
-      ) : (
-        <Appbar.Action
-          icon="magnify"
-          color="#E0E0E0"
-          onPress={() => navigation.navigate('Search')}
-        />
-      )}
+      <TouchableWithoutFeedback onPress={onRightIconPress}>
+        <View style={{alignItems: 'center'}}>
+          <Icon
+            name={rightIconName}
+            color="#E0E0E0"
+            onPress={onRightIconPress}
+            type={'material-community'}
+          />
+        </View>
+      </TouchableWithoutFeedback>
     </Appbar>
   );
 }

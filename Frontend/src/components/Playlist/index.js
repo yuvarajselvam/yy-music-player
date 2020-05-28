@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState} from 'react';
 import {View, ScrollView, Alert} from 'react-native';
 import {ListItem, Image, Text, Overlay, Button} from 'react-native-elements';
 import {Colors, IconButton} from 'react-native-paper';
@@ -9,30 +9,31 @@ import {
 } from 'react-native-responsive-screen';
 
 import {Header} from '../../widgets/Header';
-import {authService} from '../../services/auth.service';
-import {PlayerContext} from '../../contexts/player.context';
+import {trackService} from '../../services/track.service';
+import {usePlayerContext} from '../../contexts/player.context';
 
 // import {mockPlaylist} from '../../mocks/playlist';
 
 import {commonStyles} from '../common/styles';
 import {styles} from './playlist.styles';
+import {useAuthContext} from '../../contexts/auth.context';
 
 export function Playlist(props) {
   console.log('Playlist screen');
   const {navigation, route} = props;
-  let playlistId = route.params.playlistId;
-  const [playlist, setPlaylist] = useState([]);
+  const playlistId = route.params.playlistId;
   const [trackId, setTrackId] = useState('');
+  const [playlist, setPlaylist] = useState({});
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [isTrackMenuOverlayOpen, setIsTrackMenuOverlayOpen] = useState(false);
 
-  const {onAddTrack, onPlay} = useContext(PlayerContext);
+  const {onAddTrack, onPlay} = usePlayerContext();
 
   const getPlaylistService = () => {
     let data = {
       _id: playlistId,
     };
-    authService.getPlaylist(data).then(async response => {
+    trackService.getPlaylist(data).then(async response => {
       if (response.status === 200) {
         let responseData = await response.json();
         console.log('Playlist ===', responseData);
@@ -56,7 +57,7 @@ export function Playlist(props) {
       _id: track.id,
       language: 'Tamil',
     };
-    authService.getTrack(data).then(async response => {
+    trackService.getTrack(data).then(async response => {
       let trackObj = await response.json();
       onAddTrack(trackObj).then(() => {
         onPlay();
@@ -75,7 +76,7 @@ export function Playlist(props) {
       <ScrollView>
         <View style={{alignItems: 'center', padding: 12}}>
           <Image
-            source={{uri: playlist.imageUrl}}
+            // source={{uri: playlist.imageUrl}}
             style={{width: 100, height: 100}}
           />
           <Text h4 style={{color: Colors.grey200, padding: 8}}>
@@ -129,15 +130,17 @@ function TrackOverlayMenu(props) {
     getPlaylistService,
   } = props;
 
+  const {userInfo} = useAuthContext();
+
   const handleEditPlaylist = () => {
     let track = {
       _id: playlistId,
       tracks: [trackObj],
-      owner: '5e7baa1a88a82254f4f8daed',
+      owner: userInfo.id,
     };
 
     setIsTrackMenuOverlayOpen(false);
-    authService.removeFromPlaylist(track).then(response => {
+    trackService.removeFromPlaylist(track).then(response => {
       if (response.status === 200) {
         Alert.alert('Success!', 'Track deleted successfully');
         getPlaylistService();

@@ -1,21 +1,19 @@
-import React, {useState} from 'react';
-import {View, Alert} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Alert, InteractionManager} from 'react-native';
 import {Card, ListItem, Button, Overlay, Text} from 'react-native-elements';
 import {Colors, Switch, IconButton} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
-import {
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from 'react-native-responsive-screen';
+import {heightPercentageToDP} from 'react-native-responsive-screen';
 
 import {Header} from '../../widgets/Header';
 import {InputBox} from '../../widgets/InputBox';
-import {authService} from '../../services/auth.service';
+import {trackService} from '../../services/track.service';
 import {OverlayModal} from '../../widgets/OverlayModal';
 // import {mockMyPlaylists} from '../../mocks/my.playlists';
 
 import {commonStyles} from '../common/styles';
 import {styles} from './myplaylists.styles';
+import {useAuthContext} from '../../contexts/auth.context';
 
 export function MyPlaylists({navigation}) {
   const [
@@ -31,17 +29,16 @@ export function MyPlaylists({navigation}) {
 
   useFocusEffect(
     React.useCallback(() => {
-      // Do something when the screen is focused
       getPlaylistService();
       return () => {};
     }, []),
   );
 
   const getPlaylistService = () => {
-    authService.getMyPlaylists().then(async response => {
+    trackService.getMyPlaylists().then(async response => {
       if (response.status === 200) {
         let responseData = await response.json();
-        console.log('Playlists ===', responseData);
+        // console.log('Playlists ===', responseData);
         setPlaylists(responseData);
       } else if (response.status === 204) {
         setPlaylists([]);
@@ -120,6 +117,8 @@ function CreatePlaylistOverlay(props) {
   const [isPublic, setIsPublic] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  const {userInfo} = useAuthContext();
+
   const handleBackdropPress = () => {
     setIsCreatePlaylistOverlayOpen(false);
     setPlaylistName('');
@@ -131,15 +130,16 @@ function CreatePlaylistOverlay(props) {
       setErrorMessage('Playlist name cannot be empty');
       return;
     }
+    console.log('creating playlist', userInfo);
     let data = {
       name: playlistName,
       type: 'playlist',
-      owner: '5eb98e89e7d1c209066a8315',
+      owner: userInfo.id,
     };
     if (isPublic) {
       data.scope = 'public';
     }
-    authService.createPlaylist(data).then(response => {
+    trackService.createPlaylist(data).then(response => {
       if (response.status === 201) {
         setIsCreatePlaylistOverlayOpen(false);
         setPlaylistName('');
@@ -160,16 +160,10 @@ function CreatePlaylistOverlay(props) {
   };
 
   return (
-    <Overlay
-      height={heightPercentageToDP('30%')}
-      width={widthPercentageToDP('60%')}
-      isVisible={isCreatePlaylistOverlayOpen}
-      containerStyle={{opacity: 0.8}}
-      overlayStyle={{padding: 16}}
-      windowBackgroundColor={Colors.black}
-      overlayBackgroundColor={Colors.grey700}
+    <OverlayModal
+      visible={isCreatePlaylistOverlayOpen}
       onBackdropPress={handleBackdropPress}>
-      <View style={{flex: 1, justifyContent: 'space-around'}}>
+      <View style={{justifyContent: 'space-evenly', padding: 16}}>
         <InputBox
           errorMessage={errorMessage}
           erro
@@ -186,7 +180,7 @@ function CreatePlaylistOverlay(props) {
         </View>
         <Button title={'Create'} onPress={handleCreatePlaylist} />
       </View>
-    </Overlay>
+    </OverlayModal>
   );
 }
 
@@ -198,14 +192,16 @@ function OverlayMenu(props) {
     playlistId,
   } = props;
 
+  const {userInfo} = useAuthContext();
+
   const handleDeletePlaylist = () => {
     let playlist = {
       _id: playlistId,
-      owner: '5eb98e89e7d1c209066a8315',
+      owner: userInfo.id,
     };
 
     setIsPlaylistMenuOverlayOpen(false);
-    authService.deletePlaylist(playlist).then(response => {
+    trackService.deletePlaylist(playlist).then(response => {
       if (response.status === 200) {
         getPlaylistService();
         Alert.alert('Deleted!', 'Playlist deleted successfully');

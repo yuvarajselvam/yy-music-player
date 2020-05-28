@@ -9,3 +9,7 @@ export const getLocalStore = async () => {
 export const setLocalStore = async obj => {
   await AsyncStorage.setItem('localStore', JSON.stringify(obj));
 };
+
+export const removeLocalStore = async obj => {
+  await AsyncStorage.clear();
+};
