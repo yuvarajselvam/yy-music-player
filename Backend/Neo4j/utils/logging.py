@@ -24,7 +24,7 @@ class Logger:
 
             for k, v in req.items():
                 if isinstance(v, str):
-                    s += f"{k:<14s} : {v:<81.81s}\n"
+                    s += f"{k:<14s} : {v:<181.181s}\n"
                 elif isinstance(v, list):
                     s += f"{k:<14s} : {str(len(v)) + ' item(s) received.':<81.81s}\n"
             self.log(12, s)
@@ -39,14 +39,14 @@ class Logger:
                 if response.json:
                     for k, v in response.json.items():
                         if isinstance(v, str):
-                            s += f"{k:<14s} : {v:<81.81s}\n"
+                            s += f"{k:<14s} : {v:<181.181s}\n"
                         elif isinstance(v, list):
-                            s += f"{k:<14s} : {str(len(v)) + ' item(s) returned.':<81.81s}\n"
+                            s += f"{k:<14s} : {str(len(v)) + ' item(s) returned.':<181.181s}\n"
                 else:
                     s = response.data
                 if isinstance(s, str):
                     s += "\n"
-                    s += "".center(100, '-')
+                    s += "".center(200, '-')
                     s += '\n'
                     self.log(11, s)
         except Exception as e:
