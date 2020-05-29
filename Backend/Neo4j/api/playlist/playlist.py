@@ -1,12 +1,17 @@
 from flask import request, jsonify
 from flask_restplus import Namespace, Resource
 
+from firebase_admin.messaging import UnregisteredError
+
+from models.DeviceModel import Device
 from models.UserModel import User
 from models.PlaylistModel import Playlist
 from models.TrackModel import Track
 
 from utils.logging import Logger
+from utils.notifications import NotificationUtil as Notify
 from utils.response import check_required_fields, make_response
+
 
 logger = Logger("playlist").logger
 playlist_ns = Namespace('Playlist', description='Endpoints that create/edit/retrieve playlists')
@@ -17,7 +22,7 @@ class CreatePlaylist(Resource):
     def post(self):
         """Creates a new playlist for user"""
         request_json = request.get_json()
-        required_fields = ["owner"]
+        required_fields = ["name", "owner"]
 
         is_bad_request = check_required_fields(required_fields, request_json)
         if bool(is_bad_request):
@@ -78,7 +83,7 @@ class EditPlaylist(Resource):
     def put(self, _id):
         """Adds/Removes tracks to a playlist or edits playlist details"""
         request_json = request.get_json()
-        required_fields = ["operation", "tracks", "userId"]
+        required_fields = ["operation", "tracks"]
 
         is_bad_request = check_required_fields(required_fields, request_json)
         if bool(is_bad_request):
@@ -88,11 +93,11 @@ class EditPlaylist(Resource):
         if not playlist:
             return make_response((f"Playlist[{_id}] not found.", 404))
 
-        user = User.find_one(id=request_json["userId"])
+        user = User.find_one(id=request.user)
         if not user:
-            return make_response((f"User[{request_json['userId']}] not found.", 404))
+            return make_response((f"User[{request.user}] not found.", 404))
 
-        if playlist.check_visibility(user.get_node()):
+        if playlist.check_ownership(user.get_node()):
             for track_id in request_json["tracks"]:
                 track = Track.find_one(id=track_id)
                 if request_json["operation"] == "addTracks":
@@ -102,15 +107,31 @@ class EditPlaylist(Resource):
                 else:
                     return make_response((f"Invalid operation[{request_json['operation']}]", 400))
         else:
-            return make_response((f"User[{request_json['userId']}] does not have access to the playlist[{_id}].", 401))
+            return make_response((f"User[{request.user}] does not have access to the playlist[{_id}].", 401))
 
 
 class DeletePlaylist(Resource):
     @playlist_ns.doc("Deletes a playlist")
     def delete(self, _id):
         """Deletes a playlist"""
+        playlist = Playlist.find_one(id=_id)
+        if not playlist:
+            return make_response((f"Playlist[{_id}] not found.", 404))
+
+        user = User.find_one(id=request.user)
+        if playlist.check_ownership(user.get_node()):
+            playlist.delete()
+            return make_response(("Delete successful.", 200))
+        else:
+            return make_response((f"User{request.user} does not have permissions to delete.", 401))
+
+
+class SharePlaylist(Resource):
+    @playlist_ns.doc("Shares the playlist to users given a Playlist ID and a list of User IDs")
+    def post(self, _id):
+        """Shares the playlist to users given a Playlist ID and a list of User IDs"""
         request_json = request.get_json()
-        required_fields = ["userId"]
+        required_fields = ["people"]
 
         is_bad_request = check_required_fields(required_fields, request_json)
         if bool(is_bad_request):
@@ -120,8 +141,36 @@ class DeletePlaylist(Resource):
         if not playlist:
             return make_response((f"Playlist[{_id}] not found.", 404))
 
-        playlist.delete()
-        return make_response(("Delete successful.", 200))
+        current_user = User.find_one(id=request.user)
+        for user_id in request_json["people"]:
+            user = User.find_one(id=user_id)
+            if not user:
+                return make_response((f"User[{request_json['userId']}] not found.", 404))
+
+            if playlist.scope == 'PUBLIC' or playlist.check_ownership(current_user.get_node()):
+                playlist.share(user.get_node())
+                data_payload = {"Message": f"Playlist has been shared with you."}
+                notify_payload = {"title": f"Playlist has been shared with you.", "body": ""}
+                for device in user.get_devices():
+                    try:
+                        Notify.send(token=device["token"], data=data_payload, notification=notify_payload)
+                    except UnregisteredError:
+                        device = Device.find_one(id=device["id"])
+                        device.delete()
+                return make_response(("Playlist shared successfully.", 200))
+            else:
+                return make_response((f"User{request.user} does not have permissions to share.", 401))
+
+
+class ListSharedPlaylists(Resource):
+    @playlist_ns.doc("Returns a list of user's shared playlists given an User ID")
+    def get(self, _user_id):
+        """Returns a list of user's shared playlists given an User ID"""
+        user = User.find_one(id=_user_id)
+        if not user:
+            return make_response((f"User[{_user_id}] not found.", 404))
+
+        return {"sharedPlaylists": user.get_shared_playlists()}, 200
 
 
 playlist_ns.add_resource(CreatePlaylist, '/playlist/create/')
@@ -129,4 +178,6 @@ playlist_ns.add_resource(GetPlaylist, '/user/<_user_id>/playlist/<_id>/')
 playlist_ns.add_resource(ListPlaylists, '/user/<_user_id>/playlists/')
 playlist_ns.add_resource(EditPlaylist, '/playlist/<_id>/edit/')
 playlist_ns.add_resource(DeletePlaylist, '/playlist/<_id>/delete/')
+playlist_ns.add_resource(SharePlaylist, '/playlist/<_id>/share/')
+playlist_ns.add_resource(ListSharedPlaylists, '/user/<_user_id>/shared-playlists/')
 
