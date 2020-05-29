@@ -1,7 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {View, Modal, TouchableWithoutFeedback} from 'react-native';
 
 import {styles} from './overlay.modal.styles';
+
+OverlayModal.propTypes = {
+  visible: PropTypes.bool,
+  position: PropTypes.string,
+  onBackdropPress: PropTypes.func,
+  children: PropTypes.any,
+};
 
 export function OverlayModal(props) {
   const {children, visible, position, onBackdropPress} = props;
@@ -15,7 +23,11 @@ export function OverlayModal(props) {
       animationType="slide"
       transparent={true}
       visible={visible}>
-      <View style={{flex: 1, justifyContent: `${overlayPosition}`}}>
+      <View
+        style={[
+          styles.overlayContainer,
+          {justifyContent: `${overlayPosition}`},
+        ]}>
         <TouchableWithoutFeedback onPress={onBackdropPress}>
           <View style={styles.modelBackdrop} />
         </TouchableWithoutFeedback>

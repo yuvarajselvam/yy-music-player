@@ -17,8 +17,8 @@ const initialState = {};
 
 const reducer = (user, action) => {
   switch (action.type) {
-    case 'FullName':
-      return {...user, fullName: action.value};
+    case 'Name':
+      return {...user, name: action.value};
     case 'Email':
       return {...user, email: action.value};
     case 'PhoneNumber':
@@ -48,7 +48,7 @@ export function Signup({navigation}) {
     if (state.password === state.confirmPassword) {
       let data = {
         email: state.email,
-        fullName: state.fullName,
+        name: state.name,
         password: state.password,
         phone: state.phone,
       };
@@ -84,10 +84,10 @@ export function Signup({navigation}) {
           />
           <Text style={styles.signupHeading}>SIGN UP</Text>
           <InputBox
-            label="Full Name"
+            label="Name"
             type="text"
-            value={state.fullName}
-            onChangeText={value => setInputValue(value, 'FullName')}
+            value={state.name}
+            onChangeText={value => setInputValue(value, 'Name')}
           />
           <InputBox
             label="Email"
