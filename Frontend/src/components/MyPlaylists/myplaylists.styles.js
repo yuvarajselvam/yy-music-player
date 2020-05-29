@@ -1,6 +1,9 @@
 import {StyleSheet} from 'react-native';
 import {Colors} from 'react-native-paper';
-import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 export const styles = StyleSheet.create({
   card: {
@@ -37,5 +40,6 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: hp(2),
   },
 });

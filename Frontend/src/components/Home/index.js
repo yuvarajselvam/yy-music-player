@@ -3,6 +3,7 @@ import {View} from 'react-native';
 
 import {commonStyles} from '../common/styles';
 import {Header} from '../../widgets/Header';
+import {Text} from 'react-native-elements';
 
 export function Home({navigation}) {
   useEffect(() => {
@@ -11,8 +12,15 @@ export function Home({navigation}) {
 
   return (
     <View style={commonStyles.screenStyle}>
-      <Header navigation={navigation} title="Home" />
-      <View />
+      <Header
+        navigation={navigation}
+        title="Home"
+        rightIconName="bell"
+        onRightIconPress={() => navigation.navigate('Notification')}
+      />
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <Text>Home Screen Coming soon !</Text>
+      </View>
     </View>
   );
 }
