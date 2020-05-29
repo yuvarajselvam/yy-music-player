@@ -1,4 +1,4 @@
-import React, {useContext, useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Image} from 'react-native';
 import {Slider, Icon, Text} from 'react-native-elements';
 import {Colors} from 'react-native-paper';
@@ -8,7 +8,7 @@ import {getColorFromURL} from 'rn-dominant-color';
 import LinearGradient from 'react-native-linear-gradient';
 
 import {useTrackPlayerProgress} from '../utils/player.hooks';
-import {PlayerContext} from '../../../contexts/player.context';
+import {usePlayerContext} from '../../../contexts/player.context';
 
 import {styles} from './mainplayer.styles';
 import {Header} from '../../../widgets/Header';
@@ -22,7 +22,7 @@ export function MainPlayer(props) {
     onPause,
     updateSeekPosition,
     getTrackDetails,
-  } = useContext(PlayerContext);
+  } = usePlayerContext();
 
   const [trackColors, setTrackColors] = useState({
     primary: '#121212',
@@ -122,7 +122,7 @@ export function MainPlayer(props) {
         style={styles.trackGradient}
       />
       <Header
-        leftIconName="chevron-down"
+        leftIconName="keyboard-arrow-down"
         onLeftIconPress={() => navigation.goBack()}
         rightIconName="dots-vertical"
         onRightIconPress={() => console.log('album details')}

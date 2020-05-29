@@ -61,12 +61,12 @@ function CustomTabBar(props) {
           size={24}
           color={Colors.white}
         />
-        {/* <IconButton
+        <IconButton
           onPress={() => navigation.navigate('Search')}
           icon={'magnify'}
           size={24}
           color={Colors.white}
-        /> */}
+        />
         <IconButton
           onPress={() => navigation.navigate('MyPlaylist')}
           icon={'playlist-music'}
@@ -83,22 +83,3 @@ function CustomTabBar(props) {
     </View>
   );
 }
-
-// screenOptions={({route}) => ({
-//   tabBarIcon: ({focused, color, size}) => {
-//     let iconName;
-//     if (route.name === 'Home') {
-//       iconName = focused ? 'home' : 'home-outline';
-//     } else if (route.name === 'Playlist') {
-//       iconName = focused ? 'playlist-music' : 'playlist-music-outline';
-//     } else if (route.name === 'My Music') {
-//       iconName = 'music';
-//     }
-//     return <IconButton icon={iconName} size={size} color={color} />;
-//   },
-// })}
-// tabBarOptions={{
-//   style: styles.bottomBar,
-//   labelStyle: {padding: 0, marginBottom: heightPercentageToDP(0.6)},
-//   activeTintColor: '#7a7cff',
-// }}
