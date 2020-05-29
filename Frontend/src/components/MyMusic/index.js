@@ -1,14 +1,17 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
-import {Text} from 'react-native-elements';
+import {Text, Input} from 'react-native-elements';
+
+import {Header} from '../../widgets/Header';
 
 import {commonStyles} from '../common/styles';
-import {Header} from '../../widgets/Header';
+import {styles} from './mymusic.styles';
 
 export function MyMusic({navigation}) {
   return (
     <View style={commonStyles.screenStyle}>
       <Header navigation={navigation} title="My Music" />
+
       <Text
         style={{
           flex: 1,

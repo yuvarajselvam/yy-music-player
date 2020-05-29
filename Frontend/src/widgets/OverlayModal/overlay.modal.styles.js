@@ -5,11 +5,14 @@ import {
 } from 'react-native-responsive-screen';
 
 export const styles = StyleSheet.create({
+  overlayContainer: {
+    flex: 1,
+    padding: wp(1),
+  },
   modelBackdrop: {
     width: wp('100%'),
     height: hp('100%'),
     position: 'absolute',
-    // justifyContent: 'flex-end',
     opacity: 0.8,
     backgroundColor: '#000000',
   },
