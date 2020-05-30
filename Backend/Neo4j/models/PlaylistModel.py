@@ -29,9 +29,12 @@ class Playlist:
         [setattr(self, k, v) for arg in args for k, v in arg.items() if hasattr(self, k)]
         [setattr(self, k, v) for k, v in kwargs.items() if hasattr(self, k)]
 
-    def json(self):
+    def json(self, deep=True):
         attributes = inspect.getmembers(self, lambda a: not (inspect.isroutine(a)))
-        return dict([(a, v) for a, v in attributes if not (a.startswith('_')) and v])
+        if deep:
+            return dict([(a, v) for a, v in attributes if not (a.startswith('_')) and v])
+        else:
+            return dict([(a, v) for a, v in attributes if not (a.startswith('_')) and a not in ['tracks'] and v])
 
     def validate(self):
         for field in self._required_fields:
@@ -45,11 +48,11 @@ class Playlist:
             self.id = uuid.uuid4().hex
             self._createdAt = neotime.DateTime.from_native(datetime.datetime.now())
             self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
-            playlist = Node('Playlist', **self.json())
+            playlist = Node('Playlist', **self.json(deep=False))
             graph.create(playlist)
             self._node = playlist
         else:
-            playlist = Node('Playlist', **self.json())
+            playlist = Node('Playlist', **self.json(deep=False))
             self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
             graph.merge(playlist, "Playlist", "id")
             self._node = playlist
@@ -68,10 +71,17 @@ class Playlist:
         else:
             raise Exception("Playlist/Owner node does not exist.")
 
-    def check_visibility(self, user_node):
+    def check_ownership(self, user_node):
         if self._node and user_node:
             relationships = get_relationships((self._node, user_node))
             return "OWNED_BY" in relationships
+        else:
+            raise Exception("Playlist/User node does not exist.")
+
+    def check_visibility(self, user_node):
+        if self._node and user_node:
+            relationships = get_relationships((self._node, user_node))
+            return bool({"OWNED_BY", "SHARED_WITH"} & relationships)
         else:
             raise Exception("Playlist/User node does not exist.")
 
@@ -91,6 +101,15 @@ class Playlist:
                 graph.separate(rel.first())
         else:
             raise Exception("Playlist/Track node does not exist.")
+
+    def share(self, user_node):
+        if self._node and user_node:
+            relationships = get_relationships((self._node, user_node))
+            if not {"OWNED_BY", "SHARED_WITH"} & relationships:
+                playlist_user = Relationship(self._node, "SHARED_WITH", user_node)
+                graph.create(playlist_user)
+        else:
+            raise Exception("Playlist/User node does not exist.")
 
     def delete(self):
         if self._node:

@@ -28,6 +28,7 @@ def before_request():
             if auth_token:
                 try:
                     jwt_data = jwt.decode(auth_token.group(1), Secrets.JWT_SECRET_KEY)
+                    request.user = jwt_data["userId"]
                 except jwt.ExpiredSignatureError:
                     jwt_data = jwt.decode(auth_token.group(1), Secrets.JWT_SECRET_KEY, options={'verify_exp': False})
                     return make_response((f"Token expired for user[{jwt_data['userId']}]", 401))
