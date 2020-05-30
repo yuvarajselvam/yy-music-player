@@ -29,11 +29,14 @@ def get_related_nodes(nodes, rel_type, **kwargs):
 
 
 def music_search(search_term):
-    search_term = ' '.join([term + '~' for term in search_term.split(' ') if len(term)])
-    query = f'''CALL db.index.fulltext.queryNodes("albumsAndTrackName", "{search_term}") 
-                YIELD node
-                RETURN node.id as id, node.name as name, node.artists as artists, 
-                       node.imageUrl as imageUrl, labels(node)[0] as type, 'tamil' as language                    
-                LIMIT 20'''
-    cursor = graph.run(query)
-    return cursor.data()
+    if search_term.strip():
+        fuzzy_term = ' '.join([term + '~' for term in search_term.split(' ') if len(term)])
+        query = f'''CALL db.index.fulltext.queryNodes("searchTermIndex", "{fuzzy_term} searchTerm:{search_term}") 
+                    YIELD node
+                    RETURN node.id as id, node.name as name, node.artists as artists, 
+                           node.imageUrl as imageUrl, labels(node)[0] as type, 'tamil' as language                    
+                    LIMIT 20'''
+        cursor = graph.run(query)
+        return cursor.data()
+    else:
+        return []
