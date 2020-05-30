@@ -1,10 +1,8 @@
 import inspect
 
-from py2neo import Node
-
 from utils.extensions import neo4j
 from utils.querying import get_related_nodes
-from utils.selenium import get_track_url
+from utils.selenium import BrowserService
 
 
 graph = neo4j.get_db()
@@ -82,5 +80,5 @@ class Track:
 
     @property
     def trackUrl(self):
-        return get_track_url(self.saavnUrl)
+        return BrowserService.get_track_url(self.saavnUrl)
 

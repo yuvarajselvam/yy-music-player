@@ -166,6 +166,9 @@ class User:
     def get_playlists(self):
         return get_related_nodes((None, self._node), 'OWNED_BY')
 
+    def get_shared_playlists(self):
+        return get_related_nodes((None, self._node), 'SHARED_WITH')
+
     def get_linked_accounts(self, **kwargs):
         return get_related_nodes((None, self._node), 'LINKED_TO', **kwargs)
 
