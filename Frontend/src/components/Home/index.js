@@ -15,7 +15,7 @@ export function Home({navigation}) {
       <Header
         navigation={navigation}
         title="Home"
-        rightIconName="bell"
+        rightIconName="notifications"
         onRightIconPress={() => navigation.navigate('Notification')}
       />
       <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
