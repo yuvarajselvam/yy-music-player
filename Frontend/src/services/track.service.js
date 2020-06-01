@@ -47,9 +47,20 @@ export const trackService = {
     return putMethod(endPoint, data);
   },
 
+  sharePlaylist: async data => {
+    let endPoint = 'playlist/' + data.id + '/share/';
+    return postMethod(endPoint, data);
+  },
+
   getMyPlaylists: async data => {
     let userId = await getUserId();
     let endPoint = 'user/' + userId + '/playlists/';
+    return getMethod(endPoint);
+  },
+
+  getSharedPlaylists: async data => {
+    let userId = await getUserId();
+    let endPoint = 'user/' + userId + '/shared-playlists/';
     return getMethod(endPoint);
   },
 

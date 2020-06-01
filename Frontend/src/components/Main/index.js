@@ -12,7 +12,7 @@ import {MiniPlayer} from '../Player/MiniPlayer';
 import {MyPlaylists} from '../MyPlaylists';
 import {Search} from '../Search';
 import {Album} from '../Album';
-import {Playlist} from '../Playlist';
+import {Playlist} from '../MyPlaylists/Playlist';
 
 const stack = createStackNavigator();
 

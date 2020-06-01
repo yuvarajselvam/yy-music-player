@@ -74,6 +74,7 @@ export function MainPlayer(props) {
       }
       getTrack();
       return () => {};
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []),
   );
 
@@ -124,7 +125,7 @@ export function MainPlayer(props) {
       <Header
         leftIconName="keyboard-arrow-down"
         onLeftIconPress={() => navigation.goBack()}
-        rightIconName="dots-vertical"
+        rightIconName="more-vert"
         onRightIconPress={() => console.log('album details')}
       />
       <View style={{alignItems: 'center'}}>

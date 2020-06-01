@@ -394,7 +394,7 @@ function PlaylistsOverlay(props) {
         tracks: [],
       };
       selectedTrackItems.forEach(track => {
-        playlistObj.tracks.push(track.id);
+        playlistObj.tracks.push(track);
       });
 
       if (actionType === 'add') {

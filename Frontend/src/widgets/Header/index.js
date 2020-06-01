@@ -9,6 +9,7 @@ import {View, TouchableWithoutFeedback} from 'react-native';
 Header.propTypes = {
   navigation: PropTypes.object,
   title: PropTypes.string,
+  subtitle: PropTypes.string,
   leftIconName: PropTypes.string,
   onLeftIconPress: PropTypes.func,
   rightIconName: PropTypes.string,
@@ -19,6 +20,7 @@ export function Header(props) {
   const {
     navigation,
     title,
+    subtitle,
     leftIconName,
     onLeftIconPress,
     rightIconName,
@@ -40,14 +42,19 @@ export function Header(props) {
           </View>
         </TouchableWithoutFeedback>
       )}
-      <Appbar.Content title={title} titleStyle={{color: Colors.grey200}} />
+      <Appbar.Content
+        title={title}
+        subtitle={subtitle}
+        titleStyle={{color: Colors.grey200}}
+        subtitleStyle={{color: Colors.grey200}}
+      />
       <TouchableWithoutFeedback onPress={onRightIconPress}>
         <View style={{alignItems: 'center'}}>
           <Icon
             name={rightIconName}
             color="#E0E0E0"
             onPress={onRightIconPress}
-            type={'material-community'}
+            // type={'material-community'}
           />
         </View>
       </TouchableWithoutFeedback>
