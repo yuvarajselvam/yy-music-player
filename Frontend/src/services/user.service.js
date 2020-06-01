@@ -26,19 +26,19 @@ export const userService = {
     return postMethod(endPoint, data);
   },
 
-  getFollowers: async data => {
+  getFollowers: async () => {
     let userId = await getUserId();
     let endPoint = 'user/' + userId + '/followers/';
     return getMethod(endPoint);
   },
 
-  getFollowing: async data => {
+  getFollowing: async () => {
     let userId = await getUserId();
     let endPoint = 'user/' + userId + '/following/';
     return getMethod(endPoint);
   },
 
-  getPendingRequests: async data => {
+  getPendingRequests: async () => {
     let userId = await getUserId();
     let endPoint = 'user/' + userId + '/pending-requests/';
     return getMethod(endPoint);
