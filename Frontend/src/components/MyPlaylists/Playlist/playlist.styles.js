@@ -28,4 +28,14 @@ export const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     fontSize: wp(4),
   },
+  selectedFollowersContainer: {
+    width: wp('100%'),
+    borderBottomWidth: 0.2,
+    borderBottomColor: Colors.grey600,
+    borderTopWidth: 0.2,
+    borderTopColor: Colors.grey600,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: wp(2),
+  },
 });
