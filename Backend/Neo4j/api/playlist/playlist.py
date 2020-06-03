@@ -98,7 +98,8 @@ class EditPlaylist(Resource):
             return make_response((f"User[{request.user}] not found.", 404))
 
         if playlist.check_ownership(user.get_node()):
-            for track_id in request_json["tracks"]:
+            for track_dict in request_json["tracks"]:
+                track_id = track_dict["id"]
                 track = Track.find_one(id=track_id)
                 if request_json["operation"] == "addTracks":
                     playlist.add_track(track.get_node())
@@ -142,10 +143,11 @@ class SharePlaylist(Resource):
             return make_response((f"Playlist[{_id}] not found.", 404))
 
         current_user = User.find_one(id=request.user)
-        for user_id in request_json["people"]:
+        for user_dict in request_json["people"]:
+            user_id = user_dict["id"]
             user = User.find_one(id=user_id)
             if not user:
-                return make_response((f"User[{request_json['userId']}] not found.", 404))
+                return make_response((f"User[{user_id}] not found.", 404))
 
             if playlist.scope == 'PUBLIC' or playlist.check_ownership(current_user.get_node()):
                 playlist.share(user.get_node())

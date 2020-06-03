@@ -26,9 +26,10 @@ class RegisterDevice(Resource):
         if bool(is_bad_request):
             return is_bad_request
 
-        user = User.find_one(id=request_json.pop("userId"))
+        user_id = request_json.pop("userId")
+        user = User.find_one(id=user_id)
         if not user:
-            return make_response((f"User[{request_json['userId']}] not found.", 404))
+            return make_response((f"User[{user_id}] not found.", 404))
 
         try:
             device = Device(request_json)
