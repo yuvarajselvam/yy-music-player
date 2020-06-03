@@ -27,6 +27,7 @@ class User:
         _name = \
         _email = \
         _username = \
+        _imageUrl = \
         _dob = \
         _phone = \
         _password = \
@@ -224,6 +225,15 @@ class User:
         validation.check_instance_type(field, value, str)
         validation.check_regex_match(field, value, "^[a-zA-Z0-9_]+$")
         self._username = value
+
+    @property
+    def imageUrl(self):
+        return self._imageUrl
+
+    @imageUrl.setter
+    def imageUrl(self, value):
+        validation.check_regex_match("Image URL", value, validation.URL_REGEX)
+        self._imageUrl = value
 
     @property
     def dob(self):
