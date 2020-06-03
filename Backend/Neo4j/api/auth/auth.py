@@ -148,8 +148,8 @@ class SingleSignOn(Resource):
             try:
                 user = User(name=request_json["name"], email=request_json["email"])
                 account = Account(externalId=request_json["id"], token=request_json["token"], type=request_json["type"])
-                if "photoUrl" in request_json:
-                    account.photoUrl = request_json["photoUrl"]
+                if "imageUrl" in request_json:
+                    user.imageUrl = request_json["imageUrl"]
                 user.save()
                 account.save()
                 account.link_user(user.get_node())
@@ -172,6 +172,9 @@ class SingleSignOn(Resource):
                 account = Account(externalId=request_json["id"], token=request_json["token"], type=request_json["type"])
                 account.save()
                 account.link_user(user.get_node())
+                if "imageUrl" in request_json and not user.imageUrl:
+                    user.imageUrl = request_json["imageUrl"]
+                    user.save()
                 return generate_auth_token_response(user.id)
 
 
