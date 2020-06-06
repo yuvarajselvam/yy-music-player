@@ -1,6 +1,6 @@
 import {getLocalStore} from '../utils/funtions';
 
-const URL_LINK = 'http://192.168.0.4:5000/';
+const URL_LINK = 'https://19432c36c34b.ngrok.io/';
 
 export const getMethod = async endPoint => {
   let localObj = await getLocalStore();
