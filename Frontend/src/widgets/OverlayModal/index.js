@@ -9,6 +9,7 @@ OverlayModal.propTypes = {
   fullScreen: PropTypes.bool,
   position: PropTypes.string,
   onBackdropPress: PropTypes.func,
+  backHandler: PropTypes.func,
   children: PropTypes.any,
 };
 
