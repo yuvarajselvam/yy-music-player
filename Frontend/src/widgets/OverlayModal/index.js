@@ -13,13 +13,21 @@ OverlayModal.propTypes = {
 };
 
 export function OverlayModal(props) {
-  const {children, visible, fullScreen, position, onBackdropPress} = props;
+  const {
+    children,
+    visible,
+    fullScreen,
+    position,
+    onBackdropPress,
+    backHandler,
+  } = props;
   let overlayPosition = 'center';
   if (position === 'bottom') {
     overlayPosition = 'flex-end';
   }
   return (
     <Modal
+      onRequestClose={backHandler}
       statusBarTranslucent={false}
       animationType="slide"
       transparent={true}
