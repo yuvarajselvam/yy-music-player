@@ -9,14 +9,9 @@ import {OverlayModal} from '../../../widgets/OverlayModal';
 // import {mockMyPlaylists} from '../../mocks/my.playlists';
 
 import {commonStyles} from '../../common/styles';
-import {styles} from '../Playlists/playlists.styles';
+import {styles} from '../MyPlaylists/myplaylists.styles';
 import {useAuthContext} from '../../../contexts/auth.context';
 import ListItems from '../../../widgets/ListItems';
-
-const SCOPES = {
-  PUBLIC: 'public',
-  PRIVATE: 'private',
-};
 
 export function SharedPlaylists({navigation}) {
   const [isPlaylistMenuOverlayOpen, setIsPlaylistMenuOverlayOpen] = useState(
