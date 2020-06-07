@@ -14,7 +14,7 @@ import {commonStyles} from '../common/styles';
 import {useAuthContext} from '../../contexts/auth.context';
 import ListItems from '../../widgets/ListItems';
 
-export function Search({navigation}) {
+function SearchComponent({navigation}) {
   console.log('Search screen');
   const [keyword, setKeyword] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -441,3 +441,7 @@ function PlaylistsOverlay(props) {
     </OverlayModal>
   );
 }
+
+const Search = React.memo(SearchComponent);
+
+export {Search};

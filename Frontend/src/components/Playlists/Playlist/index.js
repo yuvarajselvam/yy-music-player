@@ -190,6 +190,22 @@ function SharePlaylistOverlay(props) {
   const [followers, setFollowers] = useState([]);
   const [selectedFollowers, setSelectedFollowers] = useState([]);
 
+  const backAction = () => {
+    Alert.alert('Hold on!', 'Are you sure you want to cancel ?', [
+      {
+        text: 'No',
+        onPress: () => null,
+        style: 'cancel',
+      },
+      {
+        text: 'YES',
+        onPress: () => {
+          setIsSharePlaylistOverlayOpen(false);
+        },
+      },
+    ]);
+  };
+
   useEffect(() => {
     userService.getFollowers().then(async response => {
       if (response.status === 200) {
@@ -262,7 +278,10 @@ function SharePlaylistOverlay(props) {
   };
 
   return (
-    <OverlayModal visible={isSharePlaylistOverlayOpen} fullScreen={true}>
+    <OverlayModal
+      backHandler={backAction}
+      visible={isSharePlaylistOverlayOpen}
+      fullScreen={true}>
       <View>
         <Header
           title="Share playlist"
@@ -313,6 +332,7 @@ function SharePlaylistOverlay(props) {
             titleKeys={['name']}
             onPress={handleFollowerSelect}
             listSelectedStyle={selectedItemStyle}
+            emptyTitle="No Followers"
           />
         </ScrollView>
         <Button title="Share" onPress={handleSharePlaylist} />

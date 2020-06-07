@@ -7,10 +7,11 @@ import {useFocusEffect} from '@react-navigation/native';
 import {InputBox} from '../../../widgets/InputBox';
 import {trackService} from '../../../services/track.service';
 import {OverlayModal} from '../../../widgets/OverlayModal';
-import {mockMyPlaylists} from '../../../mocks/my.playlists';
+
+// import {mockMyPlaylists} from '../../../mocks/my.playlists';
 
 import {commonStyles} from '../../common/styles';
-import {styles} from './playlists.styles';
+import {styles} from './myplaylists.styles';
 import {useAuthContext} from '../../../contexts/auth.context';
 import ListItems from '../../../widgets/ListItems';
 
@@ -19,7 +20,7 @@ const SCOPES = {
   PRIVATE: 'private',
 };
 
-export function Playlists({navigation}) {
+export function MyPlaylists({navigation}) {
   const [
     isCreatePlaylistOverlayOpen,
     setIsCreatePlaylistOverlayOpen,
@@ -28,7 +29,7 @@ export function Playlists({navigation}) {
     false,
   );
   const [playlistName, setPlaylistName] = useState('');
-  const [playlists, setPlaylists] = useState(mockMyPlaylists);
+  const [playlists, setPlaylists] = useState([]);
   const [playlistId, setPlaylistId] = useState('');
 
   useFocusEffect(
