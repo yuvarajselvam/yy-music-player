@@ -1,150 +1,77 @@
-import uuid
-import inspect
-import neotime
-import datetime
+from py2neo import Relationship, RelationshipMatcher
 
-from py2neo import Node, Relationship, RelationshipMatcher
-
+from models.BaseModel import Entity, require_node
 from models.GroupModel import Group
 
-from utils.extensions import neo4j
 from utils import validation
+from utils.extensions import neo4j
+from utils.exceptions import AppLogicError
+from utils.enums import Scope, PlaylistType
 from utils.querying import get_relationships, get_related_nodes
 
 
 graph = neo4j.get_db()
 
 
-class Playlist:
+class Playlist(Entity):
     _resource_prefix = 'PLY'
     _required_fields = ["name", "scope", "type"]
-    _id = \
-        _name = \
+    _deep_fields = ["tracks"]
+
+    _name = \
         _scope = \
-        _type = \
-        _updatedAt = \
-        _createdAt = \
-        _node = None
+        _type = None
 
-    _allowed_scopes = {"PUBLIC", "PRIVATE"}
-    _allowed_types = {"GROUP", "USER", "SYSTEM"}
-
-    def __init__(self, *args, **kwargs):
-        [setattr(self, k, v) for arg in args for k, v in arg.items() if hasattr(self, k)]
-        [setattr(self, k, v) for k, v in kwargs.items() if hasattr(self, k)]
-
-    def json(self, deep=True):
-        attributes = inspect.getmembers(self, lambda a: not (inspect.isroutine(a)))
-        if deep:
-            return dict([(a, v) for a, v in attributes if not (a.startswith('_')) and v])
-        else:
-            return dict([(a, v) for a, v in attributes if not (a.startswith('_')) and a not in ['tracks'] and v])
-
-    def validate(self):
-        for field in self._required_fields:
-            if getattr(self, field) is None:
-                raise KeyError(f"{field.title()} is mandatory.")
-
-    def save(self, validate=True):
-        if validate:
-            self.validate()
-        if not self.id:
-            self.id = uuid.uuid4().hex
-            self._createdAt = neotime.DateTime.from_native(datetime.datetime.now())
-            self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
-            playlist = Node('Playlist', **self.json(deep=False))
-            graph.create(playlist)
-            self._node = playlist
-        else:
-            playlist = Node('Playlist', **self.json(deep=False))
-            self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
-            graph.merge(playlist, "Playlist", "id")
-            self._node = playlist
-
-    @classmethod
-    def find_one(cls, **kwargs):
-        playlist = graph.nodes.match('Playlist', **kwargs).first()
-        return cls(dict(playlist), _node=playlist)
-
-    # Create/Delete Relationships
-
+    @require_node
     def link_owner(self, owner_node):
-        if self._node and owner_node:
-            playlist_owner = Relationship(self._node, "OWNED_BY", owner_node)
-            graph.create(playlist_owner)
-        else:
-            raise Exception("Playlist/Owner node does not exist.")
+        playlist_owner = Relationship(self._node, "OWNED_BY", owner_node)
+        graph.create(playlist_owner)
 
+    @require_node
     def get_owner(self):
         owner_id = get_related_nodes((self._node, None), 'OWNED_BY')[0]["id"]
         return Group.find_one(id=owner_id)
 
+    @require_node
     def check_ownership(self, user_node):
-        if self._node and user_node:
-            relationships = get_relationships((self._node, user_node))
-            return "OWNED_BY" in relationships
-        else:
-            raise Exception("Playlist/User node does not exist.")
+        relationships = get_relationships((self._node, user_node))
+        return bool({"OWNED_BY"} & relationships)
 
+    @require_node
     def check_visibility(self, user_node):
-        if self._node and user_node:
-            if self.type == 'USER':
-                relationships = get_relationships((self._node, user_node))
-                return bool({"OWNED_BY", "SHARED_WITH"} & relationships)
-            elif self.type == 'GROUP':
-                group = self.get_owner()
-                return group.check_visibility(user_node)
-        else:
-            raise Exception("Playlist/User node does not exist.")
-
-    def add_track(self, track_node):
-        if self._node and track_node:
-            if "ADDED_TO" not in get_relationships((track_node, self._node)):
-                track_playlist = Relationship(track_node, "ADDED_TO", self._node)
-                graph.create(track_playlist)
-        else:
-            raise Exception("Playlist/Track node does not exist.")
-
-    def remove_track(self, track_node):
-        if self._node and track_node:
-            rel_match = RelationshipMatcher(graph)
-            rel = rel_match.match((track_node, self._node), r_type='ADDED_TO')
-            if rel.exists():
-                graph.separate(rel.first())
-        else:
-            raise Exception("Playlist/Track node does not exist.")
-
-    def share(self, user_node):
-        if self._node and user_node:
+        if self.type == PlaylistType.USER.value:
             relationships = get_relationships((self._node, user_node))
-            if not {"OWNED_BY", "SHARED_WITH"} & relationships:
-                playlist_user = Relationship(self._node, "SHARED_WITH", user_node)
-                graph.create(playlist_user)
-        else:
-            raise Exception("Playlist/User node does not exist.")
+            return bool({"OWNED_BY", "SHARED_WITH"} & relationships)
+        elif self.type == PlaylistType.GROUP.value:
+            group = self.get_owner()
+            return group.check_visibility(user_node)
 
-    def delete(self):
-        if self._node:
-            graph.delete(self._node)
-        else:
-            raise Exception("Playlist does not exist.")
+    @require_node
+    def add_track(self, track_node):
+        relationships = get_relationships((track_node, self._node))
+        if bool({"ADDED_TO"} & relationships):
+            raise AppLogicError("Track is already present in the playlist.")
+        track_playlist = Relationship(track_node, "ADDED_TO", self._node)
+        graph.create(track_playlist)
 
-    def get_node(self):
-        return self._node
+    @require_node
+    def remove_track(self, track_node):
+        rel_match = RelationshipMatcher(graph)
+        rel = rel_match.match((track_node, self._node), r_type='ADDED_TO')
+        if not rel.exists():
+            raise AppLogicError("Track is not present in the playlist.")
+        graph.separate(rel.first())
 
-    def set_node(self, node):
-        self._node = node
+    @require_node
+    def share(self, user_node):
+        relationships = get_relationships((self._node, user_node))
+        # If the user already has access to the playlist, new link is not created
+        # Error is not thrown either and the user is notified
+        if not bool({"OWNED_BY", "SHARED_WITH"} & relationships):
+            playlist_user = Relationship(self._node, "SHARED_WITH", user_node)
+            graph.create(playlist_user)
 
     # Properties
-
-    @property
-    def id(self):
-        return self._id
-
-    @id.setter
-    def id(self, value):
-        validation.check_instance_type("id", value, str)
-        self._id = self._resource_prefix + value if not value.startswith(self._resource_prefix) else value
 
     @property
     def name(self):
@@ -159,38 +86,20 @@ class Playlist:
 
     @property
     def scope(self):
-        return self._scope
+        return self._scope.value if self._scope else None
 
     @scope.setter
     def scope(self, value):
-        validation.check_choices("scope", value, self._allowed_scopes)
-        self._scope = value.upper()
+        self._scope = Scope(value.upper())
 
     @property
     def type(self):
-        return self._type
+        return self._type.value if self._type else None
 
     @type.setter
     def type(self, value):
-        validation.check_choices("type", value, self._allowed_types)
-        self._type = value.upper()
+        self._type = PlaylistType(value.upper())
 
     @property
     def tracks(self):
         return get_related_nodes((None, self._node), 'ADDED_TO')
-
-    @property
-    def createdAt(self):
-        return str(self._createdAt).split('.')[0] if self._createdAt else None
-
-    @createdAt.setter
-    def createdAt(self, value):
-        self._createdAt = value
-
-    @property
-    def updatedAt(self):
-        return str(self._updatedAt).split('.')[0] if self._updatedAt else None
-
-    @updatedAt.setter
-    def updatedAt(self, value):
-        self._updatedAt = value

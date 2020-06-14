@@ -10,6 +10,7 @@ from models.PlaylistModel import Playlist
 from models.TrackModel import Track
 
 from utils.logging import Logger
+from utils.exceptions import AppLogicError
 from utils.notifications import NotificationUtil as Notify
 from utils.response import check_required_fields, make_response
 
@@ -115,12 +116,16 @@ class EditPlaylist(Resource):
             for track_dict in request_json["tracks"]:
                 track_id = track_dict["id"]
                 track = Track.find_one(id=track_id)
-                if request_json["operation"] == "addTracks":
-                    playlist.add_track(track.get_node())
-                elif request_json["operation"] == "removeTracks":
-                    playlist.remove_track(track.get_node())
-                else:
-                    return make_response((f"Invalid operation[{request_json['operation']}]", 400))
+                try:
+                    if request_json["operation"] == "addTracks":
+                        playlist.add_track(track.get_node())
+                    elif request_json["operation"] == "removeTracks":
+                        playlist.remove_track(track.get_node())
+                    else:
+                        return make_response((f"Invalid operation[{request_json['operation']}]", 400))
+                    return make_response(("Playlist edit successful.", 400))
+                except AppLogicError as e:
+                    return make_response((str(e), 400))
         else:
             return make_response((f"User[{request.user}] does not have access to the playlist[{_id}].", 401))
 
