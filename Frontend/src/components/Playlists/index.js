@@ -14,10 +14,10 @@ import {SharedPlaylists} from './SharedPlaylists';
 import {styles} from './myplaylists.styles';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
-export function Playlists() {
+export function Playlists({navigation}) {
   return (
     <View style={commonStyles.screenStyle}>
-      <Header title="Playlists" />
+      <Header title="Playlists" navigation={navigation} />
       <Tab.Navigator
         sceneContainerStyle={{backgroundColor: '#121212'}}
         tabBar={props => <CustomPlaylistTopbar {...props} />}>

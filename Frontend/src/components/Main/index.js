@@ -32,7 +32,6 @@ export function Main({navigation}) {
         initialRouteName={'Home'}>
         <stack.Screen name="Home" component={Home} />
         <stack.Screen name="Playlists" component={Playlists} />
-        <stack.Screen name="Playlist" component={Playlist} />
         <stack.Screen name="Search" component={Search} />
         <stack.Screen name="My Music" component={MyMusic} />
         <stack.Screen name="Album" component={Album} />

@@ -1,10 +1,4 @@
-import {
-  getMethod,
-  postMethod,
-  putMethod,
-  deleteMethod,
-  getUserId,
-} from './service.util';
+import {getMethod, postMethod, putMethod, deleteMethod} from './service.util';
 
 export const trackService = {
   getSearch: data => {
@@ -53,20 +47,17 @@ export const trackService = {
   },
 
   getMyPlaylists: async data => {
-    let userId = await getUserId();
-    let endPoint = 'user/' + userId + '/playlists/';
+    let endPoint = 'playlists/';
     return getMethod(endPoint);
   },
 
   getSharedPlaylists: async data => {
-    let userId = await getUserId();
-    let endPoint = 'user/' + userId + '/shared-playlists/';
+    let endPoint = 'shared-playlists/';
     return getMethod(endPoint);
   },
 
   getPlaylist: async data => {
-    let userId = await getUserId();
-    let endPoint = 'user/' + userId + '/playlist/' + `${data.id}/`;
+    let endPoint = 'playlist/' + `${data.id}/`;
     return getMethod(endPoint);
   },
 

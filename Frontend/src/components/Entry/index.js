@@ -1,14 +1,14 @@
 import React, {useEffect} from 'react';
 import {View, Alert} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
-import {Divider} from 'react-native-elements';
+import {Divider, Icon} from 'react-native-elements';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItem,
 } from '@react-navigation/drawer';
 import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
-import {Colors, IconButton} from 'react-native-paper';
+import {Colors} from 'react-native-paper';
 
 import {Main} from '../Main';
 import {Settings} from '../Settings';
@@ -21,6 +21,9 @@ import {Notification} from '../Notification';
 import {Users} from '../Social/Users';
 import {PlayerProvider} from '../../contexts/player.context';
 import {Requests} from '../Social/Requests';
+import {Groups} from '../Social/Groups';
+import {Group} from '../Social/Groups/Group';
+import {Playlist} from '../Playlists/Playlist';
 
 const Drawer = createDrawerNavigator();
 
@@ -39,11 +42,11 @@ const CustomDrawerContent = React.memo(function CustomDrawerContent({
           label="Home"
           labelStyle={styles.drawerLabel}
           icon={() => (
-            <IconButton
-              style={styles.drawerIcon}
+            <Icon
+              containerStyle={styles.drawerIcon}
               color={Colors.grey200}
               size={wp(6.4)}
-              icon={'home-outline'}
+              name={'home'}
             />
           )}
           onPress={() => navigation.navigate('Home')}
@@ -52,11 +55,11 @@ const CustomDrawerContent = React.memo(function CustomDrawerContent({
           label="My Profile"
           labelStyle={styles.drawerLabel}
           icon={() => (
-            <IconButton
-              style={styles.drawerIcon}
+            <Icon
+              containerStyle={styles.drawerIcon}
               color={Colors.grey200}
               size={wp(6.4)}
-              icon={'account-circle-outline'}
+              name={'account-circle'}
             />
           )}
           onPress={() => navigation.navigate('My Profile')}
@@ -65,24 +68,37 @@ const CustomDrawerContent = React.memo(function CustomDrawerContent({
           label="People"
           labelStyle={styles.drawerLabel}
           icon={() => (
-            <IconButton
-              style={styles.drawerIcon}
+            <Icon
+              containerStyle={styles.drawerIcon}
               color={Colors.grey200}
               size={wp(6.4)}
-              icon={'account-multiple-outline'}
+              name={'supervisor-account'}
             />
           )}
           onPress={() => navigation.navigate('Users')}
         />
         <DrawerItem
+          label="Groups"
+          labelStyle={styles.drawerLabel}
+          icon={() => (
+            <Icon
+              containerStyle={styles.drawerIcon}
+              color={Colors.grey200}
+              size={wp(6.4)}
+              name={'group'}
+            />
+          )}
+          onPress={() => navigation.navigate('Groups')}
+        />
+        <DrawerItem
           label="Music Languages"
           labelStyle={styles.drawerLabel}
           icon={() => (
-            <IconButton
-              style={styles.drawerIcon}
+            <Icon
+              containerStyle={styles.drawerIcon}
               color={Colors.grey200}
               size={wp(6.4)}
-              icon={'map-marker-outline'}
+              name={'language'}
             />
           )}
           onPress={() => navigation.navigate('Settings')}
@@ -92,11 +108,11 @@ const CustomDrawerContent = React.memo(function CustomDrawerContent({
           label="Settings"
           labelStyle={styles.drawerLabel}
           icon={() => (
-            <IconButton
-              style={styles.drawerIcon}
+            <Icon
+              containerStyle={styles.drawerIcon}
               color={Colors.grey200}
               size={wp(6.4)}
-              icon={'settings-outline'}
+              name={'settings'}
             />
           )}
           onPress={() => navigation.navigate('Settings')}
@@ -135,9 +151,12 @@ export function Entry() {
         initialRouteName="Main">
         <Drawer.Screen name="Main" component={Main} />
         <Drawer.Screen name="Main Player" component={MainPlayer} />
+        <Drawer.Screen name="Playlist" component={Playlist} />
         <Drawer.Screen name="Notification" component={Notification} />
         <Drawer.Screen name="My Profile" component={MyProfile} />
         <Drawer.Screen name="Users" component={Users} />
+        <Drawer.Screen name="Groups" component={Groups} />
+        <Drawer.Screen name="Group" component={Group} />
         <Drawer.Screen name="Requests" component={Requests} />
         <Drawer.Screen name="Followers" component={Followers} />
         <Drawer.Screen name="Following" component={Following} />
