@@ -1,15 +1,14 @@
 from flask import request, jsonify
-from flask_restplus import Namespace, Resource
+from flask_restplus import Resource
 
 from firebase_admin.messaging import UnregisteredError
-from py2neo import DatabaseError
 
 from models.DeviceModel import Device
 from models.UserModel import User
 from models.GroupModel import Group
-from models.PlaylistModel import Playlist
 
 from utils.logging import Logger
+from utils.exceptions import AppLogicError
 from utils.notifications import NotificationUtil as Notify
 from utils.response import check_required_fields, make_response
 from api.social.follow import social_ns
@@ -103,7 +102,10 @@ class EditGroup(Resource):
                 user_id = user_dict["id"]
                 user = User.find_one(id=user_id)
                 if request_json["operation"] == "removeMembers":
-                    group.remove_member(user.get_node())
+                    try:
+                        group.remove_member(user.get_node())
+                    except AppLogicError as e:
+                        return make_response((str(e), 400))
                 else:
                     return make_response((f"Invalid operation[{request_json['operation']}]", 400))
         else:
@@ -131,7 +133,7 @@ class GroupInviteSender(Resource):
     def post(self, _id):
         """Invites an user to a group"""
         request_json = request.get_json()
-        required_fields = ["userId"]
+        required_fields = ["users"]
 
         is_bad_request = check_required_fields(required_fields, request_json)
         if bool(is_bad_request):
@@ -147,27 +149,29 @@ class GroupInviteSender(Resource):
         if not group.check_adminship(current_user.get_node()):
             return make_response((f"User[{request.user}] does not have required permissions.", 401))
 
-        user = User.find_one(id=request_json["userId"])
-        if not user:
-            return make_response((f"User[{request_json['userId']}] not found.", 404))
+        for user_dict in request_json["users"]:
+            user_id = user_dict["id"]
+            user = User.find_one(id=user_id)
+            if not user:
+                return make_response((f"User[{user_id}] not found.", 404))
 
-        try:
-            group.invite(user.get_node())
-        except DatabaseError as e:
-            return make_response((str(e), 400))
-
-        data_payload = {"Message": f"{current_user.name} has invited you to their group: {group.name}."}
-        notify_payload = {"title": f"{current_user.name} has invited you to their group: {group.name}.",
-                          "body": "Tap to accept/reject"}
-
-        for device in user.get_devices():
             try:
-                Notify.send(token=device["token"], data=data_payload, notification=notify_payload)
-            except UnregisteredError:
-                device = Device.find_one(id=device["id"])
-                device.delete()
+                group.invite(user.get_node(), current_user.get_node())
+            except AppLogicError as e:
+                return make_response((str(e), 400))
 
-        return make_response((f"Invite sent successfully to {user.name}", 200))
+            data_payload = {"Message": f"{current_user.name} has invited you to their group: {group.name}."}
+            notify_payload = {"title": f"{current_user.name} has invited you to their group: {group.name}.",
+                              "body": "Tap to accept/reject"}
+
+            for device in user.get_devices():
+                try:
+                    Notify.send(token=device["token"], data=data_payload, notification=notify_payload)
+                except UnregisteredError:
+                    device = Device.find_one(id=device["id"])
+                    device.delete()
+
+        return make_response((f"Invite(s) sent successfully.", 200))
 
 
 class GroupInviteResponder(Resource):
@@ -195,7 +199,7 @@ class GroupInviteResponder(Resource):
 
         try:
             group.respond_to_group_invite(current_user.get_node(), _op)
-        except DatabaseError as e:
+        except AppLogicError as e:
             return make_response((str(e), 400))
 
         data_payload = {"Message": f"{current_user.name} has {_op.lower()}ed your group invite."}
