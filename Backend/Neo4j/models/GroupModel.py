@@ -3,9 +3,7 @@ import inspect
 import neotime
 import datetime
 
-from py2neo import Node, Relationship, RelationshipMatcher
-
-from models.GroupModel import Group
+from py2neo import Node, Relationship, RelationshipMatcher, DatabaseError
 
 from utils.extensions import neo4j
 from utils import validation
@@ -15,19 +13,17 @@ from utils.querying import get_relationships, get_related_nodes
 graph = neo4j.get_db()
 
 
-class Playlist:
-    _resource_prefix = 'PLY'
-    _required_fields = ["name", "scope", "type"]
+class Group:
+    _resource_prefix = 'GRP'
+    _required_fields = ["name", "scope"]
     _id = \
         _name = \
         _scope = \
-        _type = \
         _updatedAt = \
         _createdAt = \
         _node = None
 
     _allowed_scopes = {"PUBLIC", "PRIVATE"}
-    _allowed_types = {"GROUP", "USER", "SYSTEM"}
 
     def __init__(self, *args, **kwargs):
         [setattr(self, k, v) for arg in args for k, v in arg.items() if hasattr(self, k)]
@@ -38,7 +34,7 @@ class Playlist:
         if deep:
             return dict([(a, v) for a, v in attributes if not (a.startswith('_')) and v])
         else:
-            return dict([(a, v) for a, v in attributes if not (a.startswith('_')) and a not in ['tracks'] and v])
+            return dict([(a, v) for a, v in attributes if not (a.startswith('_')) and a not in ['members'] and v])
 
     def validate(self):
         for field in self._required_fields:
@@ -52,82 +48,90 @@ class Playlist:
             self.id = uuid.uuid4().hex
             self._createdAt = neotime.DateTime.from_native(datetime.datetime.now())
             self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
-            playlist = Node('Playlist', **self.json(deep=False))
-            graph.create(playlist)
-            self._node = playlist
+            group = Node('Group', **self.json(deep=False))
+            graph.create(group)
+            self._node = group
         else:
-            playlist = Node('Playlist', **self.json(deep=False))
+            group = Node('Group', **self.json(deep=False))
             self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
-            graph.merge(playlist, "Playlist", "id")
-            self._node = playlist
+            graph.merge(group, "Group", "id")
+            self._node = group
 
     @classmethod
     def find_one(cls, **kwargs):
-        playlist = graph.nodes.match('Playlist', **kwargs).first()
-        return cls(dict(playlist), _node=playlist)
+        group = graph.nodes.match('Group', **kwargs).first()
+        return cls(dict(group), _node=group)
 
     # Create/Delete Relationships
 
-    def link_owner(self, owner_node):
-        if self._node and owner_node:
-            playlist_owner = Relationship(self._node, "OWNED_BY", owner_node)
-            graph.create(playlist_owner)
+    def link_admin(self, admin_node):
+        if self._node and admin_node:
+            group_admin = Relationship(self._node, "ADMINED_BY", admin_node)
+            graph.create(group_admin)
+            self.add_member(admin_node)
         else:
-            raise Exception("Playlist/Owner node does not exist.")
+            raise Exception("Group/Admin node does not exist.")
 
-    def get_owner(self):
-        owner_id = get_related_nodes((self._node, None), 'OWNED_BY')[0]["id"]
-        return Group.find_one(id=owner_id)
-
-    def check_ownership(self, user_node):
+    def check_adminship(self, user_node):
         if self._node and user_node:
             relationships = get_relationships((self._node, user_node))
-            return "OWNED_BY" in relationships
+            return bool({"ADMINED_BY"} & relationships)
         else:
-            raise Exception("Playlist/User node does not exist.")
+            raise Exception("Group/User node does not exist.")
 
     def check_visibility(self, user_node):
         if self._node and user_node:
-            if self.type == 'USER':
-                relationships = get_relationships((self._node, user_node))
-                return bool({"OWNED_BY", "SHARED_WITH"} & relationships)
-            elif self.type == 'GROUP':
-                group = self.get_owner()
-                return group.check_visibility(user_node)
+            relationships = get_relationships((user_node, self._node))
+            return bool({"MEMBER_OF"} & relationships)
         else:
-            raise Exception("Playlist/User node does not exist.")
+            raise Exception("Group/User node does not exist.")
 
-    def add_track(self, track_node):
-        if self._node and track_node:
-            if "ADDED_TO" not in get_relationships((track_node, self._node)):
-                track_playlist = Relationship(track_node, "ADDED_TO", self._node)
-                graph.create(track_playlist)
+    def invite(self, user_node):
+        if self._node and user_node:
+            relationships = get_relationships((user_node, self._node))
+            if bool({"MEMBER_OF"} & relationships):
+                raise DatabaseError("User is already a member.")
+            user_group = Relationship(user_node, "INVITED_TO", self._node)
+            graph.create(user_group)
         else:
-            raise Exception("Playlist/Track node does not exist.")
+            raise DatabaseError("Group/User node does not exist.")
 
-    def remove_track(self, track_node):
-        if self._node and track_node:
+    def respond_to_group_invite(self, user_node, operation):
+        if self._node and user_node:
             rel_match = RelationshipMatcher(graph)
-            rel = rel_match.match((track_node, self._node), r_type='ADDED_TO')
+            rel = rel_match.match((user_node, self._node), r_type='INVITED_TO')
+            if rel.exists() and (operation.upper() == 'ACCEPT'):
+                rel = rel.first()
+                graph.separate(rel)
+                self.add_member(user_node)
+            else:
+                raise DatabaseError("User has not been invited to the group.")
+        else:
+            raise DatabaseError("Group/User node does not exist.")
+
+    def add_member(self, user_node):
+        if self._node and user_node:
+            if "MEMBER_OF" not in get_relationships((user_node, self._node)):
+                current_time = neotime.DateTime.from_native(datetime.datetime.now())
+                user_group = Relationship(user_node, "MEMBER_OF", self._node, since=current_time)
+                graph.create(user_group)
+        else:
+            raise Exception("Group/User node does not exist.")
+
+    def remove_member(self, user_node):
+        if self._node and user_node:
+            rel_match = RelationshipMatcher(graph)
+            rel = rel_match.match((user_node, self._node), r_type='MEMBER_OF')
             if rel.exists():
                 graph.separate(rel.first())
         else:
-            raise Exception("Playlist/Track node does not exist.")
-
-    def share(self, user_node):
-        if self._node and user_node:
-            relationships = get_relationships((self._node, user_node))
-            if not {"OWNED_BY", "SHARED_WITH"} & relationships:
-                playlist_user = Relationship(self._node, "SHARED_WITH", user_node)
-                graph.create(playlist_user)
-        else:
-            raise Exception("Playlist/User node does not exist.")
+            raise Exception("Group/User node does not exist.")
 
     def delete(self):
         if self._node:
             graph.delete(self._node)
         else:
-            raise Exception("Playlist does not exist.")
+            raise Exception("Group does not exist.")
 
     def get_node(self):
         return self._node
@@ -167,17 +171,12 @@ class Playlist:
         self._scope = value.upper()
 
     @property
-    def type(self):
-        return self._type
-
-    @type.setter
-    def type(self, value):
-        validation.check_choices("type", value, self._allowed_types)
-        self._type = value.upper()
+    def members(self):
+        return get_related_nodes((None, self._node), 'MEMBER_OF')
 
     @property
-    def tracks(self):
-        return get_related_nodes((None, self._node), 'ADDED_TO')
+    def playlists(self):
+        return get_related_nodes((None, self._node), 'OWNED_BY')
 
     @property
     def createdAt(self):
