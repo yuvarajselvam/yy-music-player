@@ -11,6 +11,7 @@ from models.TrackModel import Track
 
 from utils.logging import Logger
 from utils.exceptions import AppLogicError
+from utils.enums import PlaylistType, Scope
 from utils.notifications import NotificationUtil as Notify
 from utils.response import check_required_fields, make_response
 
@@ -31,7 +32,7 @@ class CreatePlaylist(Resource):
             return is_bad_request
 
         owner = None
-        if request_json['type'].upper() == 'GROUP':
+        if request_json['type'].upper() == PlaylistType.GROUP.value:
             owner = Group.find_one(id=request_json['owner'])
             if not owner:
                 return make_response((f"Group[{request_json['owner']}] not found.", 404))
@@ -42,7 +43,7 @@ class CreatePlaylist(Resource):
 
             if not owner.check_visibility(current_user.get_node()):
                 return make_response((f"User does not have permissions to create playlist for this group.", 401))
-        elif request_json['type'].upper() == 'USER':
+        elif request_json['type'].upper() == PlaylistType.USER.value:
             owner = User.find_one(id=request_json.pop("owner"))
             if not owner:
                 return make_response((f"User[{request_json['owner']}] not found.", 404))
@@ -168,7 +169,7 @@ class SharePlaylist(Resource):
             if not user:
                 return make_response((f"User[{user_id}] not found.", 404))
 
-            if playlist.scope == 'PUBLIC' or playlist.check_ownership(current_user.get_node()):
+            if playlist.scope == Scope.PUBLIC.value or playlist.check_ownership(current_user.get_node()):
                 playlist.share(user.get_node())
                 data_payload = {"Message": f"Playlist has been shared with you."}
                 notify_payload = {"title": f"Playlist has been shared with you.", "body": ""}
