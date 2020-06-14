@@ -131,7 +131,6 @@ class User:
                 raise DatabaseError("User already requested to follow/follows")
             follower_followee = Relationship(follower_node, "REQUESTED_TO_FOLLOW", self._node)
             graph.create(follower_followee)
-            return True
         else:
             raise DatabaseError("Follower/Followee node does not exist.")
 
@@ -169,6 +168,9 @@ class User:
 
     def get_shared_playlists(self):
         return get_related_nodes((None, self._node), 'SHARED_WITH')
+
+    def get_groups(self):
+        return get_related_nodes((self._node, None), 'MEMBER_OF')
 
     def get_linked_accounts(self, **kwargs):
         return get_related_nodes((None, self._node), 'LINKED_TO', **kwargs)
