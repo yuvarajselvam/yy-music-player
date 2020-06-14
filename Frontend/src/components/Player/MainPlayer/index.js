@@ -13,7 +13,7 @@ import {usePlayerContext} from '../../../contexts/player.context';
 import {styles} from './mainplayer.styles';
 import {Header} from '../../../widgets/Header';
 
-export function MainPlayer(props) {
+function MainPlayerComponent(props) {
   const {navigation} = props;
 
   const {
@@ -74,6 +74,7 @@ export function MainPlayer(props) {
       }
       getTrack();
       return () => {};
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []),
   );
 
@@ -124,7 +125,7 @@ export function MainPlayer(props) {
       <Header
         leftIconName="keyboard-arrow-down"
         onLeftIconPress={() => navigation.goBack()}
-        rightIconName="dots-vertical"
+        rightIconName="more-vert"
         onRightIconPress={() => console.log('album details')}
       />
       <View style={{alignItems: 'center'}}>
@@ -209,3 +210,7 @@ export function MainPlayer(props) {
     </View>
   );
 }
+
+const MainPlayer = React.memo(MainPlayerComponent);
+
+export {MainPlayer};

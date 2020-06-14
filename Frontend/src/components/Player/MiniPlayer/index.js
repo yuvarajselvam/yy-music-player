@@ -12,7 +12,7 @@ import {usePlayerContext} from '../../../contexts/player.context';
 
 import {styles} from './player.styles';
 
-export function MiniPlayer(props) {
+function MiniPlayerComponent(props) {
   const {navigation} = props;
   const {
     isPlaying,
@@ -112,3 +112,7 @@ export function MiniPlayer(props) {
     </TouchableWithoutFeedback>
   );
 }
+
+const MiniPlayer = React.memo(MiniPlayerComponent);
+
+export {MiniPlayer};

@@ -4,16 +4,16 @@ import {Button, Text} from 'react-native-elements';
 import {Colors, Switch, IconButton} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 
-import {Header} from '../../widgets/Header';
-import {InputBox} from '../../widgets/InputBox';
-import {trackService} from '../../services/track.service';
-import {OverlayModal} from '../../widgets/OverlayModal';
-// import {mockMyPlaylists} from '../../mocks/my.playlists';
+import {InputBox} from '../../../widgets/InputBox';
+import {trackService} from '../../../services/track.service';
+import {OverlayModal} from '../../../widgets/OverlayModal';
 
-import {commonStyles} from '../common/styles';
+// import {mockMyPlaylists} from '../../../mocks/my.playlists';
+
+import {commonStyles} from '../../common/styles';
 import {styles} from './myplaylists.styles';
-import {useAuthContext} from '../../contexts/auth.context';
-import ListItems from '../../widgets/ListItems';
+import {useAuthContext} from '../../../contexts/auth.context';
+import ListItems from '../../../widgets/ListItems';
 
 const SCOPES = {
   PUBLIC: 'public',
@@ -71,7 +71,7 @@ export function MyPlaylists({navigation}) {
 
   return (
     <View style={commonStyles.screenStyle}>
-      <Header navigation={navigation} title="My Playlists" />
+      {/* <Header navigation={navigation} title="My Playlists" /> */}
       <View style={{alignItems: 'center', padding: 12}}>
         <Button title="Create Playlist" onPress={createPlaylist} />
       </View>

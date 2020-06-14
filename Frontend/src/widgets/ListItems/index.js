@@ -21,6 +21,7 @@ ListItemsComponent.propTypes = {
   onLongPress: PropTypes.func,
   rightIconName: PropTypes.string,
   onRightIconPress: PropTypes.func,
+  listSelectedStyle: PropTypes.any,
   disabledKey: PropTypes.string,
   disabledValue: PropTypes.string,
   emptyTitle: PropTypes.string,
@@ -76,13 +77,17 @@ function ListItemsComponent(props) {
           leftElement={leftElement && leftElement.bind(this, item)}
           rightElement={rightElement && rightElement.bind(this, item)}
           rightIcon={
-            rightIconName && (
+            rightIconName && !item.isSelect ? (
               <Icon
                 color={Colors.grey200}
                 size={wp(6)}
                 name={rightIconName}
                 onPress={onRightIconPress && onRightIconPress.bind(this, item)}
               />
+            ) : (
+              item.isSelect && (
+                <Icon color={Colors.grey200} size={wp(6)} name="check" />
+              )
             )
           }
           leftAvatar={
@@ -92,10 +97,7 @@ function ListItemsComponent(props) {
           }
           onPress={onPress && onPress.bind(this, item)}
           onLongPress={onLongPress && onLongPress.bind(this, item)}
-          containerStyle={[
-            styles.listContainer,
-            item.isSelect && {...listSelectedStyle},
-          ]}
+          containerStyle={styles.listContainer}
           titleStyle={styles.title}
           subtitleStyle={styles.subtitle}
           titleProps={{numberOfLines: 1}}
