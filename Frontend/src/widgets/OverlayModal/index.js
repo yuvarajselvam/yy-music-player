@@ -6,19 +6,29 @@ import {styles} from './overlay.modal.styles';
 
 OverlayModal.propTypes = {
   visible: PropTypes.bool,
+  fullScreen: PropTypes.bool,
   position: PropTypes.string,
   onBackdropPress: PropTypes.func,
+  backHandler: PropTypes.func,
   children: PropTypes.any,
 };
 
 export function OverlayModal(props) {
-  const {children, visible, position, onBackdropPress} = props;
+  const {
+    children,
+    visible,
+    fullScreen,
+    position,
+    onBackdropPress,
+    backHandler,
+  } = props;
   let overlayPosition = 'center';
   if (position === 'bottom') {
     overlayPosition = 'flex-end';
   }
   return (
     <Modal
+      onRequestClose={backHandler}
       statusBarTranslucent={false}
       animationType="slide"
       transparent={true}
@@ -27,11 +37,14 @@ export function OverlayModal(props) {
         style={[
           styles.overlayContainer,
           {justifyContent: `${overlayPosition}`},
+          fullScreen ? {padding: 0} : null,
         ]}>
         <TouchableWithoutFeedback onPress={onBackdropPress}>
           <View style={styles.modelBackdrop} />
         </TouchableWithoutFeedback>
-        <View style={styles.overlayContent}>{children}</View>
+        <View style={[styles.overlayContent, fullScreen ? {flex: 1} : null]}>
+          {children}
+        </View>
       </View>
     </Modal>
   );
