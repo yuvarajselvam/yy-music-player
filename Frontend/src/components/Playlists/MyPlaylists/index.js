@@ -130,6 +130,7 @@ function CreatePlaylistOverlay(props) {
       name: playlistName,
       owner: userInfo.id,
       scope: SCOPES.PRIVATE,
+      type: 'user',
     };
     if (isPublic) {
       data.scope = SCOPES.PUBLIC;
