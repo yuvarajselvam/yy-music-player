@@ -1,75 +1,37 @@
-import uuid
-import inspect
 import neotime
 import requests
 import datetime
 
-from py2neo import Node, Relationship
+from py2neo import Relationship
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
 
+from models.BaseModel import Entity, require_node
 
 from utils import validation
+from utils.enums import AccountType
 from utils.extensions import neo4j
 
 
 graph = neo4j.get_db()
 
 
-class Account:
+class Account(Entity):
     _resource_prefix = 'ACC'
     _required_fields = ["externalId", "token", "type"]
-    _id = \
-        _externalId = \
+    _externalId = \
         _token = \
         _type = \
         _photoUrl = \
-        _lastRefreshedAt = \
-        _updatedAt = \
-        _createdAt = \
-        _node = None
-
-    _allowed_types = {"GOOGLE", "FACEBOOK"}
-
-    def __init__(self, *args, **kwargs):
-        [setattr(self, k, v) for arg in args for k, v in arg.items() if hasattr(self, k)]
-        [setattr(self, k, v) for k, v in kwargs.items() if hasattr(self, k)]
-
-    def json(self):
-        attributes = inspect.getmembers(self, lambda a: not (inspect.isroutine(a)))
-        return dict([(a, v) for a, v in attributes if not (a.startswith('_')) and v])
-
-    def validate(self):
-        for field in self._required_fields:
-            if getattr(self, field) is None:
-                raise KeyError(f"{field.title()} is mandatory.")
-
-    def save(self, validate=True):
-        if validate:
-            self.validate()
-        if not self.id:
-            self.id = uuid.uuid4().hex
-            self._createdAt = neotime.DateTime.from_native(datetime.datetime.now())
-            self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
-            account = Node('Account', **self.json())
-            graph.create(account)
-            self._node = account
-        else:
-            account = Node('Account', **self.json())
-            self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
-            graph.merge(account, "Account", "id")
-            self._node = account
-
-    @classmethod
-    def find_one(cls, **kwargs):
-        account = graph.nodes.match('Account', **kwargs).first()
-        return cls(dict(account), _node=account)
+        _lastRefreshedAt = None
 
     def refresh_token(self):
-        if self.type == "GOOGLE":
+        is_authorized = False
+
+        if self.type == AccountType.GOOGLE.value:
             id_info = id_token.verify_oauth2_token(self.token, grequests.Request())
             is_authorized = id_info['iss'] in ['accounts.google.com', 'https://accounts.google.com']
-        else:
+        elif self.type == AccountType.FACEBOOK.value:
             r = requests.post(f"https://graph.facebook.com/me?fields=id,name,email&access_token={self.token}")
             is_authorized = "email" in r.text
 
@@ -81,29 +43,12 @@ class Account:
 
     # Create/Delete Relationships
 
+    @require_node
     def link_user(self, user_node):
-        if self._node:
-            account_user = Relationship(self._node, "LINKED_TO", user_node, accountType=self.type)
-            graph.create(account_user)
-        else:
-            raise Exception("Account node does not exist.")
-
-    def get_node(self):
-        return self._node
-
-    def set_node(self, node):
-        self._node = node
+        account_user = Relationship(self._node, "LINKED_TO", user_node, accountType=self.type)
+        graph.create(account_user)
 
     # Properties
-
-    @property
-    def id(self):
-        return self._id
-
-    @id.setter
-    def id(self, value):
-        validation.check_instance_type("id", value, str)
-        self._id = self._resource_prefix + value if not value.startswith(self._resource_prefix) else value
 
     @property
     def externalId(self):
@@ -125,12 +70,11 @@ class Account:
 
     @property
     def type(self):
-        return self._type
+        return self._type.value if self._type else None
 
     @type.setter
     def type(self, value):
-        validation.check_choices("type", value, self._allowed_types)
-        self._type = value.upper()
+        self._type = AccountType(value.upper())
 
     @property
     def photoUrl(self):
@@ -150,18 +94,3 @@ class Account:
     def lastRefreshedAt(self, value):
         self._lastRefreshedAt = value
 
-    @property
-    def createdAt(self):
-        return str(self._createdAt).split('.')[0] if self._createdAt else None
-
-    @createdAt.setter
-    def createdAt(self, value):
-        self._createdAt = value
-
-    @property
-    def updatedAt(self):
-        return str(self._updatedAt).split('.')[0] if self._updatedAt else None
-
-    @updatedAt.setter
-    def updatedAt(self, value):
-        self._updatedAt = value
