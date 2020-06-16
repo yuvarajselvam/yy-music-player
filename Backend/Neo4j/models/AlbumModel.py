@@ -1,46 +1,15 @@
-import inspect
+from models.BaseModel import EntityBase
 
-from py2neo import Node
-
-from utils.extensions import neo4j
 from utils.querying import get_related_nodes
 
-graph = neo4j.get_db()
 
-
-class Album:
-    _id = \
-        _name = \
+class Album(EntityBase):
+    _name = \
         _artists = \
         _imageUrl = \
-        _totalTracks = \
-        _node = None
-
-    def __init__(self, *args, **kwargs):
-        [setattr(self, k, v) for arg in args for k, v in arg.items() if hasattr(self, k)]
-        [setattr(self, k, v) for k, v in kwargs.items() if hasattr(self, k)]
-
-    def json(self):
-        attributes = inspect.getmembers(self, lambda a: not (inspect.isroutine(a)))
-        return dict([(a, v) for a, v in attributes if not (a.startswith('_')) and v])
-
-    @classmethod
-    def find_one(cls, **kwargs):
-        album = graph.nodes.match('Album', **kwargs).first()
-        return cls(dict(album), _node=album)
-
-    def get_node(self):
-        return self._node
+        _totalTracks = None
 
     # Properties
-
-    @property
-    def id(self):
-        return self._id
-
-    @id.setter
-    def id(self, value):
-        self._id = value
 
     @property
     def name(self):
