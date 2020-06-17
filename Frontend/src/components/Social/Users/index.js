@@ -2,10 +2,10 @@ import React, {useState} from 'react';
 import {View, ToastAndroid} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 
-import {Header} from '../../../widgets/Header';
+import {Header} from '../../../shared/widgets/Header';
 import {userService} from '../../../services/user.service';
 import {useAuthContext} from '../../../contexts/auth.context';
-import ListItems from '../../../widgets/ListItems';
+import ListItems from '../../../shared/components/ListItems';
 
 function UsersComponent(props) {
   const {navigation} = props;

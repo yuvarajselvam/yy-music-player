@@ -4,16 +4,16 @@ import {Button, Text} from 'react-native-elements';
 import {Colors, Switch, IconButton} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 
-import {InputBox} from '../../../widgets/InputBox';
+import {InputBox} from '../../../shared/widgets/InputBox';
 import {trackService} from '../../../services/track.service';
-import {OverlayModal} from '../../../widgets/OverlayModal';
+import {OverlayModal} from '../../../shared/components/OverlayModal';
 
 // import {mockMyPlaylists} from '../../../mocks/my.playlists';
 
 import {commonStyles} from '../../common/styles';
 import {styles} from './myplaylists.styles';
 import {useAuthContext} from '../../../contexts/auth.context';
-import ListItems from '../../../widgets/ListItems';
+import ListItems from '../../../shared/components/ListItems';
 
 const SCOPES = {
   PUBLIC: 'public',
@@ -28,9 +28,10 @@ export function MyPlaylists({navigation}) {
   const [isPlaylistMenuOverlayOpen, setIsPlaylistMenuOverlayOpen] = useState(
     false,
   );
-  const [playlistName, setPlaylistName] = useState('');
   const [playlists, setPlaylists] = useState([]);
   const [playlistId, setPlaylistId] = useState('');
+
+  const {userInfo} = useAuthContext();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -87,9 +88,8 @@ export function MyPlaylists({navigation}) {
       <CreatePlaylistOverlay
         isCreatePlaylistOverlayOpen={isCreatePlaylistOverlayOpen}
         setIsCreatePlaylistOverlayOpen={setIsCreatePlaylistOverlayOpen}
-        playlistName={playlistName}
-        setPlaylistName={setPlaylistName}
         getPlaylistService={getPlaylistService}
+        ownerId={userInfo.id}
       />
       <OverlayMenu
         playlistId={playlistId}
@@ -101,19 +101,18 @@ export function MyPlaylists({navigation}) {
   );
 }
 
-function CreatePlaylistOverlay(props) {
+export function CreatePlaylistOverlay(props) {
   const {
     isCreatePlaylistOverlayOpen,
     setIsCreatePlaylistOverlayOpen,
-    playlistName,
-    setPlaylistName,
     getPlaylistService,
+    playlistType = 'user',
+    ownerId,
   } = props;
 
   const [isPublic, setIsPublic] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
-  const {userInfo} = useAuthContext();
+  const [playlistName, setPlaylistName] = useState('');
 
   const handleBackdropPress = () => {
     setIsCreatePlaylistOverlayOpen(false);
@@ -126,11 +125,12 @@ function CreatePlaylistOverlay(props) {
       setErrorMessage('Playlist name cannot be empty');
       return;
     }
+
     let data = {
       name: playlistName,
-      owner: userInfo.id,
+      owner: ownerId,
       scope: SCOPES.PRIVATE,
-      type: 'user',
+      type: playlistType,
     };
     if (isPublic) {
       data.scope = SCOPES.PUBLIC;

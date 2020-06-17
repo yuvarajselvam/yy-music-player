@@ -4,11 +4,12 @@ import {Button, Text} from 'react-native-elements';
 import {useFocusEffect} from '@react-navigation/native';
 import {widthPercentageToDP} from 'react-native-responsive-screen';
 
-import {Header} from '../../../widgets/Header';
+import {Header} from '../../../shared/widgets/Header';
 
 import {userService} from '../../../services/user.service';
 import {useAuthContext} from '../../../contexts/auth.context';
-import ListItems from '../../../widgets/ListItems';
+import ListItems from '../../../shared/components/ListItems';
+import {groupService} from '../../../services/group.service';
 
 export function Requests(props) {
   const {navigation} = props;
@@ -29,7 +30,7 @@ export function Requests(props) {
     userService.getPendingRequests().then(async response => {
       if (response.status === 200) {
         let responseObj = await response.json();
-        // console.log('Pending list', responseObj);
+        console.log('Pending list', responseObj);
         setPendingRequests(responseObj.pendingRequests);
       } else {
         setPendingRequests([]);
@@ -38,30 +39,66 @@ export function Requests(props) {
   };
 
   const handleAcceptRequest = React.useCallback(request => {
-    let data = {
-      followee: userInfo.id,
-      follower: request.id,
-    };
-    userService.acceptRequest(data).then(response => {
-      if (response.status === 200) {
-        getPendingRequestService();
-        ToastAndroid.show('Request accepted successfully', ToastAndroid.SHORT);
-      }
-    });
+    if (request.type === 'group') {
+      let data = {
+        id: request.groupId,
+        userId: request.id,
+      };
+      groupService.acceptInvite(data).then(response => {
+        if (response.status === 200) {
+          ToastAndroid.show(
+            'Request accepted successfully',
+            ToastAndroid.SHORT,
+          );
+        }
+      });
+    } else {
+      let data = {
+        followee: userInfo.id,
+        follower: request.id,
+      };
+      userService.acceptRequest(data).then(response => {
+        if (response.status === 200) {
+          getPendingRequestService();
+          ToastAndroid.show(
+            'Request accepted successfully',
+            ToastAndroid.SHORT,
+          );
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleRejectRequest = React.useCallback(request => {
-    let data = {
-      followee: userInfo.id,
-      follower: request.id,
-    };
-    userService.rejectRequest(data).then(response => {
-      if (response.status === 200) {
-        getPendingRequestService();
-        ToastAndroid.show('Request rejected successfully', ToastAndroid.SHORT);
-      }
-    });
+    if (request.type === 'group') {
+      let data = {
+        id: request.groupId,
+        userId: request.id,
+      };
+      groupService.rejectInvite(data).then(response => {
+        if (response.status === 200) {
+          ToastAndroid.show(
+            'Request rejected successfully',
+            ToastAndroid.SHORT,
+          );
+        }
+      });
+    } else {
+      let data = {
+        followee: userInfo.id,
+        follower: request.id,
+      };
+      userService.rejectRequest(data).then(response => {
+        if (response.status === 200) {
+          getPendingRequestService();
+          ToastAndroid.show(
+            'Request rejected successfully',
+            ToastAndroid.SHORT,
+          );
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -75,17 +112,17 @@ export function Requests(props) {
       />
       <ListItems
         options={pendingRequests}
-        titleKeys={['name']}
+        titleKeys={['name', 'groupName']}
         subtitleElement={request => {
           let subtitleText = 'Request Pending';
-          if (request.type === 'received') {
+          if (!request.isSender) {
             subtitleText = 'Approve or ignore request';
           }
           return <Text>{subtitleText}</Text>;
         }}
         rightElement={request => {
           return (
-            request.type === 'received' && (
+            !request.isSender && (
               <View style={{flexDirection: 'row'}}>
                 <Button
                   containerStyle={{marginRight: widthPercentageToDP(3.2)}}

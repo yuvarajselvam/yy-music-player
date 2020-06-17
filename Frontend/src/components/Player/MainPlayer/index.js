@@ -11,7 +11,7 @@ import {useTrackPlayerProgress} from '../utils/player.hooks';
 import {usePlayerContext} from '../../../contexts/player.context';
 
 import {styles} from './mainplayer.styles';
-import {Header} from '../../../widgets/Header';
+import {Header} from '../../../shared/widgets/Header';
 
 function MainPlayerComponent(props) {
   const {navigation} = props;

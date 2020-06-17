@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {Text, Input} from 'react-native-elements';
 
-import {Header} from '../../widgets/Header';
+import {Header} from '../../shared/widgets/Header';
 
 import {commonStyles} from '../common/styles';
 import {styles} from './mymusic.styles';

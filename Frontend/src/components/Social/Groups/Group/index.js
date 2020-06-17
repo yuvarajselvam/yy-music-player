@@ -9,7 +9,7 @@ import {
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
 import {Feed} from './Feed';
-import {Header} from '../../../../widgets/Header';
+import {Header} from '../../../../shared/widgets/Header';
 import {GroupPlaylists} from './GroupPlaylists';
 import {Members} from './Members';
 import {groupService} from '../../../../services/group.service';
@@ -18,7 +18,7 @@ const Tab = createMaterialTopTabNavigator();
 
 export function Group(props) {
   const {route, navigation} = props;
-  console.log(route);
+  // console.log(route);
   const groupId = route.params.groupId;
 
   const [group, setGroup] = useState({});
