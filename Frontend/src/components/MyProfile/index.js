@@ -1,10 +1,10 @@
 import React from 'react';
 import {View} from 'react-native';
 import {Text, Avatar, Card, Badge} from 'react-native-elements';
-import {Header} from '../../widgets/Header';
+import {Header} from '../../shared/widgets/Header';
 import {useAuthContext} from '../../contexts/auth.context';
 import {styles} from './myprofile.styles';
-import ListItems from '../../widgets/ListItems';
+import ListItems from '../../shared/components/ListItems';
 
 function MyProfileComponent(props) {
   const {navigation} = props;

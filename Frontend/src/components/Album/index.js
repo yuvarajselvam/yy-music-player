@@ -4,7 +4,7 @@ import {Image, Text, Icon} from 'react-native-elements';
 import {Colors} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 
-import {Header} from '../../widgets/Header';
+import {Header} from '../../shared/widgets/Header';
 import {trackService} from '../../services/track.service';
 import {usePlayerContext} from '../../contexts/player.context';
 
@@ -12,7 +12,7 @@ import {usePlayerContext} from '../../contexts/player.context';
 
 import {commonStyles} from '../common/styles';
 import {styles} from './album.style';
-import ListItems from '../../widgets/ListItems';
+import ListItems from '../../shared/components/ListItems';
 
 export function Album(props) {
   const {navigation, route} = props;

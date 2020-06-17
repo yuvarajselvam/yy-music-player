@@ -1,6 +1,6 @@
 import React from 'react';
 import {View} from 'react-native';
-import {Header} from '../../widgets/Header';
+import {Header} from '../../shared/widgets/Header';
 
 import {commonStyles} from '../common/styles';
 import {Button} from 'react-native-elements';

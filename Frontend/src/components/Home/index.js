@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {View} from 'react-native';
 
 import {commonStyles} from '../common/styles';
-import {Header} from '../../widgets/Header';
+import {Header} from '../../shared/widgets/Header';
 import {Text} from 'react-native-elements';
 
 export function Home({navigation}) {

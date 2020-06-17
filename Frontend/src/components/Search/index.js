@@ -4,7 +4,7 @@ import {Button, SearchBar} from 'react-native-elements';
 import {IconButton, Colors, Appbar} from 'react-native-paper';
 import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
 
-import {OverlayModal} from '../../widgets/OverlayModal';
+import {OverlayModal} from '../../shared/components/OverlayModal';
 import {trackService} from '../../services/track.service';
 import {usePlayerContext} from '../../contexts/player.context';
 // import {searchResultsMock} from '../../mocks/search.list';
@@ -12,7 +12,7 @@ import {usePlayerContext} from '../../contexts/player.context';
 import {styles} from './search.styles';
 import {commonStyles} from '../common/styles';
 import {useAuthContext} from '../../contexts/auth.context';
-import ListItems from '../../widgets/ListItems';
+import ListItems from '../../shared/components/ListItems';
 
 function SearchComponent({navigation}) {
   console.log('Search screen');
