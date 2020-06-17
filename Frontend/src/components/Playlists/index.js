@@ -7,7 +7,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 const Tab = createMaterialTopTabNavigator();
 
 import {commonStyles} from '../common/styles';
-import {Header} from '../../widgets/Header';
+import {Header} from '../../shared/widgets/Header';
 import {MyPlaylists} from './MyPlaylists';
 import {SharedPlaylists} from './SharedPlaylists';
 
