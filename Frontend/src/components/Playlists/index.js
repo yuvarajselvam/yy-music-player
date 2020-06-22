@@ -1,28 +1,27 @@
 import React from 'react';
 import {View} from 'react-native';
 import {Text} from 'react-native-elements';
+import {Colors} from 'react-native-paper';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
 const Tab = createMaterialTopTabNavigator();
 
 import {commonStyles} from '../common/styles';
-import {Header} from '../../widgets/Header';
-import {Playlists} from './Playlists/playlists';
+import {Header} from '../../shared/widgets/Header';
+import {MyPlaylists} from './MyPlaylists';
 import {SharedPlaylists} from './SharedPlaylists';
 
 import {styles} from './myplaylists.styles';
-import {Colors} from 'react-native-paper';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
-export function MyPlaylists() {
+export function Playlists({navigation}) {
   return (
     <View style={commonStyles.screenStyle}>
-      <Header title="Playlist" />
+      <Header title="Playlists" navigation={navigation} />
       <Tab.Navigator
         sceneContainerStyle={{backgroundColor: '#121212'}}
-        tabBar={props => <CustomPlaylistTopbar {...props} />}
-        initialRouteName="Playlists">
-        <Tab.Screen name="Playlists" component={Playlists} />
+        tabBar={props => <CustomPlaylistTopbar {...props} />}>
+        <Tab.Screen name="MyPlaylists" component={MyPlaylists} />
         <Tab.Screen name="Shared Playlists" component={SharedPlaylists} />
       </Tab.Navigator>
     </View>
@@ -38,7 +37,7 @@ function CustomPlaylistTopbar(props) {
 
   return (
     <View style={styles.playlistTopbar}>
-      <TouchableOpacity onPress={() => navigation.navigate('Playlists')}>
+      <TouchableOpacity onPress={() => navigation.navigate('MyPlaylists')}>
         <Text
           style={[
             currentIndex === 0 ? {fontWeight: 'bold'} : null,

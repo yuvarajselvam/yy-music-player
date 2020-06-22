@@ -3,7 +3,7 @@ from py2neo.database import GraphTransactionError
 from models.UserModel import User
 from models.DeviceModel import Device
 
-from flask import Blueprint, request
+from flask import request
 from flask_restplus import Resource, Namespace
 
 from utils.response import check_required_fields, make_response

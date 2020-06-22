@@ -1,14 +1,14 @@
 from flask import request
 from flask_restplus import Namespace, Resource
 from firebase_admin.messaging import UnregisteredError
-from py2neo import DatabaseError
 
 from models.UserModel import User
 from models.DeviceModel import Device
 
 from utils.logging import Logger
-from utils.response import check_required_fields, make_response
+from utils.exceptions import AppLogicError
 from utils.notifications import NotificationUtil as Notify
+from utils.response import check_required_fields, make_response
 
 logger = Logger("follow").logger
 social_ns = Namespace('Social', description='Endpoints that perform social operations')
@@ -33,8 +33,8 @@ class FollowRequestSender(Resource):
             return make_response((f"User[{request_json['followee']}] not found.", 404))
 
         try:
-            followee.send_follow_request(follower)
-        except DatabaseError as e:
+            followee.send_follow_request(follower.get_node())
+        except AppLogicError as e:
             return make_response((str(e), 400))
 
         data_payload = {"Message": f"{follower.name} has requested to follow you.",
@@ -72,7 +72,7 @@ class FollowRequestResponder(Resource):
 
         try:
             followee.respond_to_follow_request(follower.get_node(), _op)
-        except DatabaseError as e:
+        except AppLogicError as e:
             return make_response((str(e), 400))
 
         data_payload = {"Message": f"{followee.name} has {_op.lower()}ed your follow request."}
