@@ -11,9 +11,9 @@ import {useTrackPlayerProgress} from '../utils/player.hooks';
 import {usePlayerContext} from '../../../contexts/player.context';
 
 import {styles} from './mainplayer.styles';
-import {Header} from '../../../widgets/Header';
+import {Header} from '../../../shared/widgets/Header';
 
-export function MainPlayer(props) {
+function MainPlayerComponent(props) {
   const {navigation} = props;
 
   const {
@@ -210,3 +210,7 @@ export function MainPlayer(props) {
     </View>
   );
 }
+
+const MainPlayer = React.memo(MainPlayerComponent);
+
+export {MainPlayer};

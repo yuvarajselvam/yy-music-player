@@ -1,10 +1,5 @@
-import {
-  getMethod,
-  postMethod,
-  putMethod,
-  deleteMethod,
-  getUserId,
-} from './service.util';
+import {getMethod, postMethod, putMethod, deleteMethod} from './service.util';
+import {getUniqueId} from 'react-native-device-info';
 
 export const trackService = {
   getSearch: data => {
@@ -53,25 +48,35 @@ export const trackService = {
   },
 
   getMyPlaylists: async data => {
-    let userId = await getUserId();
-    let endPoint = 'user/' + userId + '/playlists/';
+    let endPoint = 'playlists/';
     return getMethod(endPoint);
   },
 
   getSharedPlaylists: async data => {
-    let userId = await getUserId();
-    let endPoint = 'user/' + userId + '/shared-playlists/';
+    let endPoint = 'shared-playlists/';
     return getMethod(endPoint);
   },
 
   getPlaylist: async data => {
-    let userId = await getUserId();
-    let endPoint = 'user/' + userId + '/playlist/' + `${data.id}/`;
+    let endPoint = 'playlist/' + `${data.id}/`;
     return getMethod(endPoint);
   },
 
   deletePlaylist: async data => {
     let endPoint = 'playlist/' + data.id + '/delete/';
     return deleteMethod(endPoint, data);
+  },
+
+  downloadTrack: data => {
+    let endPoint = 'track/' + `${data.language}/` + `${data.id}/download/`;
+    const uniqueId = getUniqueId();
+    data.deviceId = uniqueId;
+    return postMethod(endPoint, data);
+  },
+
+  downloads: () => {
+    const uniqueId = getUniqueId();
+    let endPoint = 'device/' + uniqueId + '/downloads/';
+    return getMethod(endPoint);
   },
 };

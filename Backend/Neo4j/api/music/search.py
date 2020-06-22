@@ -2,7 +2,6 @@ from flask import request, jsonify
 from flask_restplus import Resource
 
 from utils.logging import Logger
-from utils.response import make_response
 from utils.querying import music_search
 from api.music.metadata import music_ns
 

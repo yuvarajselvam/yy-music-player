@@ -3,7 +3,7 @@ import {View} from 'react-native';
 import withObservables from '@nozbe/with-observables';
 
 import {commonStyles} from '../common/styles';
-import {Header} from '../../widgets/Header';
+import {Header} from '../../shared/widgets/Header';
 import {Text} from 'react-native-elements';
 import {database} from '../../utils/db/model';
 

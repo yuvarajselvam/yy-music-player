@@ -1,30 +1,29 @@
 import jwt
-import uuid
 import bcrypt
 import random
-import inspect
 import neotime
 import datetime
-from hmac import compare_digest
 
-from py2neo import Node, Relationship
+from hmac import compare_digest
+from py2neo import Relationship
 from py2neo.matching import RelationshipMatcher
-from py2neo import DatabaseError
+
+from models.BaseModel import Entity, require_node
 
 from utils import validation
 from utils.secrets import Secrets
 from utils.extensions import neo4j
+from utils.exceptions import AppLogicError
 from utils.querying import get_relationships, get_related_nodes
 
 
 graph = neo4j.get_db()
 
 
-class User:
+class User(Entity):
     _resource_prefix = 'USR'
     _required_fields = ["name", "email"]
-    _id = \
-        _name = \
+    _name = \
         _email = \
         _username = \
         _imageUrl = \
@@ -32,39 +31,7 @@ class User:
         _phone = \
         _password = \
         _forgotPasswordToken = \
-        _forgotPasswordRetries = \
-        _createdAt = \
-        _updatedAt = \
-        _node = None
-
-    def __init__(self, *args, **kwargs):
-        [setattr(self, k, v) for arg in args for k, v in arg.items() if hasattr(self, k)]
-        [setattr(self, k, v) for k, v in kwargs.items() if hasattr(self, k)]
-
-    def json(self):
-        attributes = inspect.getmembers(self, lambda a: not (inspect.isroutine(a)))
-        return dict([(a, v) for a, v in attributes if not (a.startswith('_')) and v])
-
-    def validate(self):
-        for field in self._required_fields:
-            if getattr(self, field) is None:
-                raise KeyError(f"{field.title()} is mandatory.")
-
-    def save(self, validate=True):
-        if validate:
-            self.validate()
-        if not self.id:
-            self.id = uuid.uuid4().hex
-            self._createdAt = neotime.DateTime.from_native(datetime.datetime.now())
-            self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
-            user = Node('User', **self.json())
-            graph.create(user)
-            self._node = user
-        else:
-            user = Node('User', **self.json())
-            self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
-            graph.merge(user, "User", "id")
-            self._node = user
+        _forgotPasswordRetries = None
 
     @classmethod
     def find_one(cls, **kwargs):
@@ -123,75 +90,92 @@ class User:
 
     # Create/Delete Relationships
 
-    def send_follow_request(self, follower):
-        follower_node = follower.get_node()
-        if self._node and follower_node and not self._node == follower_node:
-            relationships = get_relationships((follower_node, self._node))
-            if len({"REQUESTED_TO_FOLLOW", "FOLLOWS"} & relationships):
-                raise DatabaseError("User already requested to follow/follows")
-            follower_followee = Relationship(follower_node, "REQUESTED_TO_FOLLOW", self._node)
-            graph.create(follower_followee)
-            return True
-        else:
-            raise DatabaseError("Follower/Followee node does not exist.")
+    @require_node
+    def send_follow_request(self, follower_node):
+        if self._node == follower_node:
+            return
+        relationships = get_relationships((follower_node, self._node))
+        if bool({"REQUESTED_TO_FOLLOW", "FOLLOWS"} & relationships):
+            raise AppLogicError("User already requested to follow/follows.")
+        follower_followee = Relationship(follower_node, "REQUESTED_TO_FOLLOW", self._node)
+        graph.create(follower_followee)
 
+    @require_node
     def respond_to_follow_request(self, follower_node, operation):
-        if self._node and follower_node:
-            rel_match = RelationshipMatcher(graph)
-            rel = rel_match.match((follower_node, self._node), r_type='REQUESTED_TO_FOLLOW')
-            if rel.exists() and (operation.upper() == 'ACCEPT'):
-                rel = rel.first()
-                graph.separate(rel)
-                current_time = neotime.DateTime.from_native(datetime.datetime.now())
-                graph.create(Relationship(follower_node, 'FOLLOWS', self._node, since=current_time))
-        else:
-            raise DatabaseError("Follower/Followee node does not exist.")
+        rel_match = RelationshipMatcher(graph)
+        rel = rel_match.match((follower_node, self._node), r_type='REQUESTED_TO_FOLLOW')
+        if not rel.exists():
+            raise AppLogicError("User does not have a pending request from the follower.")
+        if operation.upper() == 'ACCEPT':
+            rel = rel.first()
+            graph.separate(rel)
+            current_time = neotime.DateTime.from_native(datetime.datetime.now())
+            graph.create(Relationship(follower_node, 'FOLLOWS', self._node, since=current_time))
 
+    @require_node
     def get_followers(self):
         return get_related_nodes((None, self._node), 'FOLLOWS')
 
+    @require_node
     def get_following(self):
         return get_related_nodes((self._node,), 'FOLLOWS')
 
+    @require_node
     def get_pending_requests(self):
-        sent = []
-        received = []
+        follow_requests = []
+        group_invites = []
         for followee in get_related_nodes((self._node, None), 'REQUESTED_TO_FOLLOW'):
-            followee["type"] = "sent"
-            sent.append(followee)
+            followee["type"] = "follow"
+            followee["isSender"] = True
+            follow_requests.append(followee)
         for follower in get_related_nodes((None, self._node), 'REQUESTED_TO_FOLLOW'):
-            follower["type"] = "received"
-            received.append(follower)
-        return sent + received
+            follower["type"] = "follow"
+            follower["isSender"] = False
+            follow_requests.append(follower)
 
+        rel_match = RelationshipMatcher(graph)
+        invites = rel_match.match((self._node, None), r_type='HAS_INVITED')
+        for invite in invites:
+            invited_user = invite.end_node
+            invite = dict(invite)
+            invite["id"] = invited_user["id"]
+            invite["name"] = invited_user["name"]
+            invite["type"] = "group"
+            invite["isSender"] = True
+            group_invites.append(invite)
+        rel_match = RelationshipMatcher(graph)
+        invites = rel_match.match((None, self._node), r_type='HAS_INVITED')
+        for invite in invites:
+            invitor = invite.start_node
+            invite = dict(invite)
+            invite["id"] = invitor["id"]
+            invite["name"] = invitor["name"]
+            invite["type"] = "group"
+            invite["isSender"] = False
+            group_invites.append(invite)
+        return follow_requests + group_invites
+
+    @require_node
     def get_playlists(self):
         return get_related_nodes((None, self._node), 'OWNED_BY')
 
+    @require_node
     def get_shared_playlists(self):
         return get_related_nodes((None, self._node), 'SHARED_WITH')
 
+    @require_node
+    def get_groups(self):
+        return get_related_nodes((self._node, None), 'MEMBER_OF')
+
+    @require_node
     def get_linked_accounts(self, **kwargs):
         return get_related_nodes((None, self._node), 'LINKED_TO', **kwargs)
 
+    @require_node
     def get_devices(self):
         return get_related_nodes((None, self._node), 'USED_BY')
 
-    def get_node(self):
-        return self._node
-
-    def set_node(self, node):
-        self._node = node
-
     # Properties
-
-    @property
-    def id(self):
-        return self._id
-
-    @id.setter
-    def id(self, value):
-        validation.check_instance_type("id", value, str)
-        self._id = self._resource_prefix + value if not value.startswith(self._resource_prefix) else value
 
     @property
     def name(self):
@@ -289,19 +273,3 @@ class User:
     def forgotPasswordRetries(self, value):
         validation.check_instance_type("forgot password retries", value, int)
         self._forgotPasswordRetries = value
-
-    @property
-    def createdAt(self):
-        return str(self._createdAt).split('.')[0] if self._createdAt else None
-
-    @createdAt.setter
-    def createdAt(self, value):
-        self._createdAt = value
-
-    @property
-    def updatedAt(self):
-        return str(self._updatedAt).split('.')[0] if self._updatedAt else None
-
-    @updatedAt.setter
-    def updatedAt(self, value):
-        self._updatedAt = value

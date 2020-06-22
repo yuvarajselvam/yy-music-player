@@ -8,11 +8,10 @@ import {Home} from '../Home';
 
 import {MiniPlayer} from '../Player/MiniPlayer';
 
-// import {styles} from './main.styles';
-import {MyPlaylists} from '../MyPlaylists';
 import {Search} from '../Search';
 import {Album} from '../Album';
-import {Playlist} from '../MyPlaylists/Playlist';
+import {Playlists} from '../Playlists';
+import {Playlist} from '../Playlists/Playlist';
 
 const stack = createStackNavigator();
 
@@ -32,8 +31,7 @@ export function Main({navigation}) {
         headerMode="none"
         initialRouteName={'Home'}>
         <stack.Screen name="Home" component={Home} />
-        <stack.Screen name="MyPlaylist" component={MyPlaylists} />
-        <stack.Screen name="Playlist" component={Playlist} />
+        <stack.Screen name="Playlists" component={Playlists} />
         <stack.Screen name="Search" component={Search} />
         <stack.Screen name="My Music" component={MyMusic} />
         <stack.Screen name="Album" component={Album} />
@@ -68,7 +66,7 @@ function CustomTabBar(props) {
           color={Colors.white}
         />
         <IconButton
-          onPress={() => navigation.navigate('MyPlaylist')}
+          onPress={() => navigation.navigate('Playlists')}
           icon={'playlist-music'}
           size={24}
           color={Colors.white}
