@@ -94,7 +94,7 @@ export function Album(props) {
           <ListItems
             options={albumTracks}
             titleKeys={['name']}
-            subtitleKeys={['name']}
+            subtitleKeys={['artists']}
             onPress={handleTrackSelect}
             rightIconName="more-vert"
           />

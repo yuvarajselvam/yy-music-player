@@ -1,8 +1,17 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {View, ScrollView, Keyboard, Alert, BackHandler} from 'react-native';
+import {
+  View,
+  ScrollView,
+  Keyboard,
+  Alert,
+  BackHandler,
+  PermissionsAndroid,
+  ToastAndroid,
+} from 'react-native';
 import {Button, SearchBar} from 'react-native-elements';
 import {IconButton, Colors, Appbar} from 'react-native-paper';
 import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
+import RNFetchBlob from 'rn-fetch-blob';
 
 import {OverlayModal} from '../../shared/components/OverlayModal';
 import {trackService} from '../../services/track.service';
@@ -126,7 +135,8 @@ function SearchComponent({navigation}) {
         navigation.navigate('Album', data);
       }
     },
-    [handleLongPress, handleTrackSelect, isSelectable, navigation],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isSelectable, selectedItems],
   );
 
   const handleMultiTrackAction = () => {
@@ -137,7 +147,7 @@ function SearchComponent({navigation}) {
 
   const trackVerticalButton = React.useCallback(item => {
     setIsOverlayVisible(prevState => !prevState);
-    setSelectedTrackItems([item]);
+    setSelectedTrackItems(item);
   }, []);
 
   const handleLongPress = React.useCallback(
@@ -162,7 +172,7 @@ function SearchComponent({navigation}) {
       updatedSearchResults[index] = itemObj;
       setSearchResults(updatedSearchResults);
     },
-    [searchResults, selectedItems],
+    [selectedItems, searchResults],
   );
 
   const handleRemoveSelectedItems = () => {
@@ -208,10 +218,9 @@ function SearchComponent({navigation}) {
           isPlaylistsOverlayOpen={isPlaylistsOverlayOpen}
           setIsPlaylistsOverlayOpen={setIsPlaylistsOverlayOpen}
           actionType={actionType}
-          selectedTrackItems={selectedTrackItems}
+          selectedItems={selectedItems}
           setIsSelectable={setIsSelectable}
-          setSelectedTrackItems={setSelectedTrackItems}
-          setSelectedItems={setSelectedItems}
+          handleRemoveSelectedItems={handleRemoveSelectedItems}
         />
       )}
       {isOverlayVisible && (
@@ -273,7 +282,11 @@ function SearchComponent({navigation}) {
               onPress={clearSearch}
             />
           }
-          leftIconContainerStyle={{padding: 0, margin: 0, alignItems: 'center'}}
+          leftIconContainerStyle={{
+            padding: 0,
+            margin: 0,
+            alignItems: 'center',
+          }}
           rightIconContainerStyle={{
             padding: 0,
             margin: 0,
@@ -307,11 +320,45 @@ function OverlayMenu(props) {
   const {
     isOverlayVisible,
     setIsOverlayVisible,
+    selectedTrackItems,
     handlePlaylistTrackEdit,
   } = props;
 
   const handleBackdropPress = () => {
     setIsOverlayVisible(false);
+  };
+
+  const handleTrackDownload = async () => {
+    console.log('Download', selectedTrackItems.language);
+    let data = {
+      id: selectedTrackItems.id,
+      language: selectedTrackItems.language,
+    };
+    let dirs = RNFetchBlob.fs.dirs;
+    console.log('Download path', dirs.DocumentDir);
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+    );
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      trackService.downloadTrack(data).then(async response => {
+        if (response.status === 200) {
+          let responseData = await response.json();
+          RNFetchBlob.config({
+            fileCache: true,
+            path: dirs.DocumentDir + `/songs/${responseData.id}.mp3`,
+          })
+            .fetch('GET', responseData.trackUrl, {})
+            .then(res => {
+              console.log('The file saved to ', res.path());
+              setIsOverlayVisible(false);
+              ToastAndroid.show(
+                'Song downloaded successfully!',
+                ToastAndroid.SHORT,
+              );
+            });
+        }
+      });
+    }
   };
 
   return (
@@ -356,6 +403,14 @@ function OverlayMenu(props) {
         title="Add to Queue"
         titleStyle={styles.overlayButtonTitle}
       />
+      <Button
+        icon={<IconButton color={Colors.grey200} icon="download" />}
+        buttonStyle={styles.overlayButtons}
+        type="clear"
+        title="Download"
+        titleStyle={styles.overlayButtonTitle}
+        onPress={handleTrackDownload}
+      />
     </OverlayModal>
   );
 }
@@ -364,14 +419,11 @@ function PlaylistsOverlay(props) {
   const {
     isPlaylistsOverlayOpen,
     setIsPlaylistsOverlayOpen,
-    setSelectedItems,
-    selectedTrackItems,
-    setSelectedTrackItems,
+    selectedItems,
+    handleRemoveSelectedItems,
     setIsSelectable,
     actionType,
   } = props;
-
-  console.log('Playlist overlay', selectedTrackItems);
 
   const [playlists, setPlaylists] = useState([]);
 
@@ -391,18 +443,16 @@ function PlaylistsOverlay(props) {
       let playlistObj = {
         id: playlist.id,
         userId: userInfo.id,
-        tracks: [],
+        tracks: selectedItems,
       };
-      selectedTrackItems.forEach(track => {
-        playlistObj.tracks.push(track);
-      });
+
+      console.log('Playlist overlay', playlistObj.tracks);
 
       if (actionType === 'add') {
         trackService.addToPlaylist(playlistObj).then(response => {
           if (response.status === 200) {
             setIsSelectable(false);
             setIsPlaylistsOverlayOpen(false);
-            setSelectedTrackItems([]);
             Alert.alert('Success!', 'Tracks added to playlist successfully');
           } else {
             Alert.alert('Failed!', 'Tracks cannot be added to Playlist');
@@ -413,7 +463,6 @@ function PlaylistsOverlay(props) {
           if (response.status === 200) {
             setIsSelectable(false);
             setIsPlaylistsOverlayOpen(false);
-            setSelectedTrackItems([]);
             Alert.alert(
               'Success!',
               'Tracks removed from playlist successfully',
@@ -423,10 +472,10 @@ function PlaylistsOverlay(props) {
           }
         });
       }
-      setSelectedItems([]);
+      handleRemoveSelectedItems();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [actionType, selectedTrackItems],
+    [actionType, selectedItems],
   );
 
   return (

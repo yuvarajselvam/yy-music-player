@@ -1,4 +1,5 @@
 import {getMethod, postMethod, putMethod, deleteMethod} from './service.util';
+import {getUniqueId} from 'react-native-device-info';
 
 export const trackService = {
   getSearch: data => {
@@ -64,5 +65,18 @@ export const trackService = {
   deletePlaylist: async data => {
     let endPoint = 'playlist/' + data.id + '/delete/';
     return deleteMethod(endPoint, data);
+  },
+
+  downloadTrack: data => {
+    let endPoint = 'track/' + `${data.language}/` + `${data.id}/download/`;
+    const uniqueId = getUniqueId();
+    data.deviceId = uniqueId;
+    return postMethod(endPoint, data);
+  },
+
+  downloads: () => {
+    const uniqueId = getUniqueId();
+    let endPoint = 'device/' + uniqueId + '/downloads/';
+    return getMethod(endPoint);
   },
 };
