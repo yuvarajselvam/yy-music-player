@@ -124,9 +124,9 @@ class EditPlaylist(Resource):
                         playlist.remove_track(track.get_node())
                     else:
                         return make_response((f"Invalid operation[{request_json['operation']}]", 400))
-                    return make_response(("Playlist edit successful.", 400))
                 except AppLogicError as e:
                     return make_response((str(e), 400))
+            return make_response(("Playlist edit successful.", 200))
         else:
             return make_response((f"User[{request.user}] does not have access to the playlist[{_id}].", 401))
 
