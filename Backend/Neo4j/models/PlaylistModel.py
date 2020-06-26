@@ -71,6 +71,17 @@ class Playlist(Entity):
             playlist_user = Relationship(self._node, "SHARED_WITH", user_node)
             graph.create(playlist_user)
 
+    @require_node
+    def get_linked_devices(self):
+        query = ''
+        if self.type == PlaylistType.USER.value:
+            query = f'''
+            MATCH (p:Playlist)-[:OWNED_BY|SHARED_WITH]->(u:User)<-[:USED_BY]-(d:Device)
+            WHERE p.id = '{self.id}'
+            RETURN d
+            '''
+        return graph.run(query).data()
+
     # Properties
 
     @property

@@ -1,11 +1,13 @@
 from py2neo import Node, Relationship
 
 from models.BaseModel import Entity, require_node
+from models.TrackModel import Track
 
 from utils import validation
 from utils.enums import DeviceOs
+from utils.exceptions import AppLogicError
 from utils.extensions import neo4j
-
+from utils.querying import get_related_nodes, get_relationships
 
 graph = neo4j.get_db()
 
@@ -28,6 +30,23 @@ class Device(Entity):
     def link_user(self, user_node):
         device_user = Relationship(self._node, "USED_BY", user_node)
         graph.create(device_user)
+
+    @require_node
+    def download_track(self, track_node):
+        relationships = get_relationships((track_node, self._node))
+        if bool({"DOWNLOADED_IN"} & relationships):
+            raise AppLogicError("Track has already been downloaded in this device.")
+        track_device = Relationship(track_node, "DOWNLOADED_IN", self._node)
+        graph.create(track_device)
+
+    @require_node
+    def get_downloaded_tracks(self):
+        tracks = get_related_nodes((None, self._node), 'DOWNLOADED_IN')
+        tracks_with_album = []
+        for track in tracks:
+            track["album"] = Track.find_one(id=track["id"]).album
+            tracks_with_album.append(track)
+        return tracks_with_album
 
     # Properties
 
