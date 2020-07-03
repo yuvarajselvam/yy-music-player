@@ -31,6 +31,7 @@ export function Main({navigation}) {
         headerMode="none"
         initialRouteName={'Home'}>
         <stack.Screen name="Home" component={Home} />
+        <stack.Screen name="Playlist" component={Playlist} />
         <stack.Screen name="Playlists" component={Playlists} />
         <stack.Screen name="Search" component={Search} />
         <stack.Screen name="My Music" component={MyMusic} />

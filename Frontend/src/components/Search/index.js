@@ -5,32 +5,35 @@ import {
   Keyboard,
   Alert,
   BackHandler,
-  PermissionsAndroid,
   ToastAndroid,
 } from 'react-native';
 import {Button, SearchBar} from 'react-native-elements';
 import {IconButton, Colors, Appbar} from 'react-native-paper';
 import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
-import RNFetchBlob from 'rn-fetch-blob';
 
 import {OverlayModal} from '../../shared/components/OverlayModal';
+import ListItems from '../../shared/components/ListItems';
 import {trackService} from '../../services/track.service';
 import {usePlayerContext} from '../../contexts/player.context';
+import {useAuthContext} from '../../contexts/auth.context';
 // import {searchResultsMock} from '../../mocks/search.list';
+
+import {database} from '../../utils/db/model';
+import {downloadTracks} from '../../shared/utils/Downloads';
 
 import {styles} from './search.styles';
 import {commonStyles} from '../common/styles';
-import {useAuthContext} from '../../contexts/auth.context';
-import ListItems from '../../shared/components/ListItems';
+import {mySync} from '../../utils/db/model/sync';
+import {Q} from '@nozbe/watermelondb';
 
 function SearchComponent({navigation}) {
   console.log('Search screen');
   const [keyword, setKeyword] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
-  const [selectedTrackItems, setSelectedTrackItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [isSelectable, setIsSelectable] = useState(false);
+  const [isPlaylistsOverlayOpen, setIsPlaylistsOverlayOpen] = useState(false);
 
   const searchRef = useRef();
   const {onAddTrack, onPlay} = usePlayerContext();
@@ -141,13 +144,13 @@ function SearchComponent({navigation}) {
 
   const handleMultiTrackAction = () => {
     console.log(selectedItems);
-    setSelectedTrackItems(selectedItems);
+    setSelectedItems(selectedItems);
     setIsOverlayVisible(prevState => !prevState);
   };
 
   const trackVerticalButton = React.useCallback(item => {
     setIsOverlayVisible(prevState => !prevState);
-    setSelectedTrackItems(item);
+    setSelectedItems([item]);
   }, []);
 
   const handleLongPress = React.useCallback(
@@ -176,20 +179,21 @@ function SearchComponent({navigation}) {
   );
 
   const handleRemoveSelectedItems = () => {
-    let revertItems = [...searchResults];
-    // console.log(selectedItems);
-    selectedItems.forEach(itemObj => {
-      let itemToBeRemoved = searchResults.find(item => {
-        return item.id === itemObj.id;
+    if (isSelectable) {
+      let revertItems = [...searchResults];
+      // console.log(selectedItems);
+      selectedItems.forEach(itemObj => {
+        let itemToBeRemoved = searchResults.find(item => {
+          return item.id === itemObj.id;
+        });
+        let itemIndex = searchResults.find(item => item.id === itemObj.id);
+        itemToBeRemoved.isSelect = !itemToBeRemoved.isSelect;
+        revertItems[itemIndex] = itemToBeRemoved;
       });
-      let itemIndex = searchResults.find(item => item.id === itemObj.id);
-      itemToBeRemoved.isSelect = !itemToBeRemoved.isSelect;
-      revertItems[itemIndex] = itemToBeRemoved;
-    });
-    setSearchResults(revertItems);
-    setIsSelectable(false);
-    setSelectedTrackItems([]);
-    setSelectedItems([]);
+      setSearchResults(revertItems);
+      setIsSelectable(false);
+      setSelectedItems([]);
+    }
   };
 
   let selectedItemStyle = {
@@ -197,11 +201,7 @@ function SearchComponent({navigation}) {
     opacity: 0.9,
   };
 
-  const [isPlaylistsOverlayOpen, setIsPlaylistsOverlayOpen] = useState(false);
-  const [actionType, setActionType] = useState('');
-
   const handlePlaylistTrackEdit = type => {
-    setActionType(type);
     setIsOverlayVisible(false);
     setIsPlaylistsOverlayOpen(true);
   };
@@ -217,7 +217,6 @@ function SearchComponent({navigation}) {
         <PlaylistsOverlay
           isPlaylistsOverlayOpen={isPlaylistsOverlayOpen}
           setIsPlaylistsOverlayOpen={setIsPlaylistsOverlayOpen}
-          actionType={actionType}
           selectedItems={selectedItems}
           setIsSelectable={setIsSelectable}
           handleRemoveSelectedItems={handleRemoveSelectedItems}
@@ -228,9 +227,9 @@ function SearchComponent({navigation}) {
           handlePlaylistTrackEdit={handlePlaylistTrackEdit}
           isOverlayVisible={isOverlayVisible}
           setIsOverlayVisible={setIsOverlayVisible}
-          selectedTrackItems={selectedTrackItems}
+          selectedTrackItems={selectedItems}
           setIsSelectable={setIsSelectable}
-          setSelectedTrackItems={setSelectedTrackItems}
+          setSelectedTrackItems={setSelectedItems}
           setSelectedItems={setSelectedItems}
         />
       )}
@@ -329,36 +328,15 @@ function OverlayMenu(props) {
   };
 
   const handleTrackDownload = async () => {
-    console.log('Download', selectedTrackItems.language);
+    console.log('Download', selectedTrackItems[0].language);
     let data = {
-      id: selectedTrackItems.id,
-      language: selectedTrackItems.language,
+      id: selectedTrackItems[0].id,
+      language: selectedTrackItems[0].language,
     };
-    let dirs = RNFetchBlob.fs.dirs;
-    console.log('Download path', dirs.DocumentDir);
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-    );
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      trackService.downloadTrack(data).then(async response => {
-        if (response.status === 200) {
-          let responseData = await response.json();
-          RNFetchBlob.config({
-            fileCache: true,
-            path: dirs.DocumentDir + `/songs/${responseData.id}.mp3`,
-          })
-            .fetch('GET', responseData.trackUrl, {})
-            .then(res => {
-              console.log('The file saved to ', res.path());
-              setIsOverlayVisible(false);
-              ToastAndroid.show(
-                'Song downloaded successfully!',
-                ToastAndroid.SHORT,
-              );
-            });
-        }
-      });
-    }
+    downloadTracks(data).then(() => {
+      setIsOverlayVisible(false);
+      ToastAndroid.show('Song downloaded successfully!', ToastAndroid.SHORT);
+    });
   };
 
   return (
@@ -389,14 +367,6 @@ function OverlayMenu(props) {
         onPress={() => handlePlaylistTrackEdit('add')}
       />
       <Button
-        icon={<IconButton color={Colors.grey200} icon="playlist-remove" />}
-        buttonStyle={styles.overlayButtons}
-        type="clear"
-        title="Remove from Playlist"
-        titleStyle={styles.overlayButtonTitle}
-        onPress={() => handlePlaylistTrackEdit('remove')}
-      />
-      <Button
         icon={<IconButton color={Colors.grey200} icon="playlist-plus" />}
         buttonStyle={styles.overlayButtons}
         type="clear"
@@ -422,7 +392,6 @@ function PlaylistsOverlay(props) {
     selectedItems,
     handleRemoveSelectedItems,
     setIsSelectable,
-    actionType,
   } = props;
 
   const [playlists, setPlaylists] = useState([]);
@@ -430,15 +399,28 @@ function PlaylistsOverlay(props) {
   const {userInfo} = useAuthContext();
 
   useEffect(() => {
-    trackService.getMyPlaylists().then(async response => {
-      let responseObj = await response.json();
-      // console.log('Playlist overlay list ', responseObj);
-      setPlaylists(responseObj.playlists);
-    });
+    const playlistsCollection = database.collections.get('playlists');
+    playlistsCollection
+      .query()
+      .fetch()
+      .then(records => {
+        // console.log('Myplaylists fetch', records);
+        let playlistList = records.map(playlist => {
+          let data = {
+            id: playlist._raw.id,
+            name: playlist._raw.name,
+            owner: playlist._raw.owner,
+            scope: playlist._raw.scope,
+            type: playlist._raw.type,
+          };
+          return data;
+        });
+        setPlaylists(playlistList);
+      });
   }, [isPlaylistsOverlayOpen]);
 
-  const handlePlaylistSelect = React.useCallback(
-    playlist => {
+  const handleAddToPlaylist = React.useCallback(
+    async playlist => {
       // owner need to updated dynamically from local DB
       let playlistObj = {
         id: playlist.id,
@@ -448,34 +430,71 @@ function PlaylistsOverlay(props) {
 
       console.log('Playlist overlay', playlistObj.tracks);
 
-      if (actionType === 'add') {
-        trackService.addToPlaylist(playlistObj).then(response => {
-          if (response.status === 200) {
-            setIsSelectable(false);
-            setIsPlaylistsOverlayOpen(false);
-            Alert.alert('Success!', 'Tracks added to playlist successfully');
-          } else {
-            Alert.alert('Failed!', 'Tracks cannot be added to Playlist');
-          }
+      const tracksCollection = await database.collections.get('tracks');
+      let tracksList = await playlistObj.tracks.map(trackObj => {
+        return tracksCollection.prepareCreate(track => {
+          track._raw.id = trackObj.id;
+          track._raw.albumId = trackObj.album.id;
+          track._raw.name = trackObj.name;
+          track._raw.imageUrl = trackObj.imageUrl;
+          track._raw.artists = trackObj.artists;
         });
-      } else if (actionType === 'remove') {
-        trackService.removeFromPlaylist(playlist).then(response => {
-          if (response.status === 200) {
-            setIsSelectable(false);
-            setIsPlaylistsOverlayOpen(false);
-            Alert.alert(
-              'Success!',
-              'Tracks removed from playlist successfully',
-            );
-          } else {
-            Alert.alert('Failed!', 'Tracks cannot be removed from Playlist');
-          }
+      });
+      console.log('Adding tracksList to playlist');
+
+      const playlistsTracksCollection = await database.collections.get(
+        'playlistsTracks',
+      );
+      let playlistsTracksList = await playlistObj.tracks.map(trackObj => {
+        return playlistsTracksCollection.prepareCreate(playlistsTrack => {
+          playlistsTrack._raw.id = playlistObj.id + '__' + trackObj.id;
+          playlistsTrack._raw.playlistId = playlistObj.id;
+          playlistsTrack._raw.trackId = trackObj.id;
         });
+      });
+      console.log('Adding playlistsTracksList to playlist');
+
+      const albumsCollection = await database.collections.get('albums');
+      let albumsList = await Promise.all(
+        playlistObj.tracks.map(async trackObj => {
+          let isAlbumExists =
+            (await albumsCollection
+              .query(Q.where('id', trackObj.album.id))
+              .fetch()).length > 0;
+          console.log('Albums exists check ', isAlbumExists);
+          if (!isAlbumExists) {
+            return albumsCollection.prepareCreate(albumObj => {
+              albumObj._raw.id = trackObj.album.id;
+              albumObj._raw.name = trackObj.album.name;
+              albumObj._raw.artists = trackObj.album.artists;
+              albumObj._raw.totalTracks = trackObj.album.totalTracks;
+              albumObj._raw.releaseYear = trackObj.album.releaseYear;
+            });
+          }
+        }),
+      );
+
+      console.log('Adding albumsList to playlist', albumsList);
+
+      let batchUpdates = [...tracksList, ...playlistsTracksList, ...albumsList];
+      try {
+        await database.action(async () => {
+          await database.batch(...batchUpdates);
+        });
+        setIsSelectable(false);
+        setIsPlaylistsOverlayOpen(false);
+        handleRemoveSelectedItems();
+        Alert.alert('Success!', 'Tracks added to playlist successfully');
+        await mySync();
+      } catch (error) {
+        console.error(error);
+        Alert.alert('Failed!', 'Tracks cannot be added to Playlist');
       }
-      handleRemoveSelectedItems();
+
+      console.log('newPlaylistsTrack created successfully');
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [actionType, selectedItems],
+    [selectedItems],
   );
 
   return (
@@ -485,7 +504,7 @@ function PlaylistsOverlay(props) {
       <ListItems
         options={playlists}
         titleKeys={['name']}
-        onPress={handlePlaylistSelect}
+        onPress={handleAddToPlaylist}
       />
     </OverlayModal>
   );
