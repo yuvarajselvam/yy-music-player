@@ -1,26 +1,37 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {View, Alert, InteractionManager, ScrollView} from 'react-native';
 import {Button, Text} from 'react-native-elements';
 import {Colors, Switch, IconButton} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
+import {Q} from '@nozbe/watermelondb';
 
 import {InputBox} from '../../../shared/widgets/InputBox';
 import {trackService} from '../../../services/track.service';
 import {OverlayModal} from '../../../shared/components/OverlayModal';
 
 // import {mockMyPlaylists} from '../../../mocks/my.playlists';
+import {useAuthContext} from '../../../contexts/auth.context';
+import ListItems from '../../../shared/components/ListItems';
+
+import {mySync, playlistsSubject} from '../../../utils/db/model/sync';
+import {database} from '../../../utils/db/model';
+import {getUniqueId} from 'react-native-device-info';
 
 import {commonStyles} from '../../common/styles';
 import {styles} from './myplaylists.styles';
-import {useAuthContext} from '../../../contexts/auth.context';
-import ListItems from '../../../shared/components/ListItems';
 
 const SCOPES = {
   PUBLIC: 'public',
   PRIVATE: 'private',
 };
 
+const PLAYLIST_TYPES = {
+  USER: 'user',
+  GROUP: 'group',
+};
+
 export function MyPlaylists({navigation}) {
+  console.log('My playlists initialize');
   const [
     isCreatePlaylistOverlayOpen,
     setIsCreatePlaylistOverlayOpen,
@@ -37,20 +48,37 @@ export function MyPlaylists({navigation}) {
     React.useCallback(() => {
       getPlaylistService();
       return () => {};
-    }, []),
+    }, [getPlaylistService]),
   );
 
-  const getPlaylistService = () => {
-    trackService.getMyPlaylists().then(async response => {
-      if (response.status === 200) {
-        let responseData = await response.json();
-        // console.log('Playlists ===', responseData);
-        setPlaylists(responseData.playlists);
-      } else if (response.status === 204) {
-        setPlaylists([]);
-      }
+  useEffect(() => {
+    const playlistsSubscriber = playlistsSubject.subscribe(value => {
+      console.log('Playlists changes subscriber!!!!!', value);
+      getPlaylistService();
     });
-  };
+    return () => playlistsSubscriber.unsubscribe();
+  }, [getPlaylistService]);
+
+  const getPlaylistService = useCallback(() => {
+    const playlistsCollection = database.collections.get('playlists');
+    playlistsCollection
+      .query(Q.where('owner', userInfo.id))
+      .fetch()
+      .then(records => {
+        // console.log('Myplaylists fetch', records);
+        let playlistList = records.map(playlist => {
+          let data = {
+            id: playlist._raw.id,
+            name: playlist._raw.name,
+            owner: playlist._raw.owner,
+            scope: playlist._raw.scope,
+            type: playlist._raw.type,
+          };
+          return data;
+        });
+        setPlaylists(playlistList);
+      });
+  }, [userInfo.id]);
 
   const createPlaylist = () => {
     console.log('Creating playlist');
@@ -106,7 +134,7 @@ export function CreatePlaylistOverlay(props) {
     isCreatePlaylistOverlayOpen,
     setIsCreatePlaylistOverlayOpen,
     getPlaylistService,
-    playlistType = 'user',
+    playlistType = PLAYLIST_TYPES.USER,
     ownerId,
   } = props;
 
@@ -120,7 +148,7 @@ export function CreatePlaylistOverlay(props) {
     setIsPublic(false);
   };
 
-  const handleCreatePlaylist = () => {
+  const handleCreatePlaylist = async () => {
     if (playlistName.length < 1) {
       setErrorMessage('Playlist name cannot be empty');
       return;
@@ -135,18 +163,52 @@ export function CreatePlaylistOverlay(props) {
     if (isPublic) {
       data.scope = SCOPES.PUBLIC;
     }
-    // console.log('creating playlist', data);
-    trackService.createPlaylist(data).then(response => {
-      if (response.status === 201) {
-        setIsCreatePlaylistOverlayOpen(false);
-        setPlaylistName('');
-        setIsPublic(false);
-        getPlaylistService();
-        Alert.alert('Created!', 'Playlist created successfully');
-      } else {
-        Alert.alert('Failed!', 'Playlist cannot be created');
-      }
-    });
+    console.log('creating playlist', data);
+    if (playlistType === PLAYLIST_TYPES.GROUP) {
+      trackService.createPlaylist(data).then(async response => {
+        if (response.status === 201) {
+          setIsCreatePlaylistOverlayOpen(false);
+          setPlaylistName('');
+          setIsPublic(false);
+          getPlaylistService();
+          Alert.alert('Created!', 'Playlist created successfully');
+        } else {
+          Alert.alert('Failed!', 'Playlist cannot be created');
+        }
+      });
+    } else {
+      const playlistsCollection = database.collections.get('playlists');
+      await database.action(async () => {
+        try {
+          playlistsCollection
+            .create(playlist => {
+              let uniqueId = getUniqueId();
+              // let uniqueIdLength = uniqueId.length;
+              let uId = uniqueId.slice(0, 10);
+              playlist._raw.id =
+                'PLY' +
+                uId +
+                Math.random()
+                  .toFixed(4)
+                  .substring(2);
+              playlist._raw.name = data.name;
+              playlist._raw.owner = data.owner;
+              playlist._raw.scope = data.scope;
+              playlist._raw.type = data.type;
+            })
+            .then(async playlist => {
+              console.log('Playlsit created successfully');
+              setIsCreatePlaylistOverlayOpen(false);
+              setPlaylistName('');
+              setIsPublic(false);
+              getPlaylistService();
+            });
+        } catch (error) {
+          console.error('Playlist cannot be created', error);
+        }
+      });
+      await mySync();
+    }
   };
 
   const handlePlaylistName = value => {
@@ -189,23 +251,65 @@ function OverlayMenu(props) {
     playlistId,
   } = props;
 
-  const {userInfo} = useAuthContext();
+  const handleDeletePlaylist = async () => {
+    const playlistsCollection = await database.collections.get('playlists');
+    const playlistToBeDeleted = await playlistsCollection.find(playlistId);
+    await database.action(async () => {
+      await playlistToBeDeleted.markAsDeleted();
+    });
 
-  const handleDeletePlaylist = () => {
-    let playlist = {
-      id: playlistId,
-      userId: userInfo.id,
-    };
+    // console.log('Add tracksList to playlist');
 
-    setIsPlaylistMenuOverlayOpen(false);
-    trackService.deletePlaylist(playlist).then(response => {
-      if (response.status === 200) {
-        getPlaylistService();
-        Alert.alert('Deleted!', 'Playlist deleted successfully');
-      } else {
-        Alert.alert('Failed!', 'Playlist cannot be deleted');
+    const playlistsTracksCollection = await database.collections.get(
+      'playlistsTracks',
+    );
+
+    const playlistsTracksToBeDeleted = await playlistsTracksCollection
+      .query(Q.where('playlistId', playlistId))
+      .fetch();
+    // console.log('playlistsTracksToBeDeleted', playlistsTracksToBeDeleted);
+    playlistsTracksToBeDeleted.forEach(async playlistsTracks => {
+      // console.log('playlistsTracks', playlistsTracks);
+      const tracksCount = await playlistsTracksCollection
+        .query(Q.where('trackId', playlistsTracks._raw.trackId))
+        .fetchCount();
+      console.log(
+        'Tracks to be checked for deletion',
+        tracksCount,
+        playlistsTracks._raw.trackId,
+      );
+      if (tracksCount === 1) {
+        const tracksCollection = await database.collections.get('tracks');
+        let trackRecord = await tracksCollection.find(
+          playlistsTracks._raw.trackId,
+        );
+        await database.action(async () => {
+          await playlistsTracks.markAsDeleted();
+        });
+        if (!trackRecord._raw.isDownloaded) {
+          let tracksAlbumCount = await tracksCollection
+            .query(Q.where('albumId', trackRecord._raw.albumId))
+            .fetchCount();
+          if (tracksAlbumCount === 1) {
+            const albumsCollection = await database.collections.get('albums');
+            let albumRecord = await albumsCollection.find(
+              trackRecord._raw.albumId,
+            );
+            await database.action(async () => {
+              await albumRecord.markAsDeleted();
+            });
+          }
+          await database.action(async () => {
+            await trackRecord.markAsDeleted();
+          });
+        }
       }
     });
+    setIsPlaylistMenuOverlayOpen(false);
+    getPlaylistService();
+    await mySync();
+
+    console.log('Playlist deleted');
   };
 
   return (

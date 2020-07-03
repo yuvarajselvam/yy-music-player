@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {View, Alert, InteractionManager, ScrollView} from 'react-native';
 import {Button} from 'react-native-elements';
 import {Colors, IconButton} from 'react-native-paper';
@@ -12,6 +12,9 @@ import {commonStyles} from '../../common/styles';
 import {styles} from '../MyPlaylists/myplaylists.styles';
 import {useAuthContext} from '../../../contexts/auth.context';
 import ListItems from '../../../shared/components/ListItems';
+import {database} from '../../../utils/db/model';
+import {Q} from '@nozbe/watermelondb';
+import {playlistsSubject} from '../../../utils/db/model/sync';
 
 export function SharedPlaylists({navigation}) {
   const [isPlaylistMenuOverlayOpen, setIsPlaylistMenuOverlayOpen] = useState(
@@ -19,25 +22,44 @@ export function SharedPlaylists({navigation}) {
   );
   const [sharedPlaylists, setSharedPlaylists] = useState([]);
   const [playlistId, setPlaylistId] = useState('');
+  const {userInfo} = useAuthContext();
 
   useFocusEffect(
     React.useCallback(() => {
       getSharedPlaylistsService();
       return () => {};
-    }, [ ]),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []),
   );
 
-  const getSharedPlaylistsService = () => {
-    trackService.getSharedPlaylists().then(async response => {
-      if (response.status === 200) {
-        let responseData = await response.json();
-        console.log('Playlists ===', responseData);
-        setSharedPlaylists(responseData.sharedPlaylists);
-      } else if (response.status === 204) {
-        setSharedPlaylists([]);
-      }
+  useEffect(() => {
+    const sharedPlaylistsSubscriber = playlistsSubject.subscribe(value => {
+      getSharedPlaylistsService();
     });
-  };
+
+    return () => sharedPlaylistsSubscriber.unsubscribe();
+  }, [getSharedPlaylistsService]);
+
+  const getSharedPlaylistsService = useCallback(() => {
+    const playlistsCollection = database.collections.get('playlists');
+    playlistsCollection
+      .query(Q.where('owner', Q.notEq(userInfo.id)))
+      .fetch()
+      .then(records => {
+        // console.log('Myplaylists fetch', records);
+        let playlistList = records.map(playlist => {
+          let data = {
+            id: playlist._raw.id,
+            name: playlist._raw.name,
+            owner: playlist._raw.owner,
+            scope: playlist._raw.scope,
+            type: playlist._raw.type,
+          };
+          return data;
+        });
+        setSharedPlaylists(playlistList);
+      });
+  }, [userInfo.id]);
 
   const handlePlaylistSelect = React.useCallback(
     playlist => {

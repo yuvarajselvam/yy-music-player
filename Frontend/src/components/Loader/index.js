@@ -18,6 +18,7 @@ import {getLocalStore} from '../../utils/funtions';
 
 import {styles} from './load.styles';
 import {useAuthContext} from '../../contexts/auth.context';
+import {mySync} from '../../utils/db/model/sync';
 
 export function Loader(props) {
   const {setIsLoaded} = props;
@@ -46,6 +47,7 @@ export function Loader(props) {
           let responseData = await response.json();
           let userObj = {...responseData, authToken: info.authToken};
           setUserInfo(userObj);
+          await mySync();
           setIsLoaded(true);
         } else {
           signOut();
@@ -73,6 +75,7 @@ export function Loader(props) {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return (
     <View style={styles.indicator}>
       <Image

@@ -1,6 +1,6 @@
 import {postMethod} from './service.util';
 
-const URL_LINK = 'http://192.168.0.4:5000/';
+const URL_LINK = 'https://d99f78ad0404.ngrok.io/';
 
 export const authService = {
   userSSO: data => {
