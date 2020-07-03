@@ -174,11 +174,22 @@ class SharePlaylist(Resource):
                 data_payload = {"Message": f"Playlist has been shared with you."}
                 notify_payload = {"title": f"Playlist has been shared with you.", "body": ""}
                 for device in user.get_devices():
+                    device = Device.find_one(id=device["id"])
+                    if device.isSynced:
+                        try:
+                            Notify.send(device.token, data={"type": 'sync_now'})
+                        except UnregisteredError:
+                            logger.debug(f"Could not notify device: {device.name}")
+                        device.isSynced = False
+                    device.playlistCreated += [playlist.id]
+                    for track in playlist.tracks:
+                        device.playlistTrackCreated += [playlist.id + "__" + track["id"]]
+                    device.save()
                     try:
-                        Notify.send(token=device["token"], data=data_payload, notification=notify_payload)
+                        Notify.send(token=device.token, data=data_payload, notification=notify_payload)
                     except UnregisteredError:
-                        device = Device.find_one(id=device["id"])
-                        device.delete()
+                        logger.debug(f"Could not notify device: {device['name']}")
+
                 return make_response(("Playlist shared successfully.", 200))
             else:
                 return make_response((f"User{request.user} does not have permissions to share.", 401))

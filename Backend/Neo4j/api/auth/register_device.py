@@ -31,19 +31,27 @@ class RegisterDevice(Resource):
         if not user:
             return make_response((f"User[{user_id}] not found.", 404))
 
-        try:
-            device = Device(request_json)
-        except ValueError as e:
-            return make_response((f"Error when creating device: {str(e)}.", 400))
-
-        try:
+        device = Device.find_one(uniqueId=request_json["uniqueId"])
+        if device and device.id in [d["id"] for d in user.get_devices()]:
+            device.token = request_json["token"]
             device.save()
-            device.link_user(user.get_node())
-            return make_response((f"Device registered successfully.", 200))
-        except GraphTransactionError as e:
             return make_response((f"Device already registered: {device.name}.", 409))
-        except Exception as e:
-            return make_response((f"Error when creating device: {str(e)}.", 400))
+        else:
+            if device:
+                device.delete()
+            try:
+                device = Device(request_json)
+            except ValueError as e:
+                return make_response((f"Error when creating device: {str(e)}.", 400))
+
+            try:
+                device.save()
+                device.link_user(user.get_node())
+                return make_response((f"Device registered successfully.", 200))
+            except GraphTransactionError as e:
+                return make_response((f"Device already registered: {device.name}.", 409))
+            except Exception as e:
+                return make_response((f"Error when creating device: {str(e)}.", 400))
 
 
 device_ns.add_resource(RegisterDevice, '/register-device/')
