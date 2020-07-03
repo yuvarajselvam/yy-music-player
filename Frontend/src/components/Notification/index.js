@@ -1,8 +1,8 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {Header} from '../../widgets/Header';
-import ListItems from '../../widgets/ListItems';
+import {Header} from '../../shared/widgets/Header';
+import ListItems from '../../shared/components/ListItems';
 
 function NotificationComponent(props) {
   const {navigation} = props;

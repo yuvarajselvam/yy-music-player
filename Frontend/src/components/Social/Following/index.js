@@ -2,9 +2,9 @@ import React, {useState} from 'react';
 import {View} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 
-import {Header} from '../../../widgets/Header';
+import {Header} from '../../../shared/widgets/Header';
 import {userService} from '../../../services/user.service';
-import ListItems from '../../../widgets/ListItems';
+import ListItems from '../../../shared/components/ListItems';
 
 export function Following(props) {
   const {navigation} = props;
