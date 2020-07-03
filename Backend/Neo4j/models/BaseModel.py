@@ -45,6 +45,8 @@ class EntityBase:
     def find_one(cls, **kwargs):
         entity = cls.__name__
         entity_node = graph.nodes.match(entity, **kwargs).first()
+        if not entity_node:
+            return
         return cls(dict(entity_node), _node=entity_node)
 
     @require_node

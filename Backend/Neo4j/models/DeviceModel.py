@@ -16,12 +16,18 @@ class Device(Entity):
     _resource_prefix = 'DVC'
     _required_fields = ["token", "uniqueId"]
     _name = \
+        _isSynced = \
         _token = \
         _uniqueId = \
         _osName = \
         _osVersion = \
         _appVersion = \
         _deviceType = \
+        _playlistCreated = \
+        _playlistUpdated = \
+        _playlistDeleted = \
+        _playlistTrackCreated = \
+        _playlistTrackDeleted = \
         _model = None
 
     # Create/Delete Relationships
@@ -30,6 +36,19 @@ class Device(Entity):
     def link_user(self, user_node):
         device_user = Relationship(self._node, "USED_BY", user_node)
         graph.create(device_user)
+
+    @require_node
+    def get_track_link_count(self, track_node, tx=graph):
+        relationships = get_relationships((track_node, self._node))
+        if bool({"DOWNLOADED_IN"} & relationships):
+            return -1
+        query = f'''
+                MATCH (t:Track)-[:ADDED_TO]->(p:Playlist)-[:OWNED_BY|SHARED_WITH]->(u:User)<-[:USED_BY]-(d:Device)
+                WHERE d.id = '{self.id}' AND t.id = '{track_node["id"]}'
+                RETURN p
+                '''
+        cursor = tx.run(query)
+        return len(cursor.data())
 
     @require_node
     def download_track(self, track_node):
@@ -48,6 +67,34 @@ class Device(Entity):
             tracks_with_album.append(track)
         return tracks_with_album
 
+    @require_node
+    def clear_change_log(self):
+        self.playlistCreated = []
+        self.playlistUpdated = []
+        self.playlistDeleted = []
+        self.playlistTrackCreated = []
+        self.playlistTrackDeleted = []
+        self.isSynced = True
+        self.save()
+
+    def get_initial_sync_data(self):
+        query = f'''MATCH (p:Playlist)-[:OWNED_BY|SHARED_WITH]->(u:User)<-[:USED_BY]-(d:Device)
+                    OPTIONAL MATCH (a:Album)<-[:BELONGS_TO]-(t:Track)-[:ADDED_TO]->(p)
+                    OPTIONAL MATCH (p)-[:OWNED_BY]->(o)
+                    WHERE d.id = '{self.id}'
+                    WITH {{created: COLLECT({{id: p.id, name: p.name, type: p.type, scope: p.scope, owner: o.id}}),
+                           updated: [], deleted: [] }} as playlists, 
+                         {{created: COLLECT({{id: p.id + '__' + t.id, playlistId: p.id, trackId: t.id}}),
+                           updated: [], deleted: [] }} as playlistsTracks,
+                         {{created: COLLECT({{id: t.id, name: t.name, artists: t.artists, imageUrl: t.imageUrl, 
+                                        albumId: a.id}}),
+                           updated: [], deleted: [] }} as tracks, 
+                         {{created: COLLECT({{id: a.id, name: a.name, artists: a.artists, imageUrl: a.imageUrl, 
+                                        totalTracks: a.totalTracks, releaseYear: a.releaseYear }}),
+                           updated: [], deleted: [] }} as albums
+                    RETURN playlists, tracks, playlistsTracks, albums'''
+        return graph.run(query).data()[0]
+
     # Properties
 
     @property
@@ -60,6 +107,15 @@ class Device(Entity):
         validation.check_instance_type(field, value, str)
         validation.check_min_length(field, value, 1)
         self._name = value
+
+    @property
+    def isSynced(self):
+        return self._isSynced
+
+    @isSynced.setter
+    def isSynced(self, value):
+        validation.check_instance_type('is synced', value, bool)
+        self._isSynced = value
 
     @property
     def token(self):
@@ -123,3 +179,42 @@ class Device(Entity):
         validation.check_instance_type("Device Type", value, str)
         self._deviceType = value
 
+    @property
+    def playlistCreated(self):
+        return self._playlistCreated if self._playlistCreated else []
+
+    @playlistCreated.setter
+    def playlistCreated(self, value):
+        self._playlistCreated = value
+
+    @property
+    def playlistUpdated(self):
+        return self._playlistUpdated if self._playlistUpdated else []
+
+    @playlistUpdated.setter
+    def playlistUpdated(self, value):
+        self._playlistUpdated = value
+
+    @property
+    def playlistDeleted(self):
+        return self._playlistDeleted if self._playlistDeleted else []
+
+    @playlistDeleted.setter
+    def playlistDeleted(self, value):
+        self._playlistDeleted = value
+
+    @property
+    def playlistTrackCreated(self):
+        return self._playlistTrackCreated if self._playlistTrackCreated else []
+
+    @playlistTrackCreated.setter
+    def playlistTrackCreated(self, value):
+        self._playlistTrackCreated = value
+
+    @property
+    def playlistTrackDeleted(self):
+        return self._playlistTrackDeleted if self._playlistTrackDeleted else []
+
+    @playlistTrackDeleted.setter
+    def playlistTrackDeleted(self, value):
+        self._playlistTrackDeleted = value
