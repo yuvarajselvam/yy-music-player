@@ -168,9 +168,7 @@ class GroupInviteSender(Resource):
                 try:
                     Notify.send(token=device["token"], data=data_payload, notification=notify_payload)
                 except UnregisteredError:
-                    device = Device.find_one(id=device["id"])
-                    device.delete()
-
+                    logger.debug(f"Could not notify device: {device['name']}")
         return make_response((f"Invite(s) sent successfully.", 200))
 
 
@@ -208,8 +206,7 @@ class GroupInviteResponder(Resource):
             try:
                 Notify.send(token=device["token"], data=data_payload, notification=notify_payload)
             except UnregisteredError:
-                device = Device.find_one(id=device["id"])
-                device.delete()
+                logger.debug(f"Could not notify device: {device['name']}")
 
         return make_response((f"{current_user.name} {_op.lower()}ed the invite.", 200))
 

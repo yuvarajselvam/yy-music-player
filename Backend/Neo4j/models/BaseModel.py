@@ -45,6 +45,8 @@ class EntityBase:
     def find_one(cls, **kwargs):
         entity = cls.__name__
         entity_node = graph.nodes.match(entity, **kwargs).first()
+        if not entity_node:
+            return
         return cls(dict(entity_node), _node=entity_node)
 
     @require_node
@@ -72,21 +74,20 @@ class Entity(EntityBase):
             if getattr(self, field) is None:
                 raise KeyError(f"{field.title()} is mandatory.")
 
-    def save(self, validate=True):
+    def save(self, validate=True, tx=None):
         if validate:
             self.validate()
         if not self.id:
             self.id = uuid.uuid4().hex
+        if not self.createdAt:
             self._createdAt = neotime.DateTime.from_native(datetime.datetime.now())
-            self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
-            entity_node = Node(self._entity, **self.json(deep=False))
-            graph.create(entity_node)
-            self._node = entity_node
-        else:
-            entity_node = Node(self._entity, **self.json(deep=False))
-            self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
+        self._updatedAt = neotime.DateTime.from_native(datetime.datetime.now())
+        entity_node = Node(self._entity, **self.json(deep=False))
+        if not tx:
             graph.merge(entity_node, self._entity, "id")
-            self._node = entity_node
+        else:
+            tx.merge(entity_node, self._entity, "id")
+        self._node = entity_node
 
     @require_node
     def delete(self):

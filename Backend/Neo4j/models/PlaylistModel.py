@@ -1,7 +1,8 @@
 from py2neo import Relationship, RelationshipMatcher
 
-from models.BaseModel import Entity, require_node
+from models.UserModel import User
 from models.GroupModel import Group
+from models.BaseModel import Entity, require_node
 
 from utils import validation
 from utils.extensions import neo4j
@@ -30,7 +31,8 @@ class Playlist(Entity):
     @require_node
     def get_owner(self):
         owner_id = get_related_nodes((self._node, None), 'OWNED_BY')[0]["id"]
-        return Group.find_one(id=owner_id)
+        return Group.find_one(id=owner_id) if self.type == PlaylistType.GROUP.value \
+            else User.find_one(id=owner_id)
 
     @require_node
     def check_ownership(self, user_node):
@@ -70,6 +72,26 @@ class Playlist(Entity):
         if not bool({"OWNED_BY", "SHARED_WITH"} & relationships):
             playlist_user = Relationship(self._node, "SHARED_WITH", user_node)
             graph.create(playlist_user)
+
+    @require_node
+    def unshare(self, user_node, tx=graph):
+        rel_match = RelationshipMatcher(graph)
+        rel = rel_match.match((self._node, user_node), r_type='SHARED_WITH')
+        if not rel.exists():
+            raise AppLogicError("Playlist is not shared with the user.")
+        tx.separate(rel.first())
+
+    @require_node
+    def get_linked_devices(self, tx=graph):
+        query = ''
+        if self.type == PlaylistType.USER.value:
+            query = f'''
+            MATCH (p:Playlist)-[:OWNED_BY|SHARED_WITH]->(u:User)<-[:USED_BY]-(d:Device)
+            WHERE p.id = '{self.id}'
+            RETURN d.uniqueId as device_id
+            '''
+        cursor = tx.run(query)
+        return [d["device_id"] for d in cursor.data()]
 
     # Properties
 

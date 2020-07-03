@@ -46,8 +46,7 @@ class FollowRequestSender(Resource):
             try:
                 Notify.send(token=device["token"], data=data_payload, notification=notify_payload)
             except UnregisteredError:
-                device = Device.find_one(id=device["id"])
-                device.delete()
+                logger.debug(f"Could not notify device: {device['name']}")
 
         return make_response((f"Request sent successfully to {followee.name}", 200))
 
@@ -81,8 +80,7 @@ class FollowRequestResponder(Resource):
             try:
                 Notify.send(token=device["token"], data=data_payload, notification=notify_payload)
             except UnregisteredError:
-                device = Device.find_one(id=device["id"])
-                device.delete()
+                logger.debug(f"Could not notify device: {device['name']}")
 
         return make_response((f"{followee.name} {_op.lower()}ed the request.", 200))
 
