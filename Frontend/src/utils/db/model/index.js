@@ -4,6 +4,10 @@ import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
 import {mySchema} from './schema';
 
 import Users from './users';
+import {Tracks} from './tracks';
+import {Playlists} from './playlists';
+import {PlaylistsTracks} from './playlistsTracks';
+import {Albums} from './albums';
 
 const adapter = new SQLiteAdapter({
   dbName: 'YYMP',
@@ -12,7 +16,7 @@ const adapter = new SQLiteAdapter({
 
 const database = new Database({
   adapter,
-  modelClasses: [Users],
+  modelClasses: [Users, Tracks, Playlists, PlaylistsTracks, Albums],
   actionsEnabled: true,
 });
 

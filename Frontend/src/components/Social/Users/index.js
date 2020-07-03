@@ -26,21 +26,23 @@ function UsersComponent(props) {
     }, []),
   );
 
-  const handleRequest = React.useCallback(user => {
-    let userId = userInfo.id;
-    let data = {
-      follower: userId,
-      followee: user.id,
-    };
-    userService.followRequest(data).then(response => {
-      if (response.status === 200) {
-        ToastAndroid.show('Request sent successfully', ToastAndroid.SHORT);
-      } else {
-        ToastAndroid.show('Request failed', ToastAndroid.SHORT);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const handleRequest = React.useCallback(
+    user => {
+      let userId = userInfo.id;
+      let data = {
+        follower: userId,
+        followee: user.id,
+      };
+      userService.followRequest(data).then(response => {
+        if (response.status === 200) {
+          ToastAndroid.show('Request sent successfully', ToastAndroid.SHORT);
+        } else {
+          ToastAndroid.show('Request failed', ToastAndroid.SHORT);
+        }
+      });
+    },
+    [userInfo.id],
+  );
 
   return (
     <View style={{flex: 1}}>
