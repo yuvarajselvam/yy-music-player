@@ -1,6 +1,7 @@
 import {getLocalStore} from '../utils/funtions';
+import {getUniqueId} from 'react-native-device-info';
 
-const URL_LINK = 'https://19432c36c34b.ngrok.io/';
+const URL_LINK = 'http://d99f78ad0404.ngrok.io/';
 
 export const getMethod = async endPoint => {
   let localObj = await getLocalStore();
@@ -9,6 +10,7 @@ export const getMethod = async endPoint => {
     method: 'GET',
     headers: {
       Authorization: bearer,
+      Device: getUniqueId(),
     },
   });
 };
@@ -19,8 +21,9 @@ export const postMethod = async (endPoint, data) => {
   return fetch(URL_LINK + endPoint, {
     method: 'POST',
     headers: {
-      Authorization: bearer,
       'Content-Type': 'application/json',
+      Authorization: bearer,
+      Device: getUniqueId(),
     },
     body: JSON.stringify(data),
   });
@@ -32,8 +35,9 @@ export const putMethod = async (endPoint, data) => {
   return fetch(URL_LINK + endPoint, {
     method: 'PUT',
     headers: {
-      Authorization: bearer,
       'Content-Type': 'application/json',
+      Authorization: bearer,
+      Device: getUniqueId(),
     },
     body: JSON.stringify(data),
   });
@@ -45,8 +49,9 @@ export const deleteMethod = async (endPoint, data) => {
   return fetch(URL_LINK + endPoint, {
     method: 'DELETE',
     headers: {
-      Authorization: bearer,
       'Content-Type': 'application/json',
+      Authorization: bearer,
+      Device: getUniqueId(),
     },
     body: JSON.stringify(data),
   });

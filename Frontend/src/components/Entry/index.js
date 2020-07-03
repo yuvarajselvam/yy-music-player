@@ -23,7 +23,8 @@ import {PlayerProvider} from '../../contexts/player.context';
 import {Requests} from '../Social/Requests';
 import {Groups} from '../Social/Groups';
 import {Group} from '../Social/Groups/Group';
-import {Playlist} from '../Playlists/Playlist';
+
+import {mySync} from '../../utils/db/model/sync';
 
 const Drawer = createDrawerNavigator();
 
@@ -125,17 +126,22 @@ const CustomDrawerContent = React.memo(function CustomDrawerContent({
 export function Entry() {
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      Alert.alert(
-        'You got a notification !',
-        remoteMessage.notification.title,
-        [
-          {
-            text: 'Ok',
-            onPress: () => null,
-          },
-        ],
-      );
-      // console.log(remoteMessage.data);
+      if (remoteMessage.notification) {
+        Alert.alert(
+          'You got a notification !',
+          remoteMessage.notification.title,
+          [
+            {
+              text: 'Ok',
+              onPress: () => null,
+            },
+          ],
+        );
+      }
+      console.log('Notification', remoteMessage.data);
+      if (remoteMessage.data.type === 'sync_now') {
+        await mySync();
+      }
     });
 
     return unsubscribe;
@@ -151,7 +157,6 @@ export function Entry() {
         initialRouteName="Main">
         <Drawer.Screen name="Main" component={Main} />
         <Drawer.Screen name="Main Player" component={MainPlayer} />
-        <Drawer.Screen name="Playlist" component={Playlist} />
         <Drawer.Screen name="Notification" component={Notification} />
         <Drawer.Screen name="My Profile" component={MyProfile} />
         <Drawer.Screen name="Users" component={Users} />
