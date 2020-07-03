@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {View, KeyboardAvoidingView, ScrollView} from 'react-native';
 import {Image, Text, Button} from 'react-native-elements';
 
-import {InputBox} from '../../../widgets/InputBox';
+import {InputBox} from '../../../shared/widgets/InputBox';
 import {authService} from '../../../services/auth.service';
 import {getLocalStore} from '../../../utils/funtions';
 import {styles} from '../auth.styles';

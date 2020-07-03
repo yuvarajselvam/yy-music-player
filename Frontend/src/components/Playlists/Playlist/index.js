@@ -1,21 +1,24 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {View, ScrollView, Alert, ToastAndroid} from 'react-native';
-import {Image, Text, Button, Avatar} from 'react-native-elements';
-import {Colors, IconButton, Chip} from 'react-native-paper';
+import {Image, Text, Button} from 'react-native-elements';
+import {Colors, IconButton} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 
-import {Header} from '../../../widgets/Header';
-import {trackService} from '../../../services/track.service';
 import {usePlayerContext} from '../../../contexts/player.context';
+import {useAuthContext} from '../../../contexts/auth.context';
+
+import {Header} from '../../../shared/widgets/Header';
+import ListItems from '../../../shared/components/ListItems';
+import {OverlayModal} from '../../../shared/components/OverlayModal';
+import {UserModal} from '../../../shared/components/UserModal';
+
+import {trackService} from '../../../services/track.service';
+import {userService} from '../../../services/user.service';
 
 // import {mockPlaylist} from '../../../mocks/playlist';
 
 import {commonStyles} from '../../common/styles';
 import {styles} from './playlist.styles';
-import {useAuthContext} from '../../../contexts/auth.context';
-import ListItems from '../../../widgets/ListItems';
-import {OverlayModal} from '../../../widgets/OverlayModal';
-import {userService} from '../../../services/user.service';
 
 export function Playlist(props) {
   console.log('Playlist screen');
@@ -73,15 +76,33 @@ export function Playlist(props) {
     setTrack(trackObj);
   }, []);
 
-  const handleSharePlaylist = React.useCallback(() => {
+  const handleSharePlaylistOverlay = React.useCallback(() => {
     setIsSharePlaylistOverlayOpen(true);
   }, []);
+
+  const handleSharePlaylist = React.useCallback(
+    selectedFollowers => {
+      let data = {
+        id: playlistId,
+        people: selectedFollowers,
+      };
+      trackService.sharePlaylist(data).then(response => {
+        setIsSharePlaylistOverlayOpen(false);
+        if (response.status === 200) {
+          ToastAndroid.show('Successfully shared!', ToastAndroid.SHORT);
+        } else {
+          ToastAndroid.show('Share Unsuccessfull!', ToastAndroid.SHORT);
+        }
+      });
+    },
+    [playlistId],
+  );
 
   return (
     <View style={commonStyles.screenStyle}>
       <Header
         rightIconName="share"
-        onRightIconPress={handleSharePlaylist}
+        onRightIconPress={handleSharePlaylistOverlay}
         navigation={navigation}
         title={playlist.name}
       />
@@ -115,10 +136,12 @@ export function Playlist(props) {
         />
       )}
       {isSharePlaylistOverlayOpen && (
-        <SharePlaylistOverlay
-          playlistId={playlistId}
-          isSharePlaylistOverlayOpen={isSharePlaylistOverlayOpen}
-          setIsSharePlaylistOverlayOpen={setIsSharePlaylistOverlayOpen}
+        <UserModal
+          onDone={handleSharePlaylist}
+          isSOpen={isSharePlaylistOverlayOpen}
+          setIsOpen={setIsSharePlaylistOverlayOpen}
+          dataSource={userService.getFollowers}
+          type="followers"
         />
       )}
     </View>
@@ -175,167 +198,6 @@ function TrackOverlayMenu(props) {
           title="Change Playlist Name"
           titleStyle={styles.overlayButtonTitle}
         />
-      </View>
-    </OverlayModal>
-  );
-}
-
-function SharePlaylistOverlay(props) {
-  const {
-    isSharePlaylistOverlayOpen,
-    setIsSharePlaylistOverlayOpen,
-    playlistId,
-  } = props;
-
-  const [followers, setFollowers] = useState([]);
-  const [selectedFollowers, setSelectedFollowers] = useState([]);
-
-  const backAction = () => {
-    Alert.alert('Hold on!', 'Are you sure you want to cancel ?', [
-      {
-        text: 'No',
-        onPress: () => null,
-        style: 'cancel',
-      },
-      {
-        text: 'YES',
-        onPress: () => {
-          setIsSharePlaylistOverlayOpen(false);
-        },
-      },
-    ]);
-  };
-
-  useEffect(() => {
-    userService.getFollowers().then(async response => {
-      if (response.status === 200) {
-        let responseObj = await response.json();
-        // console.log('followers list', responseObj);
-        let responseFollowersList = responseObj.followers;
-        let edittedFollowersList = responseFollowersList.map(value => {
-          value.isSelect = false;
-          return value;
-        });
-        setFollowers(edittedFollowersList);
-      }
-    });
-    return () => {
-      setFollowers([]);
-    };
-  }, []);
-
-  const handleSharePlaylist = React.useCallback(() => {
-    let data = {
-      id: playlistId,
-      people: selectedFollowers,
-    };
-    trackService.sharePlaylist(data).then(response => {
-      if (response.status === 200) {
-        ToastAndroid.show('Successfully shared!', ToastAndroid.SHORT);
-      } else {
-        ToastAndroid.show('Share Unsuccessfull!', ToastAndroid.SHORT);
-      }
-    });
-  }, [playlistId, selectedFollowers]);
-
-  const handleChipClose = React.useCallback(
-    follower => {
-      if (selectedFollowers.includes(follower)) {
-        let filteredFollowers = selectedFollowers.filter(
-          selectedFollower => selectedFollower.id !== follower.id,
-        );
-        setSelectedFollowers(filteredFollowers);
-      }
-    },
-    [selectedFollowers],
-  );
-
-  const handleFollowerSelect = React.useCallback(
-    follower => {
-      if (selectedFollowers.includes(follower)) {
-        let filteredSelectedFollowers = selectedFollowers.filter(
-          selectedFollower => selectedFollower.id !== follower.id,
-        );
-        setSelectedFollowers(filteredSelectedFollowers);
-      } else {
-        setSelectedFollowers(prev => [...prev, follower]);
-      }
-      if (followers.includes(follower)) {
-        follower.isSelect = !follower.isSelect;
-
-        let selectedIndex = followers.indexOf(follower);
-        let updatedFollowersList = [...followers];
-        updatedFollowersList[selectedIndex] = follower;
-        setFollowers(updatedFollowersList);
-      }
-    },
-    [followers, selectedFollowers],
-  );
-
-  const selectedItemStyle = {
-    backgroundColor: Colors.deepPurpleA700,
-    opacity: 0.9,
-  };
-
-  return (
-    <OverlayModal
-      backHandler={backAction}
-      visible={isSharePlaylistOverlayOpen}
-      fullScreen={true}>
-      <View>
-        <Header
-          title="Share playlist"
-          subtitle={
-            selectedFollowers.length > 0
-              ? selectedFollowers.length + ' followers selected'
-              : 'select followers'
-          }
-          leftIconName="arrow-back"
-          onLeftIconPress={() => setIsSharePlaylistOverlayOpen(false)}
-          rightIconName="search"
-        />
-        {selectedFollowers.length > 0 && (
-          <ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
-            <View style={styles.selectedFollowersContainer}>
-              {selectedFollowers.map(follower => {
-                return (
-                  <Chip
-                    style={{margin: 2}}
-                    avatar={
-                      <Avatar
-                        rounded
-                        source={{
-                          uri:
-                            'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-                        }}
-                        onPress={() => console.log('Works!')}
-                        activeOpacity={0.7}
-                      />
-                    }
-                    onClose={() => handleChipClose(follower)}>
-                    <Text
-                      style={{color: Colors.grey800}}
-                      ellipsizeMode="middle">
-                      {follower.name}
-                    </Text>
-                  </Chip>
-                );
-              })}
-            </View>
-          </ScrollView>
-        )}
-      </View>
-      <View style={{flex: 1, justifyContent: 'space-between'}}>
-        <ScrollView>
-          <ListItems
-            options={followers}
-            titleKeys={['name']}
-            onPress={handleFollowerSelect}
-            listSelectedStyle={selectedItemStyle}
-            emptyTitle="No Followers"
-          />
-        </ScrollView>
-        <Button title="Share" onPress={handleSharePlaylist} />
       </View>
     </OverlayModal>
   );

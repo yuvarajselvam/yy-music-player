@@ -5,13 +5,13 @@ import {Colors, IconButton} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
 
 import {trackService} from '../../../services/track.service';
-import {OverlayModal} from '../../../widgets/OverlayModal';
+import {OverlayModal} from '../../../shared/components/OverlayModal';
 // import {mockMyPlaylists} from '../../mocks/my.playlists';
 
 import {commonStyles} from '../../common/styles';
 import {styles} from '../MyPlaylists/myplaylists.styles';
 import {useAuthContext} from '../../../contexts/auth.context';
-import ListItems from '../../../widgets/ListItems';
+import ListItems from '../../../shared/components/ListItems';
 
 export function SharedPlaylists({navigation}) {
   const [isPlaylistMenuOverlayOpen, setIsPlaylistMenuOverlayOpen] = useState(
@@ -24,7 +24,7 @@ export function SharedPlaylists({navigation}) {
     React.useCallback(() => {
       getSharedPlaylistsService();
       return () => {};
-    }, []),
+    }, [ ]),
   );
 
   const getSharedPlaylistsService = () => {
