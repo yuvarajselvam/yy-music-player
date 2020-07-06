@@ -16,7 +16,7 @@ class BrowserService:
     chrome_options.add_argument("--incognito")
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--log-level=3")
-    executable_path = '../executables/chromedriver.exe'
+    executable_path = '../executables/chromedriver'
     browser_pool = []
     count = 0
     semaphore = None
@@ -28,7 +28,7 @@ class BrowserService:
                                    chrome_options=cls.chrome_options)
         browser.get("https://www.jiosaavn.com/sitemap.php")
         browser.add_cookie({'name': 'web6_enabled', 'value': 'yes'})
-        browser.get('https://www.jiosaavn.com/song/vaathi-coming/OSJYckRBAFU')
+        browser.get('https://www.jiosaavn.com/song/kamar-se-jab-sarke-sadiya/FRtZY0RbRQs')
         js = "document.querySelector('p.o-layout__item:nth-child(1) > a:nth-child(1)').click();"
         browser.execute_script(js)
         del browser.requests
