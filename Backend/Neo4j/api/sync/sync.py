@@ -90,7 +90,8 @@ def get_track_album_changes(device, pt_changes):
             album_present = False
             for t in Album.find_one(id=album["id"]).tracks:
                 t_count = track_count[t["id"]] if t["id"] in track_count else 0
-                if device.get_track_link_count(Track.find_one(id=t["id"]).get_node(), tx=tx) > t_count:
+                device_track_link = device.get_track_link_count(Track.find_one(id=t["id"]).get_node(), tx=tx)
+                if device_track_link != -1 and device_track_link > t_count:
                     album_present = True
                     break
             if not album_present:
@@ -230,6 +231,18 @@ class Sync(Resource):
                                 change_logs = update_change_log(change_logs, devices, cur_device_id, p, change)
                             else:
                                 playlist.unshare(current_user.get_node(), tx=tx)
+
+            track_changes = changes["tracks"]
+            for change in track_changes:
+                if change == "updated" or change == "deleted":
+                    for t in track_changes[change]:
+                        track_node = Track.find_one(id=t["id"] if isinstance(t, dict) else t)
+                        cur_device = Device.find_one(uniqueId=cur_device_id)
+                        try:
+                            cur_device.remove_track(track_node)
+                        except AppLogicError:
+                            pass
+
             for device_id in change_logs:
                 device = Device.find_one(uniqueId=device_id)
                 if device.isSynced:

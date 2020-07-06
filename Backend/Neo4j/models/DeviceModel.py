@@ -1,4 +1,4 @@
-from py2neo import Node, Relationship
+from py2neo import Relationship, RelationshipMatcher
 
 from models.BaseModel import Entity, require_node
 from models.TrackModel import Track
@@ -66,6 +66,14 @@ class Device(Entity):
             track["album"] = Track.find_one(id=track["id"]).album
             tracks_with_album.append(track)
         return tracks_with_album
+
+    @require_node
+    def remove_track(self, track_node):
+        rel_match = RelationshipMatcher(graph)
+        rel = rel_match.match((track_node, self._node), r_type='DOWNLOADED_IN')
+        if not rel.exists():
+            raise AppLogicError("Track is not downloaded in the device.")
+        graph.separate(rel.first())
 
     @require_node
     def clear_change_log(self):
