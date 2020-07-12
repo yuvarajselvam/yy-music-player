@@ -23,12 +23,13 @@ function MiniPlayerComponent(props) {
     trackDetails,
   } = usePlayerContext();
 
-  const {bufferedPosition, duration, position} = useTrackPlayerProgress();
+  const {duration, position} = useTrackPlayerProgress();
 
   const onFavourite = () => {};
 
   const FavouriteButton = () => (
     <IconButton
+      disabled={!trackDetails.id}
       style={styles.miniPlayerButton}
       size={hp(4)}
       icon="heart"
@@ -40,6 +41,7 @@ function MiniPlayerComponent(props) {
   const PlayPauseButton = () => {
     return !isPlaying ? (
       <IconButton
+        disabled={!trackDetails.id}
         style={styles.miniPlayerButton}
         icon="play"
         size={hp(6)}
@@ -63,6 +65,7 @@ function MiniPlayerComponent(props) {
 
   return (
     <TouchableWithoutFeedback
+      disabled={!trackDetails.id}
       onPress={() => {
         console.log('Navigate to Main Player');
         navigation.navigate('Main Player');
@@ -80,6 +83,7 @@ function MiniPlayerComponent(props) {
           maximumTrackTintColor={Colors.grey800}
         />
         <ListItem
+          disabled={!trackDetails.id}
           containerStyle={styles.miniPlayer}
           title={trackDetails.name}
           titleStyle={{

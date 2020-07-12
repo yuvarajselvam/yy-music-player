@@ -4,6 +4,11 @@ import {Alert} from 'react-native';
 
 export const PlayerContext = createContext();
 
+const emptyPlayerDetails = {
+  name: 'No songs in player',
+  artists: 'Please add songs to play',
+};
+
 export const PlayerProvider = props => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [trackDetails, setTrackDetails] = useState({});
@@ -13,14 +18,7 @@ export const PlayerProvider = props => {
       console.log('Setting up the player');
       onUpdateOptions();
       // TO DO - removed and should contain actual last played track
-      await TrackPlayer.add({
-        id: 'track.id',
-        url: 'track.trackUrl',
-        title: 'track.name',
-        artist: 'trackArtistsName',
-        album: 'track.album.name',
-        artwork: 'track.imageUrl',
-      });
+      setTrackDetails(emptyPlayerDetails);
     });
     return () => onDestroy();
   }, []);
@@ -35,6 +33,7 @@ export const PlayerProvider = props => {
 
     TrackPlayer.setupPlayer().then(async () => {
       let details = {
+        id: track.id,
         name: track.name,
         imageUrl: track.imageUrl,
         artists: track.artists,
@@ -78,6 +77,7 @@ export const PlayerProvider = props => {
 
   const onReset = () => {
     TrackPlayer.reset();
+    setTrackDetails(emptyPlayerDetails);
   };
 
   const onRemove = () => {
@@ -116,6 +116,7 @@ export const PlayerProvider = props => {
       value={{
         isPlaying: isPlaying,
         trackDetails: trackDetails,
+        setTrackDetails: setTrackDetails,
         getCurrentTrackId: getCurrentTrackId,
         getTrackDetails: getTrackDetails,
         setIsPlaying: setIsPlaying,

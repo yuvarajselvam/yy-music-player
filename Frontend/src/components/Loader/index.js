@@ -47,31 +47,33 @@ export function Loader(props) {
           let responseData = await response.json();
           let userObj = {...responseData, authToken: info.authToken};
           setUserInfo(userObj);
-          await mySync();
-          setIsLoaded(true);
+          messaging()
+            .getToken()
+            .then(async token => {
+              console.log(token);
+              let deviceInfo = await getDeviceInfo();
+              let data = {
+                userId: info.userId,
+                token: token,
+                ...deviceInfo,
+              };
+              authService.registerDevice(data).then(async res => {
+                if (res.status === 200 || res.status === 409) {
+                  console.log('Device register successfull');
+                  await mySync();
+                  setIsLoaded(true);
+                } else {
+                  console.log('Device register unsuccessfull');
+                  signOut();
+                  return;
+                }
+              });
+            });
         } else {
           signOut();
           return;
         }
       });
-      messaging()
-        .getToken()
-        .then(async token => {
-          console.log(token);
-          let deviceInfo = await getDeviceInfo();
-          let data = {
-            userId: info.userId,
-            token: token,
-            ...deviceInfo,
-          };
-          authService.registerDevice(data).then(response => {
-            if (response.status === 200 || response.status === 409) {
-              console.log('Device register successfull');
-            } else {
-              console.log('Device register unsuccessfull');
-            }
-          });
-        });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
