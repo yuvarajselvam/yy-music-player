@@ -315,7 +315,7 @@ function SearchComponent({navigation}) {
   );
 }
 
-function OverlayMenu(props) {
+export function OverlayMenu(props) {
   const {
     isOverlayVisible,
     setIsOverlayVisible,
@@ -385,7 +385,8 @@ function OverlayMenu(props) {
   );
 }
 
-function PlaylistsOverlay(props) {
+// TODO - To be made into a separate component
+export function PlaylistsOverlay(props) {
   const {
     isPlaylistsOverlayOpen,
     setIsPlaylistsOverlayOpen,
@@ -505,6 +506,7 @@ function PlaylistsOverlay(props) {
         options={playlists}
         titleKeys={['name']}
         onPress={handleAddToPlaylist}
+        emptyTitle="No Playlists found!"
       />
     </OverlayModal>
   );

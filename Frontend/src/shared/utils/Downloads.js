@@ -1,6 +1,7 @@
-import RNFetchBlob from 'rn-fetch-blob';
 import {PermissionsAndroid} from 'react-native';
+import RNFetchBlob from 'rn-fetch-blob';
 import {Q} from '@nozbe/watermelondb';
+
 import {database} from '../../utils/db/model';
 import {trackService} from '../../services/track.service';
 
@@ -56,6 +57,7 @@ export async function downloadTracks(data) {
                         const newTrack = await tracksCollection.create(
                           trackRecord => {
                             trackRecord._raw.id = responseData.id;
+                            trackRecord._raw.albumId = responseData.album.id;
                             trackRecord._raw.name = responseData.name;
                             trackRecord._raw.imageUrl = responseData.imageUrl;
                             trackRecord._raw.artists = responseData.artists;
@@ -68,9 +70,10 @@ export async function downloadTracks(data) {
                           'albums',
                         );
 
-                        const isAlbumsExists = await albumsCollection.find(
-                          responseData.album.id,
-                        );
+                        const isAlbumsExists =
+                          (await albumsCollection.query(
+                            Q.where('id', responseData.album.id),
+                          ).fetchCount.length) > 0;
 
                         if (!isAlbumsExists) {
                           const newAlbum = albumsCollection.create(albumObj => {
@@ -103,3 +106,43 @@ export async function downloadTracks(data) {
     });
   }
 }
+
+export const removeDownloadedTrack = async track => {
+  let path = track.trackUrl;
+  const tracksCollection = await database.collections.get('tracks');
+  const playlistsTracksCollection = await database.collections.get(
+    'playlistsTracks',
+  );
+  const trackRecordToBeDeleted = await tracksCollection.find(track.id);
+  const isPlaylistsTracks =
+    (await playlistsTracksCollection
+      .query(Q.where('trackId', track.id))
+      .fetchCount().length) > 0;
+  let isOtherTracksPresent =
+    (await tracksCollection
+      .query(
+        Q.where('id', Q.notEq(track.id)),
+        Q.where('albumId', track.album.id),
+      )
+      .fetchCount().length) > 0;
+
+  if (isPlaylistsTracks || isOtherTracksPresent) {
+    await database.action(async () => {
+      await trackRecordToBeDeleted.update(trackRecord => {
+        trackRecord._raw.isDownloaded = false;
+        trackRecord._raw.path = null;
+      });
+    });
+  } else {
+    let albumRecord = await database.collections
+      .get('albums')
+      .find(track.album.id);
+    await database.action(async () => {
+      await trackRecordToBeDeleted.markAsDeleted();
+    });
+    await database.action(async () => {
+      await albumRecord.markAsDeleted();
+    });
+  }
+  return await RNFetchBlob.fs.unlink(path);
+};

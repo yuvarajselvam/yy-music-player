@@ -13,14 +13,19 @@ import {usePlayerContext} from '../../contexts/player.context';
 import {commonStyles} from '../common/styles';
 import {styles} from './album.style';
 import ListItems from '../../shared/components/ListItems';
+import {OverlayMenu, PlaylistsOverlay} from '../Search';
 
 export function Album(props) {
   const {navigation, route} = props;
   let albumId = route.params.id;
   let albumlanguage = route.params.language;
   console.log('Album screen', albumlanguage);
+
   const [album, setAlbum] = useState({artists: [{name: ''}]});
   const [albumTracks, setAlbumTracks] = useState([]);
+  const [isTrackOverlayOpen, setIsTrackOverlayOpen] = useState(false);
+  const [isPlaylistsOverlayOpen, setIsPlaylistsOverlayOpen] = useState(false);
+  const [selectedTrack, setSelectedTrack] = useState([]);
 
   const {onAddTrack, onPlay} = usePlayerContext();
 
@@ -67,6 +72,18 @@ export function Album(props) {
     [albumlanguage],
   );
 
+  const handleTrackMenuOverlay = track => {
+    console.log(track);
+    track.album = album;
+    setSelectedTrack([track]);
+    setIsTrackOverlayOpen(true);
+  };
+
+  const handlePlaylistTrackEdit = type => {
+    setIsTrackOverlayOpen(false);
+    setIsPlaylistsOverlayOpen(true);
+  };
+
   return (
     <View style={commonStyles.screenStyle}>
       <Header navigation={navigation} />
@@ -97,9 +114,27 @@ export function Album(props) {
             subtitleKeys={['artists']}
             onPress={handleTrackSelect}
             rightIconName="more-vert"
+            onRightIconPress={handleTrackMenuOverlay}
           />
         </View>
       </ScrollView>
+      {isTrackOverlayOpen && (
+        <OverlayMenu
+          isOVerlayVisible={isTrackOverlayOpen}
+          setIsOverlayVisible={setIsTrackOverlayOpen}
+          selectedTrackItems={selectedTrack}
+          handlePlaylistTrackEdit={handlePlaylistTrackEdit}
+        />
+      )}
+      {isPlaylistsOverlayOpen && (
+        <PlaylistsOverlay
+          isPlaylistsOverlayOpen={isPlaylistsOverlayOpen}
+          setIsPlaylistsOverlayOpen={setIsPlaylistsOverlayOpen}
+          selectedItems={selectedTrack}
+          handleRemoveSelectedItems={() => {}}
+          setIsSelectable={() => {}}
+        />
+      )}
     </View>
   );
 }
