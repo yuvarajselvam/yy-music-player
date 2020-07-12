@@ -1,7 +1,7 @@
 import {getLocalStore} from '../utils/funtions';
 import {getUniqueId} from 'react-native-device-info';
 
-const URL_LINK = 'http://d99f78ad0404.ngrok.io/';
+const URL_LINK = 'http://34.72.197.44/';
 
 export const getMethod = async endPoint => {
   let localObj = await getLocalStore();
