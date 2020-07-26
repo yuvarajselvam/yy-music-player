@@ -1,4 +1,4 @@
-import {PermissionsAndroid} from 'react-native';
+import {PermissionsAndroid, Alert} from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import {Q} from '@nozbe/watermelondb';
 
@@ -13,9 +13,9 @@ export async function downloadTracks(data) {
   );
   if (granted === PermissionsAndroid.RESULTS.GRANTED) {
     return new Promise((resolve, reject) => {
-      trackService.getTrack(data).then(async response => {
-        if (response.status === 200) {
-          let responseData = await response.json();
+      trackService
+        .getTrack(data)
+        .then(responseData => {
           RNFetchBlob.config({
             fileCache: true,
             path: dirs.DocumentDir + `/songs/${responseData.id}.mp3`,
@@ -101,8 +101,11 @@ export async function downloadTracks(data) {
                   }
                 });
             });
-        }
-      });
+        })
+        .catch(err => {
+          console.log('Song error', err);
+          Alert.alert('Song cannot be downloaded at this moment');
+        });
     });
   }
 }
