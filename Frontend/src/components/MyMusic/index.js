@@ -94,6 +94,7 @@ export function MyMusic({navigation}) {
           onPress={handlePlay}
           rightIconName="more-vert"
           onRightIconPress={handleTrackOptions}
+          emptyTitle="No downloads"
         />
         {isTrackMenuOverlayOpen && (
           <TrackMenuOverlay
