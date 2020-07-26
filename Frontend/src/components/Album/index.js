@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, ScrollView} from 'react-native';
+import {View, ScrollView, Alert} from 'react-native';
 import {Image, Text, Icon} from 'react-native-elements';
 import {Colors} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
@@ -54,14 +54,17 @@ export function Album(props) {
         language: albumlanguage,
       };
       if (!track.trackUrl) {
-        trackService.getTrack(data).then(async response => {
-          if (response.status === 200) {
-            let responseObj = await response.json();
-            onAddTrack(responseObj).then(() => {
+        trackService
+          .getTrack(data)
+          .then(trackObj => {
+            onAddTrack(trackObj).then(() => {
               onPlay();
             });
-          }
-        });
+          })
+          .catch(err => {
+            console.log('Song error', err);
+            Alert.alert('Song cannot be played at this moment');
+          });
       } else {
         onAddTrack(track).then(() => {
           onPlay();
