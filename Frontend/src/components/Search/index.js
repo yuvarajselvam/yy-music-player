@@ -125,15 +125,16 @@ function SearchComponent({navigation}) {
       };
       // console.log(data);
       if (item.type === 'Track') {
-        trackService.getTrack(data).then(async response => {
-          if (response.status === 200) {
-            let responseObj = await response.json();
-            let track = responseObj;
+        trackService
+          .getTrack(data)
+          .then(track => {
+            console.log('Get Track response', track);
             handleTrackSelect(track);
-          } else {
-            Alert.alert('Oops!', 'Song cannot be played at this moment');
-          }
-        });
+          })
+          .catch(err => {
+            console.log('Song error', err);
+            Alert.alert('Song cannot be played at this moment');
+          });
       } else {
         navigation.navigate('Album', data);
       }
