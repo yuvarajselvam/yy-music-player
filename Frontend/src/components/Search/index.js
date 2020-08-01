@@ -125,15 +125,16 @@ function SearchComponent({navigation}) {
       };
       // console.log(data);
       if (item.type === 'Track') {
-        trackService.getTrack(data).then(async response => {
-          if (response.status === 200) {
-            let responseObj = await response.json();
-            let track = responseObj;
+        trackService
+          .getTrack(data)
+          .then(track => {
+            console.log('Get Track response', track);
             handleTrackSelect(track);
-          } else {
-            Alert.alert('Oops!', 'Song cannot be played at this moment');
-          }
-        });
+          })
+          .catch(err => {
+            console.log('Song error', err);
+            Alert.alert('Song cannot be played at this moment');
+          });
       } else {
         navigation.navigate('Album', data);
       }
@@ -315,7 +316,7 @@ function SearchComponent({navigation}) {
   );
 }
 
-function OverlayMenu(props) {
+export function OverlayMenu(props) {
   const {
     isOverlayVisible,
     setIsOverlayVisible,
@@ -385,7 +386,8 @@ function OverlayMenu(props) {
   );
 }
 
-function PlaylistsOverlay(props) {
+// TODO - To be made into a separate component
+export function PlaylistsOverlay(props) {
   const {
     isPlaylistsOverlayOpen,
     setIsPlaylistsOverlayOpen,
@@ -505,6 +507,7 @@ function PlaylistsOverlay(props) {
         options={playlists}
         titleKeys={['name']}
         onPress={handleAddToPlaylist}
+        emptyTitle="No Playlists found!"
       />
     </OverlayModal>
   );
