@@ -83,19 +83,23 @@ def get_track_album_changes(device, pt_changes):
         album = track.album
         if device.get_track_link_count(track.get_node(), tx=tx) == track_count[track_id]:
             t_resource = dict(track.get_node())
-            del t_resource["searchTerm"]
-            del t_resource["saavnUrl"]
+            track_fields = ["name", "imageUrl"]
+            [t_resource.pop(key, None) for key in t_resource.keys() if key not in track_fields]
             t_resource["isDownloaded"] = False
             t_resource["albumId"] = album["id"]
+            t_resource["artists"] = track.artists
             album_present = False
-            for t in Album.find_one(id=album["id"]).tracks:
+            album_object = Album.find_one(id=album["id"])
+            for t in album_object.tracks:
                 t_count = track_count[t["id"]] if t["id"] in track_count else 0
                 device_track_link = device.get_track_link_count(Track.find_one(id=t["id"]).get_node(), tx=tx)
                 if device_track_link != -1 and device_track_link > t_count:
                     album_present = True
                     break
             if not album_present:
-                del album["searchTerm"]
+                album_fields = ["name", "imageUrl", "releaseYear", "totalTracks"]
+                [album.pop(key, None) for key in album.keys() if key not in album_fields]
+                album["artists"] = album_object.artists
                 a_change_log["created"].append(album)
             t_change_log["created"].append(t_resource)
     for pt in pt_changes["deleted"]:

@@ -16,7 +16,7 @@ class BrowserService:
     chrome_options.add_argument("--incognito")
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--log-level=3")
-    executable_path = '../executables/chromedriver'
+    executable_path = '../executables/chromedriver.exe'
     browser_pool = []
     count = 0
     semaphore = None
@@ -67,7 +67,14 @@ class BrowserService:
                 el.click();
                 '''
             del browser.requests
-            browser.execute_script(js)
+            try:
+                browser.execute_script(js)
+            except Exception as e:
+                logger.debug(f"JS Error: {str(e)}")
+                browser.save_screenshot('screenshot.png')
+                with cls.lock:
+                    cls.browser_pool.append(browser)
+                return None
 
             try:
                 browser.wait_for_request("generateAuthToken", 15)

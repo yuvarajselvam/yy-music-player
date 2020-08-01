@@ -1,12 +1,14 @@
 from models.BaseModel import EntityBase
+from models.TrackModel import Track
 
 from utils.querying import get_related_nodes
 
 
 class Album(EntityBase):
     _name = \
-        _artists = \
         _imageUrl = \
+        _language = \
+        _releaseYear = \
         _totalTracks = None
 
     # Properties
@@ -20,20 +22,28 @@ class Album(EntityBase):
         self._name = value
 
     @property
-    def artists(self):
-        return self._artists
-
-    @artists.setter
-    def artists(self, value):
-        self._artists = value
-
-    @property
     def imageUrl(self):
         return self._imageUrl
 
     @imageUrl.setter
     def imageUrl(self, value):
         self._imageUrl = value
+
+    @property
+    def language(self):
+        return self._language
+
+    @language.setter
+    def language(self, value):
+        self._language = value
+
+    @property
+    def releaseYear(self):
+        return self._releaseYear
+
+    @releaseYear.setter
+    def releaseYear(self, value):
+        self._releaseYear = value
 
     @property
     def totalTracks(self):
@@ -45,4 +55,12 @@ class Album(EntityBase):
 
     @property
     def tracks(self):
-        return get_related_nodes((None, self._node), 'BELONGS_TO')
+        track_list = []
+        for track in get_related_nodes((None, self._node), 'BELONGS_TO'):
+            track["artists"] = Track.find_one(id=track["id"]).artists
+            track_list.append(track)
+        return track_list
+
+    @property
+    def artists(self):
+        return ', '.join([artist['name'] for artist in get_related_nodes((None, self._node), 'COMPOSED')])

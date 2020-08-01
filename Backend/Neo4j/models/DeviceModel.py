@@ -87,9 +87,9 @@ class Device(Entity):
 
     def get_initial_sync_data(self):
         query = f'''MATCH (p:Playlist)-[:OWNED_BY|SHARED_WITH]->(u:User)<-[:USED_BY]-(d:Device)
+                    WHERE d.id = '{self.id}'
                     OPTIONAL MATCH (a:Album)<-[:BELONGS_TO]-(t:Track)-[:ADDED_TO]->(p)
                     OPTIONAL MATCH (p)-[:OWNED_BY]->(o)
-                    WHERE d.id = '{self.id}'
                     WITH {{created: COLLECT({{id: p.id, name: p.name, type: p.type, scope: p.scope, owner: o.id}}),
                            updated: [], deleted: [] }} as playlists, 
                          {{created: COLLECT({{id: p.id + '__' + t.id, playlistId: p.id, trackId: t.id}}),
