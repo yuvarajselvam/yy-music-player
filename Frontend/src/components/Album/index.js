@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, ScrollView} from 'react-native';
+import {View, ScrollView, Alert} from 'react-native';
 import {Image, Text, Icon} from 'react-native-elements';
 import {Colors} from 'react-native-paper';
 import {useFocusEffect} from '@react-navigation/native';
@@ -13,14 +13,19 @@ import {usePlayerContext} from '../../contexts/player.context';
 import {commonStyles} from '../common/styles';
 import {styles} from './album.style';
 import ListItems from '../../shared/components/ListItems';
+import {OverlayMenu, PlaylistsOverlay} from '../Search';
 
 export function Album(props) {
   const {navigation, route} = props;
   let albumId = route.params.id;
   let albumlanguage = route.params.language;
   console.log('Album screen', albumlanguage);
+
   const [album, setAlbum] = useState({artists: [{name: ''}]});
   const [albumTracks, setAlbumTracks] = useState([]);
+  const [isTrackOverlayOpen, setIsTrackOverlayOpen] = useState(false);
+  const [isPlaylistsOverlayOpen, setIsPlaylistsOverlayOpen] = useState(false);
+  const [selectedTrack, setSelectedTrack] = useState([]);
 
   const {onAddTrack, onPlay} = usePlayerContext();
 
@@ -49,14 +54,17 @@ export function Album(props) {
         language: albumlanguage,
       };
       if (!track.trackUrl) {
-        trackService.getTrack(data).then(async response => {
-          if (response.status === 200) {
-            let responseObj = await response.json();
-            onAddTrack(responseObj).then(() => {
+        trackService
+          .getTrack(data)
+          .then(trackObj => {
+            onAddTrack(trackObj).then(() => {
               onPlay();
             });
-          }
-        });
+          })
+          .catch(err => {
+            console.log('Song error', err);
+            Alert.alert('Song cannot be played at this moment');
+          });
       } else {
         onAddTrack(track).then(() => {
           onPlay();
@@ -66,6 +74,18 @@ export function Album(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [albumlanguage],
   );
+
+  const handleTrackMenuOverlay = track => {
+    console.log(track);
+    track.album = album;
+    setSelectedTrack([track]);
+    setIsTrackOverlayOpen(true);
+  };
+
+  const handlePlaylistTrackEdit = type => {
+    setIsTrackOverlayOpen(false);
+    setIsPlaylistsOverlayOpen(true);
+  };
 
   return (
     <View style={commonStyles.screenStyle}>
@@ -97,9 +117,27 @@ export function Album(props) {
             subtitleKeys={['artists']}
             onPress={handleTrackSelect}
             rightIconName="more-vert"
+            onRightIconPress={handleTrackMenuOverlay}
           />
         </View>
       </ScrollView>
+      {isTrackOverlayOpen && (
+        <OverlayMenu
+          isOVerlayVisible={isTrackOverlayOpen}
+          setIsOverlayVisible={setIsTrackOverlayOpen}
+          selectedTrackItems={selectedTrack}
+          handlePlaylistTrackEdit={handlePlaylistTrackEdit}
+        />
+      )}
+      {isPlaylistsOverlayOpen && (
+        <PlaylistsOverlay
+          isPlaylistsOverlayOpen={isPlaylistsOverlayOpen}
+          setIsPlaylistsOverlayOpen={setIsPlaylistsOverlayOpen}
+          selectedItems={selectedTrack}
+          handleRemoveSelectedItems={() => {}}
+          setIsSelectable={() => {}}
+        />
+      )}
     </View>
   );
 }

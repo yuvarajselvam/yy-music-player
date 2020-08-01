@@ -10,9 +10,29 @@ export const trackService = {
     return getMethod(endPoint);
   },
 
-  getTrack: data => {
+  getTrack: async data => {
     let endPoint = 'track/' + `${data.language}/` + `${data.id}/`;
-    return getMethod(endPoint);
+    return new Promise((resolve, reject) => {
+      getMethod(endPoint).then(async response => {
+        let trackData = await response.json();
+        let encodedSaavnUrl = encodeURIComponent(trackData.saavnUrl);
+        fetch(
+          `https://www.jiosaavn.com/api.php?__call=song.generateAuthToken&url=${encodedSaavnUrl}&bitrate=128&api_version=4&_format=json&ctx=web6dot0&_marker=0`,
+        )
+          .then(urlResponse => urlResponse.json())
+          .then(result => {
+            console.log(result);
+            if (result.auth_url === false) {
+              reject();
+            }
+            trackData.trackUrl = result.auth_url;
+            resolve(trackData);
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      });
+    });
   },
 
   getAlbum: data => {
