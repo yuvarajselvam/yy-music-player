@@ -28,15 +28,22 @@ def get_related_nodes(nodes, rel_type, **kwargs):
         else [dict(match.end_node) for match in matches]
 
 
-def music_search(search_term):
+def music_search(search_term, languages):
     if search_term.strip():
         fuzzy_term = ' '.join([term + '~' for term in search_term.split(' ') if len(term)])
+        language_term = ' OR '.join([f"'{lang}'" for lang in languages])
         query = f'''CALL db.index.fulltext.queryNodes("searchTermIndex", "{fuzzy_term} searchTerm:{search_term}") 
-                    YIELD node
+                    YIELD node, score
+                    WITH node, CASE WHEN toLower(node.name) = toLower("{search_term}") THEN score + 10 ELSE score END as s
+                    ORDER BY s DESC LIMIT 20
                     OPTIONAL MATCH (node)-[:BELONGS_TO]->(a:Album)
-                    RETURN node.id as id, node.name as name, node.artists as artists, a as album,
-                           node.imageUrl as imageUrl, labels(node)[0] as type, 'tamil' as language                    
-                    LIMIT 20'''
+                    OPTIONAL MATCH (node)<-[r]-(art:Artist)
+                    WHERE type(r) = 'SINGER' OR type(r) = 'COMPOSED'
+                    RETURN node.id as id, node.name as name, a as album,
+                           node.imageUrl as imageUrl, labels(node)[0] as type, node.language as language,
+                           REDUCE(mergedString = "", item IN COLLECT(art.name) | mergedString + 
+                           CASE WHEN mergedString='' THEN '' ELSE ', ' END + item) AS artists
+                           '''
         cursor = graph.run(query)
         return cursor.data()
     else:
