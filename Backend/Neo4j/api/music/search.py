@@ -13,7 +13,8 @@ class MusicSearch(Resource):
     def get(self):
         """Returns matching albums/tracks given a search term"""
         search_key = request.args["searchKey"]
-        response = jsonify(searchResults=music_search(search_key), searchKey=search_key)
+        languages = request.args["languages"].split(',')
+        response = jsonify(searchResults=music_search(search_key, languages), searchKey=search_key)
         response.status_code = 200
         return response
 
