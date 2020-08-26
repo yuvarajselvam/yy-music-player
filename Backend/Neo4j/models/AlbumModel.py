@@ -27,7 +27,7 @@ class Album(EntityBase):
 
     @imageUrl.setter
     def imageUrl(self, value):
-        self._imageUrl = value
+        self._imageUrl = value.replace('150x150', '500x500')
 
     @property
     def language(self):

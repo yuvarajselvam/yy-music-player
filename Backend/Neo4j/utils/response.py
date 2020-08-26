@@ -5,7 +5,7 @@ from utils.secrets import Secrets
 from utils.logging import Logger
 
 
-logger = Logger('missing_fields').logger
+logger = Logger('album').logger
 
 
 def make_response(response_tuple):

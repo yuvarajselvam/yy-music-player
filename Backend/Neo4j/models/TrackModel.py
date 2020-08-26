@@ -12,6 +12,7 @@ class Track(EntityBase):
         _duration = \
         _releaseDate = \
         _lyrics = \
+        _highQuality = \
         _encryptedUrl = None
 
     # Properties
@@ -30,7 +31,7 @@ class Track(EntityBase):
 
     @imageUrl.setter
     def imageUrl(self, value):
-        self._imageUrl = value
+        self._imageUrl = value.replace('150x150', '500x500')
 
     @property
     def language(self):
@@ -73,6 +74,14 @@ class Track(EntityBase):
         self._lyrics = value
 
     @property
+    def highQuality(self):
+        return self._highQuality
+
+    @highQuality.setter
+    def highQuality(self, value):
+        self._highQuality = value
+
+    @property
     def encryptedUrl(self):
         return self._encryptedUrl
 
@@ -86,9 +95,9 @@ class Track(EntityBase):
 
     @property
     def artists(self):
-        return ', '.join([artist['name'] for artist in get_related_nodes((None, self._node), 'SINGER')])
+        return ', '.join([artist['name'] for artist in get_related_nodes((None, self._node), 'PRIMARY_ARTIST')])
 
-    @property
-    def trackUrl(self):
-        return BrowserService.get_track_url(self.encryptedUrl)
+    # @property
+    # def trackUrl(self):
+    #     return BrowserService.get_track_url(self.encryptedUrl)
 

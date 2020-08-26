@@ -4,7 +4,7 @@ from utils.selenium import BrowserService
 
 neo4j = Neo4j()
 NotificationUtil.init_firebase()
-BrowserService.initialize(1)
+BrowserService.initialize(0)
 
 from flask_restplus import Api
 
