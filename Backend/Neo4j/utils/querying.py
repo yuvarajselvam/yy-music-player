@@ -38,7 +38,7 @@ def music_search(search_term, languages):
                     ORDER BY s DESC LIMIT 20
                     OPTIONAL MATCH (node)-[:BELONGS_TO]->(a:Album)
                     OPTIONAL MATCH (node)<-[r]-(art:Artist)
-                    WHERE type(r) = 'SINGER' OR type(r) = 'COMPOSED'
+                    WHERE type(r) = 'PRIMARY_ARTIST' OR type(r) = 'COMPOSED'
                     RETURN node.id as id, node.name as name, a as album,
                            node.imageUrl as imageUrl, labels(node)[0] as type, node.language as language,
                            REDUCE(mergedString = "", item IN COLLECT(art.name) | mergedString + 

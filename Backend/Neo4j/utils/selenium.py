@@ -16,7 +16,7 @@ class BrowserService:
     chrome_options.add_argument("--incognito")
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--log-level=3")
-    executable_path = '../executables/chromedriver.exe'
+    executable_path = '../executables/chromedriver'
     browser_pool = []
     count = 0
     semaphore = None

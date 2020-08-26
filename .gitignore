@@ -8,3 +8,9 @@
 *__pycache__*
 .idea
 .vscode
+*.hprof
+
+ngrok.exe
+geckodriver.exe
+phantomjs.exe
+ffmpeg.exe
